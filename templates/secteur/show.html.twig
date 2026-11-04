@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ secteur.nom }} · GrimpePan{% endblock %}
+
+{% block body %}
+    <div class="titre-actions">
+        <h1>{{ secteur.nom }}</h1>
+        {% if is_granted('ROLE_USER') %}
+            <a href="{{ path('voie_new', {id: secteur.id}) }}" class="btn">+ Nouvelle voie</a>
+        {% else %}
+            <a href="{{ path('app_login') }}" class="btn btn-secondaire">Connectez-vous pour créer une voie</a>
+        {% endif %}
+    </div>
+
+    {% if secteur.description %}<p>{{ secteur.description|nl2br }}</p>{% endif %}
+
+    {{ include('voie/_liste.html.twig') }}
+{% endblock %}

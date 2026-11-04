@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Secteurs · GrimpePan{% endblock %}
+
+{% block body %}
+    <div class="titre-actions">
+        <h1>Secteurs</h1>
+        {% if is_granted('ROLE_USER') %}
+            <a href="{{ path('secteur_new') }}" class="btn">+ Nouveau secteur</a>
+        {% endif %}
+    </div>
+
+    {% if secteurs is empty %}
+        <p class="vide">Aucun secteur. Commencez par en créer un (pan, mur, dévers…).</p>
+    {% else %}
+        <ul class="liste-secteurs">
+            {% for s in secteurs %}
+                <li>
+                    <a href="{{ path('secteur_show', {id: s.id}) }}">
+                        <strong>{{ s.nom }}</strong>
+                        <small>{{ s.photos|length }} photo(s)</small>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

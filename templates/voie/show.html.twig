@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ voie.nom }} · GrimpePan{% endblock %}
+
+{% block body %}
+    <p class="fil"><a href="{{ path('secteur_show', {id: voie.photo.secteur.id}) }}">← {{ voie.photo.secteur.nom }}</a></p>
+
+    <div class="titre-actions">
+        <h1>{{ include('voie/_badge.html.twig') }} {{ voie.nom }}</h1>
+        {% if voie.auteur == app.user or is_granted('ROLE_ADMIN') %}
+            <form method="post" action="{{ path('voie_delete', {id: voie.id}) }}"
+                  onsubmit="return confirm('Supprimer cette voie ?')">
+                <input type="hidden" name="_token" value="{{ csrf_token('supprimer' ~ voie.id) }}">
+                <button class="btn btn-danger">Supprimer</button>
+            </form>
+        {% endif %}
+    </div>
+
+    {{ include('voie/_photo.html.twig', {classe: 'grande'}) }}
+
+    <ul class="legende">
+        <li><span class="pastille prise-depart"></span> Départ</li>
+        <li><span class="pastille prise-main"></span> Main</li>
+        <li><span class="pastille prise-pied"></span> Pied</li>
+        <li><span class="pastille prise-top"></span> Top</li>
+    </ul>
+
+    {% if voie.description %}<p>{{ voie.description|nl2br }}</p>{% endif %}
+
+    <p class="meta">
+        {{ voie.systeme.libelle }} · ouverte par <strong>{{ voie.auteur.pseudo }}</strong>
+        le {{ voie.creeLe|date('d/m/Y') }} · {{ voie.prises|length }} prise(s)
+    </p>
+{% endblock %}

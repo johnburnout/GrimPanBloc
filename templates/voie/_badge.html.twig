@@ -1,0 +1,5 @@
+{# Badge de cotation. Variable attendue : voie #}
+{% set c = voie.cotationEnum %}
+{% if c %}
+    <span class="badge badge-{{ voie.systeme.value }}" style="--couleur: {{ c.couleurBadge }}">{{ c.libelle }}</span>
+{% endif %}

@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Les voies</h1>
+
+    <form method="get" class="filtres">
+        <label>Secteur
+            <select name="secteur">
+                <option value="">Tous</option>
+                {% for s in secteurs %}
+                    <option value="{{ s.id }}" {{ filtre.secteur and filtre.secteur.id == s.id ? 'selected' }}>{{ s.nom }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label>Échelle
+            <select name="systeme" id="filtre-systeme">
+                <option value="">Toutes</option>
+                <option value="fr" {{ filtre.systeme and filtre.systeme.value == 'fr' ? 'selected' }}>Française</option>
+                <option value="couleur" {{ filtre.systeme and filtre.systeme.value == 'couleur' ? 'selected' }}>Couleurs</option>
+            </select>
+        </label>
+
+        {% for systeme, cotations in {fr: cotationsFr, couleur: cotationsCouleur} %}
+            <fieldset class="plage" data-systeme="{{ systeme }}">
+                {% for borne, libelle in {min: 'De', max: 'à'} %}
+                    <label>{{ libelle }}
+                        <select name="{{ borne }}">
+                            <option value="">—</option>
+                            {% for c in cotations %}
+                                <option value="{{ c.value }}" {{ attribute(filtre, borne) == c ? 'selected' }}>{{ c.libelle }}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                {% endfor %}
+            </fieldset>
+        {% endfor %}
+
+        <button type="submit" class="btn">Filtrer</button>
+    </form>
+
+    {{ include('voie/_liste.html.twig') }}
+{% endblock %}
+
+{% block javascripts %}
+<script>
+    // N'affiche (et n'envoie) que la plage de difficulté de l'échelle choisie.
+    const choix = document.getElementById('filtre-systeme');
+    const majPlages = () => document.querySelectorAll('.plage').forEach(f => {
+        const actif = f.dataset.systeme === choix.value;
+        f.hidden = !actif;
+        f.querySelectorAll('select').forEach(s => s.disabled = !actif);
+    });
+    choix.addEventListener('change', majPlages);
+    majPlages();
+</script>
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion · GrimpePan{% endblock %}
+
+{% block body %}
+<div class="carte-form">
+    <h1>Connexion</h1>
+
+    {% if error %}
+        <div class="flash flash-error">Email ou mot de passe incorrect.</div>
+    {% endif %}
+
+    <form method="post">
+        <label for="username">Email</label>
+        <input type="email" value="{{ last_username }}" name="_username" id="username" autocomplete="email" required autofocus>
+
+        <label for="password">Mot de passe</label>
+        <input type="password" name="_password" id="password" autocomplete="current-password" required>
+
+        <label class="case"><input type="checkbox" name="_remember_me"> Rester connecté</label>
+
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+        <button class="btn" type="submit">Se connecter</button>
+    </form>
+
+    <p>Pas encore de compte ? <a href="{{ path('app_register') }}">Inscription</a></p>
+</div>
+{% endblock %}

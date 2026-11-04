@@ -1,0 +1,29 @@
+{#
+    Photo d'une voie avec ses prises entourées et le reste de l'image assombri.
+    Variables : voie, classe (optionnelle)
+    Les prises sont stockées en % : on les convertit dans le repère en pixels de la photo.
+#}
+{% set photo = voie.photo %}
+{% set W = photo.largeur ?: 1000 %}
+{% set H = photo.hauteur ?: 1000 %}
+{% set trait = W * 0.005 %}
+{% set masque = 'masque-voie-' ~ voie.id %}
+<figure class="photo-voie {{ classe|default('') }}">
+    <img src="{{ asset(photo.chemin) }}" alt="Photo de la voie {{ voie.nom }}" loading="lazy">
+    <svg viewBox="0 0 {{ W }} {{ H }}" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+            <mask id="{{ masque }}">
+                <rect width="{{ W }}" height="{{ H }}" fill="white"/>
+                {% for p in voie.prises %}
+                    <circle cx="{{ p.x / 100 * W }}" cy="{{ p.y / 100 * H }}" r="{{ p.rayon / 100 * W }}" fill="black"/>
+                {% endfor %}
+            </mask>
+        </defs>
+        <rect width="{{ W }}" height="{{ H }}" fill="rgba(0,0,0,0.55)" mask="url(#{{ masque }})"/>
+        {% for p in voie.prises %}
+            <circle class="prise prise-{{ p.type.value }}"
+                    cx="{{ p.x / 100 * W }}" cy="{{ p.y / 100 * H }}" r="{{ p.rayon / 100 * W }}"
+                    stroke-width="{{ trait }}"{% if p.type.value == 'pied' %} stroke-dasharray="{{ W * 0.012 }} {{ W * 0.008 }}"{% endif %}/>
+        {% endfor %}
+    </svg>
+</figure>

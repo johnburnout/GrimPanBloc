@@ -18,3 +18,9 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+###> app ###
+/public/uploads/photos/*
+!/public/uploads/photos/.gitkeep
+.DS_Store
+###< app ###
