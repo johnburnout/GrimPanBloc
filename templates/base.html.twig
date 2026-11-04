@@ -5,17 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}GrimpePan{% endblock %}</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('logo/favicon.svg') }}">
+    <link rel="preload" href="{{ asset('fonts/bricolage-grotesque/bricolage-grotesque-latin-wght-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     {% block stylesheets %}{% endblock %}
 </head>
 <body>
 <header class="entete">
-    <a href="{{ path('app_home') }}" class="logo">
-        <picture>
-            {# Sur petit écran, le symbole seul pour laisser la place au menu #}
-            <source media="(max-width: 480px)" srcset="{{ asset('logo/mark-inverse.svg') }}" width="36" height="36">
-            <img src="{{ asset('logo/logo-inverse.svg') }}" alt="GrimpePan" width="186" height="36">
-        </picture>
+    {# SVG insérés dans la page (et non en <img>) pour que le texte du logo
+       utilise la police Bricolage Grotesque chargée par la page.
+       Sur petit écran, le symbole seul laisse la place au menu. #}
+    <a href="{{ path('app_home') }}" class="logo" aria-label="GrimpePan, accueil">
+        <span class="logo-complet">{{ source('@logo/logo-inverse.svg') }}</span>
+        <span class="logo-symbole">{{ source('@logo/mark-inverse.svg') }}</span>
     </a>
     <nav>
         <a href="{{ path('app_home') }}">Voies</a>
