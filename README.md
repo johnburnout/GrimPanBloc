@@ -1,65 +1,515 @@
 # GrimpePan
 
-Création et affichage de voies sur une structure artificielle d'escalade.
-Symfony 8.1 · Twig · Doctrine · JavaScript natif (pas de build).
+Création et affichage de blocs et de voies sur une structure artificielle d'escalade
+de type « pan ».
 
-## Fonctionnalités (V1)
+On photographie une zone du mur, on marque les prises de la voie sur la photo, on
+donne une cotation, et les autres grimpeurs peuvent la consulter puis la cocher
+comme réussie.
 
-- Inscription / connexion
-- Secteurs (pan, mur, dévers…)
-- Création de voie : envoi d'une photo (ou réutilisation d'une photo du secteur),
-  marquage des prises (départ, main, pied, top), cotation française (3a → 9c)
-  ou couleur (vert → blanc)
-- Affichage de la voie : photo assombrie, prises entourées
-- Liste des voies filtrable par secteur, échelle et plage de difficulté
-- Croix (« j'ai réussi cette voie »)
-- Modification d'une voie par son créateur : tout reste modifiable tant qu'aucun
-  autre grimpeur ne l'a réussie ; ensuite, seuls le nom et la description le restent
+**Pile technique** : Symfony 8.1 · PHP ≥ 8.4 · Twig · Doctrine ORM · MariaDB 11.8 ·
+JavaScript natif (aucune étape de build) · AssetMapper.
 
-## Installation (macOS)
+---
 
-Prérequis : PHP ≥ 8.4 avec les extensions `pdo_mysql` (MariaDB 11.8), `gd`, `exif`, `intl`, et Composer.
+## Sommaire
+
+- [Fonctionnalités](#fonctionnalités)
+- [Règles métier](#règles-métier)
+- [Installation sur un serveur Apache](#installation-sur-un-serveur-apache)
+- [Mise à jour du serveur](#mise-à-jour-du-serveur)
+- [Installation en développement (macOS)](#installation-en-développement-macos)
+- [Base de données MariaDB locale](#base-de-données-mariadb-locale)
+- [Commandes utiles](#commandes-utiles)
+- [Structure du projet](#structure-du-projet)
+- [Choix techniques](#choix-techniques)
+- [Identité visuelle](#identité-visuelle)
+- [Prochaines étapes](#prochaines-étapes)
+- [Licence](#licence)
+
+---
+
+## Fonctionnalités
+
+- **Comptes** : inscription (email, pseudo, mot de passe), connexion avec « se souvenir de moi », déconnexion.
+- **Secteurs** : zones du mur (pan, dévers, dalle…), chacune avec ses photos et ses voies.
+- **Création de voie** :
+  - envoi d'une photo (JPEG, PNG ou WebP, redressée automatiquement selon l'EXIF) ou réutilisation d'une photo du secteur ;
+  - marquage des prises sur la photo : départ, main, pied, top ;
+  - cotation française (3a → 9c) ou couleur (vert → blanc).
+- **Éditeur de prises** (tactile et souris) :
+  - toucher la photo pose une prise ;
+  - toucher une prise change son type, la faire glisser la déplace ;
+  - la gomme efface une prise, « Annuler » revient en arrière ;
+  - le curseur « Taille » règle les prochaines prises **et la dernière placée**.
+- **Affichage d'une voie** : photo assombrie, prises entourées de la couleur de leur type.
+- **Liste des voies** filtrable par secteur, échelle et plage de difficulté.
+- **Croix** : « J'ai réussi cette voie », que l'on peut aussi retirer.
+- **Modification** d'une voie par son créateur, selon les règles ci-dessous.
+- **Suppression** par le créateur ou un admin, avec un garde-fou pour les voies déjà réussies.
+
+## Règles métier
+
+| Situation | Créateur | Autre grimpeur | Admin |
+|---|---|---|---|
+| Voie que **personne d'autre** n'a réussie | modifie **tout** : photo, prises, cotation, nom, description | — | — |
+| Voie **réussie** par au moins un autre grimpeur | modifie **seulement le nom et la description** | — | — |
+| Supprimer une voie non réussie | simple confirmation | — | simple confirmation |
+| Supprimer une voie réussie | doit taper **`SUPPRIMER`** | — | doit taper **`SUPPRIMER`** |
+| Poser / retirer sa croix | oui | oui | oui |
+
+Précisions :
+
+- La croix du **créateur** sur sa propre voie ne la verrouille pas : seule celle d'un autre grimpeur le fait.
+- Si toutes les croix des autres grimpeurs sont retirées, la voie redevient entièrement modifiable.
+- Supprimer une voie supprime aussi ses prises et ses croix.
+- Les règles de modification sont dans `src/Security/VoieVoter.php`. Le serveur vérifie toutes ces règles, pas seulement l'interface.
+
+## Installation sur un serveur Apache
+
+Les commandes ci-dessous visent **Debian 13 (Trixie)**, qui fournit directement
+PHP 8.4 et MariaDB 11.8. Sur Ubuntu ou une Debian plus ancienne, il faut ajouter
+le dépôt PHP de Ondřej Surý (PHP 8.4) et le dépôt officiel de MariaDB (11.8) ;
+le reste est identique.
+
+Conventions utilisées (à adapter) :
+
+| | Valeur |
+|---|---|
+| Domaine | `grimpepan.example.org` |
+| Dossier de l'application | `/var/www/grimpepan` |
+| Utilisateur qui déploie | `deploy` |
+| Utilisateur d'Apache et de PHP-FPM | `www-data` |
+
+> **Hébergement mutualisé** (pas d'accès à la configuration d'Apache) : voir
+> [la variante en fin de section](#variante--hébergement-mutualisé).
+
+### 1. Paquets
 
 ```bash
-brew install php composer          # si besoin
-brew install symfony-cli/tap/symfony-cli   # optionnel, serveur de dev
+sudo apt update
+sudo apt install apache2 mariadb-server git unzip composer \
+  php8.4-fpm php8.4-cli php8.4-mysql php8.4-gd php8.4-intl \
+  php8.4-mbstring php8.4-xml php8.4-curl php8.4-zip
+```
 
-cd ~/Documents/php/GrimpePan
+L'extension `exif`, nécessaire au redressement des photos, est incluse dans
+`php8.4-common` sous Debian. Pour vérifier :
+
+```bash
+php -m | grep -E "pdo_mysql|gd|exif|intl"
+```
+
+### 2. Apache et PHP-FPM
+
+Apache transmet les fichiers `.php` à PHP-FPM, avec le MPM *event*. Il n'y a pas
+de `mod_php`.
+
+```bash
+sudo a2dismod php8.4 mpm_prefork 2>/dev/null   # si mod_php était installé
+sudo a2enmod mpm_event proxy_fcgi setenvif rewrite headers
+sudo a2enconf php8.4-fpm
+sudo systemctl restart php8.4-fpm apache2
+```
+
+### 3. Réglages PHP
+
+Le formulaire accepte des photos jusqu'à 15 Mo, mais PHP les limite par défaut à
+2 Mo. Crée `/etc/php/8.4/fpm/conf.d/90-grimpepan.ini` :
+
+```ini
+upload_max_filesize = 16M
+post_max_size = 20M
+memory_limit = 256M        ; redressement des grandes photos (GD)
+
+; Performances en production
+opcache.enable = 1
+opcache.memory_consumption = 128
+opcache.max_accelerated_files = 20000
+opcache.validate_timestamps = 0   ; vider le cache au déploiement (voir « Mise à jour »)
+realpath_cache_size = 4096K
+realpath_cache_ttl = 600
+```
+
+```bash
+sudo systemctl reload php8.4-fpm
+```
+
+### 4. Base de données
+
+```bash
+sudo mariadb
+```
+
+```sql
+CREATE DATABASE grimpepan CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'grimpepan'@'localhost' IDENTIFIED BY 'mot-de-passe-solide';
+GRANT ALL PRIVILEGES ON grimpepan.* TO 'grimpepan'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+Si le mot de passe contient des caractères spéciaux (`@`, `:`, `/`, `#`…), il
+faut l'encoder dans l'URL de connexion (par exemple `@` devient `%40`).
+
+### 5. Code de l'application
+
+```bash
+sudo mkdir -p /var/www/grimpepan
+sudo chown deploy:www-data /var/www/grimpepan
+git clone https://github.com/johnburnout/GrimpePan.git /var/www/grimpepan
+cd /var/www/grimpepan
+```
+
+Crée `/var/www/grimpepan/.env.local`. Ce fichier n'est **pas versionné** et
+contient les secrets :
+
+```bash
+APP_ENV=prod
+APP_DEBUG=0
+APP_SECRET=<résultat de : openssl rand -hex 32>
+DATABASE_URL="mysql://grimpepan:mot-de-passe-solide@127.0.0.1:3306/grimpepan?serverVersion=11.8.6-MariaDB&charset=utf8mb4"
+```
+
+```bash
+chmod 640 .env.local
+```
+
+Puis installe et initialise l'application :
+
+```bash
+composer install --no-dev --optimize-autoloader
+composer dump-env prod                          # compile .env* en .env.local.php (plus rapide)
+php bin/console doctrine:migrations:migrate -n
+php bin/console asset-map:compile               # logos et favicon (dossier assets/)
+php bin/console cache:clear
+```
+
+### 6. Droits sur les fichiers
+
+PHP-FPM (`www-data`) doit pouvoir écrire dans `var/` (cache, logs) et dans le
+dossier des photos. Il n'a besoin d'écrire nulle part ailleurs.
+
+```bash
+cd /var/www/grimpepan
+sudo chown -R deploy:www-data .
+sudo find . -type d -exec chmod 750 {} +
+sudo find . -type f -exec chmod 640 {} +
+sudo chmod 750 bin/console
+sudo chmod -R g+w var public/uploads/photos
+sudo find var public/uploads/photos -type d -exec chmod g+s {} +   # nouveaux fichiers dans le groupe www-data
+```
+
+> Le dossier `public/uploads/photos/` contient les photos envoyées. Elles ne
+> sont **pas versionnées** : ce dossier doit être **conservé** à chaque
+> déploiement et **sauvegardé** avec la base.
+
+### 7. VirtualHost
+
+Crée `/etc/apache2/sites-available/grimpepan.conf` :
+
+```apache
+<VirtualHost *:80>
+    ServerName grimpepan.example.org
+    DocumentRoot /var/www/grimpepan/public
+
+    <Directory /var/www/grimpepan/public>
+        # Configuration complète ici : les .htaccess ne sont pas lus (plus rapide)
+        AllowOverride None
+        Require all granted
+        FallbackResource /index.php
+    </Directory>
+
+    # Dossier des photos : uniquement des images, aucun script
+    <Directory /var/www/grimpepan/public/uploads>
+        Options -Indexes -ExecCGI
+        FallbackResource disabled
+        <FilesMatch ".">
+            Require all denied
+        </FilesMatch>
+        <FilesMatch "(?i)\.(jpe?g|png|webp)$">
+            Require all granted
+        </FilesMatch>
+    </Directory>
+
+    # PHP-FPM
+    <FilesMatch "\.php$">
+        SetHandler "proxy:unix:/run/php/php8.4-fpm.sock|fcgi://localhost"
+    </FilesMatch>
+
+    # Cache navigateur longue durée pour les fichiers versionnés par AssetMapper
+    <Directory /var/www/grimpepan/public/assets>
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/grimpepan_error.log
+    CustomLog ${APACHE_LOG_DIR}/grimpepan_access.log combined
+</VirtualHost>
+```
+
+```bash
+sudo a2ensite grimpepan
+sudo a2dissite 000-default
+sudo apache2ctl configtest
+sudo systemctl reload apache2
+```
+
+### 8. HTTPS
+
+```bash
+sudo apt install certbot python3-certbot-apache
+sudo certbot --apache -d grimpepan.example.org
+```
+
+Certbot crée le VirtualHost `*:443`, ajoute la redirection HTTP → HTTPS et
+programme le renouvellement automatique du certificat.
+
+### 9. Vérification
+
+- https://grimpepan.example.org affiche la liste des voies ;
+- créer un compte, un secteur, puis une voie avec une photo de plusieurs Mo ;
+- en cas d'erreur : `/var/log/apache2/grimpepan_error.log` et
+  `/var/www/grimpepan/var/log/prod.log`.
+
+### Variante : hébergement mutualisé
+
+Sans accès à la configuration d'Apache, le projet fournit deux fichiers
+`.htaccess` qui jouent le même rôle que le VirtualHost :
+
+| Fichier | Rôle |
+|---|---|
+| `public/.htaccess` | Envoie toutes les requêtes vers `index.php` (paquet `symfony/apache-pack`) |
+| `public/uploads/.htaccess` | N'autorise que les images dans le dossier des photos |
+
+Il faut que l'hébergeur ait **`mod_rewrite`** et **`AllowOverride All`**, et que
+la **racine web pointe sur le dossier `public/`**. Si ce n'est pas possible, il
+ne faut **pas** publier tout le projet : `.env.local`, `var/` et `vendor/` ne
+doivent jamais être accessibles depuis le web.
+
+Les commandes de l'étape 5 se lancent alors en SSH, ou en local avant d'envoyer
+les fichiers. Les limites d'envoi de l'étape 3 se règlent dans l'interface de
+l'hébergeur ou dans un `.user.ini`.
+
+## Mise à jour du serveur
+
+```bash
+cd /var/www/grimpepan
+git pull
+composer install --no-dev --optimize-autoloader
+composer dump-env prod
+php bin/console doctrine:migrations:migrate -n
+php bin/console asset-map:compile
+php bin/console cache:clear
+sudo systemctl reload php8.4-fpm     # vide l'OPcache (validate_timestamps = 0)
+```
+
+Avant une migration de base, fais une sauvegarde :
+
+```bash
+mariadb-dump -u grimpepan -p grimpepan > ~/sauvegardes/grimpepan-$(date +%F).sql
+```
+
+## Installation en développement (macOS)
+
+En développement, l'application tourne avec le serveur local de la Symfony CLI,
+sans Apache. Les fichiers `.htaccess` ne servent qu'en production.
+
+### Prérequis
+
+- PHP ≥ 8.4 avec les extensions `pdo_mysql`, `gd`, `exif` et `intl`
+- Composer 2
+- Symfony CLI (serveur local)
+- MariaDB 11.8 (voir [plus bas](#base-de-données-mariadb-locale))
+
+```bash
+brew install php composer
+brew install symfony-cli/tap/symfony-cli
+symfony check:requirements
+```
+
+### Mise en route
+
+```bash
+git clone https://github.com/johnburnout/GrimpePan.git
+cd GrimpePan
 composer install
 
-# Secret local (ne pas versionner)
-echo "APP_SECRET=$(openssl rand -hex 16)" > .env.local
-
-# Base de données (MariaDB 11.8, comme en prod)
+# Base de données (MariaDB doit tourner sur le port 3307, voir plus bas)
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate -n
 
-# Lancer
-symfony serve        # ou : php -S 127.0.0.1:8000 -t public
+# Serveur local en arrière-plan
+symfony serve -d
+symfony open:local
 ```
 
-Puis ouvrir http://127.0.0.1:8000, créer un compte, un secteur, puis une voie.
+Puis créer un compte, un secteur, puis une voie.
 
-Par défaut : `mysql://root@127.0.0.1:3307/grimpepan` (MariaDB 11.8 local sur le port 3307, sans mot de passe). Pour d'autres identifiants, surcharger `DATABASE_URL` dans `.env.local`. La prod tourne sur MariaDB 11.8.6 : générer les migrations sur MariaDB, jamais sur MySQL.
+En développement, `APP_SECRET` est fourni par `.env.dev`. Pour surcharger une
+variable sur ta machine (identifiants de base, par exemple), utilise
+`.env.local`, qui n'est pas versionné.
 
-## Structure
+### HTTPS en local (facultatif)
 
-| Dossier | Contenu |
+```bash
+symfony server:ca:install     # demande le mot de passe macOS
+symfony server:stop && symfony serve -d
+```
+
+L'application est alors servie sur https://127.0.0.1:8000.
+
+### Taille des photos envoyées
+
+Le formulaire accepte des photos jusqu'à **15 Mo**, mais PHP a ses propres
+limites. Par défaut, `upload_max_filesize` vaut 2 Mo et `post_max_size` 8 Mo :
+une photo de téléphone de plus de 2 Mo est alors refusée. Pour vérifier :
+
+```bash
+php -i | grep -E "upload_max_filesize|post_max_size"
+```
+
+Il faut au moins `upload_max_filesize = 16M` et `post_max_size = 20M`. Sur le
+serveur, voir l'[étape 3](#3-réglages-php) de l'installation Apache.
+
+## Base de données MariaDB locale
+
+La production tourne sous **MariaDB 11.8.6**. Le développement utilise donc
+MariaDB 11.8, et non MySQL : les migrations Doctrine dépendent de la plateforme,
+et Doctrine ne sait pas générer une migration MariaDB à partir d'un serveur MySQL.
+
+Sur la machine de développement, MariaDB tourne **à côté** d'un MySQL existant
+(port 3306) :
+
+| | Valeur |
 |---|---|
-| `src/Entity` | `User`, `Secteur`, `Photo`, `Voie`, `Prise` |
+| Paquet | `mariadb@11.8` (Homebrew, keg-only) |
+| Adresse | `127.0.0.1:3307`, utilisateur `root` sans mot de passe |
+| Données | `/opt/homebrew/var/mariadb-11.8` |
+| Démarrage | LaunchAgent `~/Library/LaunchAgents/local.mariadb-11.8.plist` |
+| Base | `grimpepan` |
+
+> ⚠️ **Ne pas utiliser `brew services start mariadb@11.8`** : ce service
+> démarrerait MariaDB sur `/opt/homebrew/var/mysql`, le dossier de données de
+> MySQL, et risquerait de l'abîmer.
+
+Installation de zéro :
+
+```bash
+brew install mariadb@11.8
+M=/opt/homebrew/opt/mariadb@11.8
+mkdir -p /opt/homebrew/var/mariadb-11.8
+$M/bin/mariadb-install-db --no-defaults --basedir=$M \
+  --datadir=/opt/homebrew/var/mariadb-11.8 \
+  --auth-root-authentication-method=normal --skip-test-db
+```
+
+Le LaunchAgent lance `mariadbd --no-defaults --port=3307 --bind-address=127.0.0.1
+--socket=/tmp/mariadb-3307.sock --datadir=/opt/homebrew/var/mariadb-11.8
+--character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci`.
+
+```bash
+# démarrer / arrêter
+launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/local.mariadb-11.8.plist
+launchctl bootout  gui/$(id -u)/local.mariadb-11.8
+
+# console
+/opt/homebrew/opt/mariadb@11.8/bin/mariadb -h127.0.0.1 -P3307 -uroot grimpepan
+```
+
+La connexion par défaut se trouve dans `.env` :
+
+```
+DATABASE_URL="mysql://root@127.0.0.1:3307/grimpepan?serverVersion=11.8.6-MariaDB&charset=utf8mb4"
+```
+
+**Avec Docker**, `compose.yaml` fournit aussi un conteneur `mariadb:11.8.6`.
+Avec `docker compose up -d`, la Symfony CLI détecte le conteneur et fournit
+elle-même le bon `DATABASE_URL`.
+
+## Commandes utiles
+
+```bash
+# Serveur
+symfony serve -d               # démarrer en arrière-plan
+symfony server:log             # suivre les logs
+symfony server:stop            # arrêter
+
+# Base de données
+php bin/console make:migration                 # après une modification d'entité
+php bin/console doctrine:migrations:migrate -n # appliquer les migrations
+php bin/console doctrine:schema:validate       # vérifier mapping et schéma
+
+# Vérifications
+php bin/console lint:twig templates
+php bin/console lint:container
+php bin/console debug:router
+```
+
+**Donner le rôle admin** à un utilisateur (il n'y a pas encore d'interface) :
+
+```sql
+UPDATE utilisateur SET roles = '["ROLE_ADMIN"]' WHERE email = 'adresse@exemple.org';
+```
+
+L'utilisateur doit se déconnecter puis se reconnecter pour que le rôle soit pris en compte.
+
+## Structure du projet
+
+| Emplacement | Contenu |
+|---|---|
+| `src/Entity` | `User`, `Secteur`, `Photo`, `Voie`, `Prise`, `Croix` |
 | `src/Enum` | `CotationFr`, `CotationCouleur`, `SystemeCotation`, `TypePrise` |
-| `src/Controller` | Accueil, secteurs, voies, sécurité |
-| `src/Service/PhotoUploader.php` | Enregistrement des photos (+ redressement EXIF) |
+| `src/Controller` | Accueil, inscription, connexion, secteurs, voies (création, modification, croix, suppression) |
+| `src/Form` | `RegistrationFormType`, `SecteurType`, `VoieType` (option `trace` : formulaire complet ou nom + description) |
+| `src/Security/VoieVoter.php` | Droits `VOIE_MODIFIER` et `VOIE_MODIFIER_TRACE` |
+| `src/Service/PhotoUploader.php` | Enregistrement des photos et redressement EXIF |
+| `templates/voie/_form.html.twig` | Formulaire complet, commun à la création et à la modification |
 | `templates/voie/_photo.html.twig` | Rendu photo + prises (SVG) |
 | `public/js/editeur.js` | Éditeur de prises |
+| `public/css/app.css` | Styles (palette alignée sur le logo) |
+| `public/fonts/bricolage-grotesque/` | Police des titres et du logo, avec sa licence |
+| `assets/logo/` | Logos SVG et favicon |
+| `migrations/` | Migrations Doctrine (générées sur MariaDB) |
+| `public/.htaccess` | Réécriture d'URL pour Apache sans VirtualHost (`symfony/apache-pack`) |
+| `public/uploads/.htaccess` | N'autorise que les images dans le dossier des photos |
+| `compose.yaml` | Conteneurs Docker facultatifs (MariaDB, Mailpit) |
 
-Les prises sont stockées en **pourcentage** de l'image (x, y, rayon) : elles restent
-alignées quelle que soit la taille d'affichage.
-La cotation est stockée en texte (`6a`, `bleu`) avec un **rang** numérique
-qui permet de trier et filtrer par difficulté.
+## Choix techniques
 
-## Prochaines étapes (V2/V3)
+- **Prises en pourcentage** : x, y et rayon sont stockés en % de l'image, pour
+  rester alignés quelle que soit la taille d'affichage.
+- **Cotation** stockée en texte (`6a`, `bleu`) avec un **rang** numérique pour
+  trier et filtrer par difficulté, quelle que soit l'échelle.
+- **Pas de build JavaScript** : l'éditeur est en JavaScript natif, servi depuis `public/js/`.
+- **CSRF** : protection « stateless » de Symfony 8, qui vérifie l'en-tête
+  `Origin` envoyé par le navigateur.
+- **Voie validée** : `Voie::estValidee()` est vraie dès qu'une croix vient d'un
+  autre grimpeur que l'auteur.
+
+## Identité visuelle
+
+| Fichier (`assets/logo/`) | Usage |
+|---|---|
+| `logo-inverse.svg` | En-tête (fond sombre) |
+| `mark-inverse.svg` | En-tête sur petit écran (≤ 480 px) |
+| `favicon.svg` | Icône d'onglet |
+| `logo.svg`, `mark.svg`, `mark-mono.svg` | Fonds clairs, impression |
+
+- **Couleurs** : sombre `#1C1F24`, orange `#E8622C`, clair `#F4F2EE`.
+- **Police** : *Bricolage Grotesque* (variable, graisses 200 à 800), auto-hébergée,
+  sans appel à Google Fonts. Elle est utilisée pour le logo et les titres. Le texte
+  courant reste en police système.
+- Le logo de l'en-tête est inséré en SVG *inline* (`{{ source('@logo/…') }}`) :
+  chargé en `<img>`, il ne pourrait pas utiliser la police de la page.
+
+## Prochaines étapes
 
 - Plusieurs voies affichées sur une même photo
 - Page « Mes voies », avis de cotation, commentaires
-- Administration : modération, archivage des voies démontées
+- Administration : gestion des rôles, modération, archivage des voies démontées
+- Tests automatisés (PHPUnit)
+
+## Licence
+
+Code : GNU GPL v3, voir [`LICENSE`](LICENSE).
+Police Bricolage Grotesque : SIL Open Font License 1.1, voir
+[`public/fonts/bricolage-grotesque/LICENSE.txt`](public/fonts/bricolage-grotesque/LICENSE.txt).

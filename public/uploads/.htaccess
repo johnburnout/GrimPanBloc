@@ -1,0 +1,16 @@
+# Dossier des photos envoyées : on ne sert que des images, jamais de code.
+Options -Indexes -ExecCGI
+
+# Tout est refusé…
+<FilesMatch ".">
+    Require all denied
+</FilesMatch>
+# … sauf les formats d'image acceptés par l'application.
+<FilesMatch "(?i)\.(jpe?g|png|webp)$">
+    Require all granted
+</FilesMatch>
+
+# Avec mod_php, désactive en plus l'interpréteur PHP dans ce dossier.
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
