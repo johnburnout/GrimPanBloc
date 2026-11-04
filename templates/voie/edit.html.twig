@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier {{ voie.nom }} · GrimpePan{% endblock %}
+
+{% block body %}
+    <p class="fil"><a href="{{ path('voie_show', {id: voie.id}) }}">← {{ voie.nom }}</a></p>
+    <h1>Modifier la voie</h1>
+
+    {% if trace %}
+        {{ include('voie/_form.html.twig', {bouton: 'Enregistrer les modifications'}) }}
+    {% else %}
+        <div class="flash flash-info">
+            Cette voie a déjà été réussie par
+            {{ voie.croixValidantes|map(c => c.grimpeur.pseudo)|join(', ') }} :
+            la photo, les prises et la cotation sont verrouillées.
+            Vous pouvez encore corriger le nom et la description.
+        </div>
+
+        {{ include('voie/_photo.html.twig', {classe: 'grande'}) }}
+
+        {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+        {{ form_errors(form) }}
+        {{ form_row(form.nom) }}
+        {{ form_row(form.description) }}
+        <button type="submit" class="btn btn-grand">Enregistrer les modifications</button>
+        {{ form_end(form) }}
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {% if trace %}<script src="{{ asset('js/editeur.js') }}" defer></script>{% endif %}
+{% endblock %}

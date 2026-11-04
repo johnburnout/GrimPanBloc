@@ -4,12 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}GrimpePan{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('logo/favicon.svg') }}">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     {% block stylesheets %}{% endblock %}
 </head>
 <body>
 <header class="entete">
-    <a href="{{ path('app_home') }}" class="logo">Grimpe<span>Pan</span></a>
+    <a href="{{ path('app_home') }}" class="logo">
+        <picture>
+            {# Sur petit écran, le symbole seul pour laisser la place au menu #}
+            <source media="(max-width: 480px)" srcset="{{ asset('logo/mark-inverse.svg') }}" width="36" height="36">
+            <img src="{{ asset('logo/logo-inverse.svg') }}" alt="GrimpePan" width="186" height="36">
+        </picture>
+    </a>
     <nav>
         <a href="{{ path('app_home') }}">Voies</a>
         <a href="{{ path('secteur_index') }}">Secteurs</a>

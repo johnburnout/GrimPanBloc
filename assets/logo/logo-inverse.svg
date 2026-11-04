@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 64" role="img" aria-label="GrimpePan">
+  <polyline points="12,56 26,46 18,34 34,26 44,14" fill="none" stroke="#E8622C" stroke-width="3" stroke-dasharray="4 4" stroke-linecap="round"/>
+  <circle cx="12" cy="56" r="5" fill="#F4F2EE"/>
+  <circle cx="26" cy="46" r="4" fill="#F4F2EE"/>
+  <circle cx="18" cy="34" r="4" fill="#F4F2EE"/>
+  <circle cx="34" cy="26" r="4" fill="#F4F2EE"/>
+  <line x1="44" y1="14" x2="44" y2="2" stroke="#F4F2EE" stroke-width="3" stroke-linecap="round"/>
+  <polygon points="45,2 58,6 45,11" fill="#E8622C"/>
+  <circle cx="44" cy="14" r="5" fill="#F4F2EE"/>
+  <text x="76" y="46" font-family="'Bricolage Grotesque', system-ui, sans-serif" font-size="40" font-weight="600" letter-spacing="-0.5" fill="#F4F2EE">grimpe<tspan font-weight="800">pan</tspan></text>
+</svg>

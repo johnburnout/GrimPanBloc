@@ -6,54 +6,7 @@
     <p class="fil"><a href="{{ path('secteur_show', {id: secteur.id}) }}">← {{ secteur.nom }}</a></p>
     <h1>Nouvelle voie</h1>
 
-    {{ form_start(form, {attr: {id: 'form-voie', novalidate: 'novalidate'}}) }}
-    {{ form_errors(form) }}
-
-    <section class="etape">
-        <h2>1. La photo</h2>
-        {% if form.photo.vars.choices is not empty %}
-            {{ form_row(form.photo) }}
-        {% else %}
-            {% do form.photo.setRendered %}
-        {% endif %}
-        <div id="bloc-upload">{{ form_row(form.nouvellePhoto) }}</div>
-    </section>
-
-    <section class="etape">
-        <h2>2. Les prises</h2>
-        <p class="aide">Choisissez un type puis touchez la photo pour placer une prise.
-            Touchez une prise existante pour changer son type, faites-la glisser pour la déplacer.</p>
-
-        <div class="barre-outils" role="toolbar">
-            {% for t in typesPrise %}
-                <button type="button" class="outil" data-outil="{{ t.value }}" aria-pressed="{{ loop.index == 2 ? 'true' : 'false' }}">
-                    <span class="pastille prise-{{ t.value }}"></span> {{ t.libelle }}
-                </button>
-            {% endfor %}
-            <button type="button" class="outil" data-outil="gomme">✕ Effacer</button>
-            <label class="taille">Taille <input type="range" id="taille-prise" min="1" max="10" step="0.5" value="3"></label>
-            <button type="button" class="btn-lien" id="annuler">↶ Annuler</button>
-        </div>
-
-        <div id="editeur" class="editeur">
-            <p class="editeur-vide">Choisissez ou envoyez une photo pour commencer.</p>
-        </div>
-        <p class="compteur"><span id="nb-prises">0</span> prise(s)</p>
-        {{ form_errors(form.prises) }}
-        {{ form_widget(form.prises) }}
-    </section>
-
-    <section class="etape">
-        <h2>3. Infos et cotation</h2>
-        {{ form_row(form.nom) }}
-        {{ form_row(form.systeme) }}
-        <div data-pour-systeme="fr">{{ form_row(form.cotationFr) }}</div>
-        <div data-pour-systeme="couleur">{{ form_row(form.cotationCouleur) }}</div>
-        {{ form_row(form.description) }}
-    </section>
-
-    <button type="submit" class="btn btn-grand">Enregistrer la voie</button>
-    {{ form_end(form) }}
+    {{ include('voie/_form.html.twig') }}
 {% endblock %}
 
 {% block javascripts %}

@@ -7,13 +7,18 @@
 
     <div class="titre-actions">
         <h1>{{ include('voie/_badge.html.twig') }} {{ voie.nom }}</h1>
-        {% if voie.auteur == app.user or is_granted('ROLE_ADMIN') %}
-            <form method="post" action="{{ path('voie_delete', {id: voie.id}) }}"
-                  onsubmit="return confirm('Supprimer cette voie ?')">
-                <input type="hidden" name="_token" value="{{ csrf_token('supprimer' ~ voie.id) }}">
-                <button class="btn btn-danger">Supprimer</button>
-            </form>
-        {% endif %}
+        <div class="actions">
+            {% if is_granted('VOIE_MODIFIER', voie) %}
+                <a href="{{ path('voie_edit', {id: voie.id}) }}" class="btn btn-secondaire">Modifier</a>
+            {% endif %}
+            {% if voie.auteur == app.user or is_granted('ROLE_ADMIN') %}
+                <form method="post" action="{{ path('voie_delete', {id: voie.id}) }}"
+                      onsubmit="return confirm('Supprimer cette voie ?')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('supprimer' ~ voie.id) }}">
+                    <button class="btn btn-danger">Supprimer</button>
+                </form>
+            {% endif %}
+        </div>
     </div>
 
     {{ include('voie/_photo.html.twig', {classe: 'grande'}) }}
@@ -31,4 +36,29 @@
         {{ voie.systeme.libelle }} · ouverte par <strong>{{ voie.auteur.pseudo }}</strong>
         le {{ voie.creeLe|date('d/m/Y') }} · {{ voie.prises|length }} prise(s)
     </p>
+
+    <section class="croix">
+        {% set nb = voie.croix|length %}
+        <p>
+            {% if nb == 0 %}
+                Personne n'a encore réussi cette voie.
+            {% else %}
+                ✔ Réussie par {{ voie.croix|map(c => c.grimpeur.pseudo)|join(', ') }}
+            {% endif %}
+        </p>
+        {% if app.user %}
+            {% set maCroix = voie.croixDe(app.user) %}
+            <form method="post" action="{{ path('voie_croix', {id: voie.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('croix' ~ voie.id) }}">
+                {% if maCroix %}
+                    <button class="btn btn-secondaire">Retirer ma croix</button>
+                {% else %}
+                    <button class="btn">J'ai réussi cette voie</button>
+                {% endif %}
+            </form>
+            {% if voie.auteur == app.user and not maCroix %}
+                <p class="aide">Votre propre croix ne verrouille pas la voie : seule celle d'un autre grimpeur le fait.</p>
+            {% endif %}
+        {% endif %}
+    </section>
 {% endblock %}

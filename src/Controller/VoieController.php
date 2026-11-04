@@ -2,27 +2,37 @@
 
 namespace App\Controller;
 
+use App\Entity\Croix;
 use App\Entity\Prise;
 use App\Entity\Secteur;
 use App\Entity\User;
 use App\Entity\Voie;
 use App\Enum\TypePrise;
 use App\Form\VoieType;
+use App\Security\VoieVoter;
 use App\Service\PhotoUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/voies')]
 class VoieController extends AbstractController
 {
     private const MAX_PRISES = 200;
 
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly PhotoUploader $uploader,
+    ) {
+    }
+
     #[Route('/nouvelle/{id}', name: 'voie_new', requirements: ['id' => '\d+'])]
-    public function new(Secteur $secteur, Request $request, EntityManagerInterface $em, PhotoUploader $uploader): Response
+    public function new(Secteur $secteur, Request $request): Response
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -31,38 +41,51 @@ class VoieController extends AbstractController
         $form = $this->createForm(VoieType::class, $voie, ['secteur' => $secteur]);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            $fichier = $form->get('nouvellePhoto')->getData();
-            if (!$fichier && !$voie->getPhoto()) {
-                $form->get('nouvellePhoto')->addError(new FormError('Envoyez une photo ou choisissez-en une existante.'));
-            }
+        if ($form->isSubmitted() && $this->traiterTrace($form, $voie, $secteur, $user)) {
+            $this->em->persist($voie);
+            $this->em->flush();
+            $this->addFlash('success', 'Voie « '.$voie->getNom().' » créée.');
 
-            $prises = $this->decoderPrises((string) $form->get('prises')->getData());
-            if ([] === $prises) {
-                $form->get('prises')->addError(new FormError('Marquez au moins une prise sur la photo.'));
-            }
-
-            if ($form->isValid()) {
-                if ($fichier) {
-                    $photo = $uploader->upload($fichier, $secteur, $user);
-                    $em->persist($photo);
-                    $voie->setPhoto($photo);
-                }
-                foreach ($prises as $prise) {
-                    $voie->addPrise($prise);
-                }
-                $em->persist($voie);
-                $em->flush();
-
-                $this->addFlash('success', 'Voie « '.$voie->getNom().' » créée.');
-
-                return $this->redirectToRoute('voie_show', ['id' => $voie->getId()]);
-            }
+            return $this->redirectToRoute('voie_show', ['id' => $voie->getId()]);
         }
 
         return $this->render('voie/new.html.twig', [
             'form' => $form,
             'secteur' => $secteur,
+            'typesPrise' => TypePrise::cases(),
+        ]);
+    }
+
+    #[Route('/{id}/modifier', name: 'voie_edit', requirements: ['id' => '\d+'])]
+    #[IsGranted(VoieVoter::MODIFIER, subject: 'voie')]
+    public function edit(Voie $voie, Request $request): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        $secteur = $voie->getPhoto()->getSecteur();
+        $trace = $this->isGranted(VoieVoter::MODIFIER_TRACE, $voie);
+
+        $form = $this->createForm(VoieType::class, $voie, ['secteur' => $secteur, 'trace' => $trace]);
+        if ($trace) {
+            $form->get('prises')->setData(json_encode($voie->getPrisesArray()));
+        }
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted()) {
+            $ok = $trace ? $this->traiterTrace($form, $voie, $secteur, $user) : $form->isValid();
+            if ($ok) {
+                $this->em->flush();
+                $this->addFlash('success', 'Voie « '.$voie->getNom().' » modifiée.');
+
+                return $this->redirectToRoute('voie_show', ['id' => $voie->getId()]);
+            }
+        }
+
+        return $this->render('voie/edit.html.twig', [
+            'form' => $form,
+            'voie' => $voie,
+            'secteur' => $secteur,
+            'trace' => $trace,
             'typesPrise' => TypePrise::cases(),
         ]);
     }
@@ -73,8 +96,36 @@ class VoieController extends AbstractController
         return $this->render('voie/show.html.twig', ['voie' => $voie]);
     }
 
+    /** Pose ou retire la croix (« réussie ») de l'utilisateur connecté. */
+    #[Route('/{id}/croix', name: 'voie_croix', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
+    public function croix(Voie $voie, Request $request): Response
+    {
+        if (!$this->isCsrfTokenValid('croix'.$voie->getId(), $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        /** @var User $user */
+        $user = $this->getUser();
+        $existante = $voie->getCroixDe($user);
+
+        if ($existante) {
+            $voie->getCroix()->removeElement($existante);
+            $this->em->remove($existante);
+            $this->addFlash('success', 'Croix retirée.');
+        } else {
+            $croix = new Croix($voie, $user);
+            $voie->getCroix()->add($croix);
+            $this->em->persist($croix);
+            $this->addFlash('success', 'Bravo ! Voie cochée comme réussie.');
+        }
+        $this->em->flush();
+
+        return $this->redirectToRoute('voie_show', ['id' => $voie->getId()]);
+    }
+
     #[Route('/{id}/supprimer', name: 'voie_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function delete(Voie $voie, Request $request, EntityManagerInterface $em): Response
+    public function delete(Voie $voie, Request $request): Response
     {
         if ($voie->getAuteur() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
             throw $this->createAccessDeniedException();
@@ -84,11 +135,41 @@ class VoieController extends AbstractController
         }
 
         $secteurId = $voie->getPhoto()->getSecteur()->getId();
-        $em->remove($voie);
-        $em->flush();
+        $this->em->remove($voie);
+        $this->em->flush();
         $this->addFlash('success', 'Voie supprimée.');
 
         return $this->redirectToRoute('secteur_show', ['id' => $secteurId]);
+    }
+
+    /**
+     * Valide le formulaire complet (photo, prises, cotation) et applique photo
+     * et prises à la voie. Renvoie true si tout est valide.
+     */
+    private function traiterTrace(FormInterface $form, Voie $voie, Secteur $secteur, User $user): bool
+    {
+        $fichier = $form->get('nouvellePhoto')->getData();
+        if (!$fichier && !$voie->getPhoto()) {
+            $form->get('nouvellePhoto')->addError(new FormError('Envoyez une photo ou choisissez-en une existante.'));
+        }
+
+        $prises = $this->decoderPrises((string) $form->get('prises')->getData());
+        if ([] === $prises) {
+            $form->get('prises')->addError(new FormError('Marquez au moins une prise sur la photo.'));
+        }
+
+        if (!$form->isValid()) {
+            return false;
+        }
+
+        if ($fichier) {
+            $photo = $this->uploader->upload($fichier, $secteur, $user);
+            $this->em->persist($photo);
+            $voie->setPhoto($photo);
+        }
+        $voie->remplacerPrises($prises);
+
+        return true;
     }
 
     /**

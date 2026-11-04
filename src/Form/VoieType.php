@@ -27,8 +27,16 @@ class VoieType extends AbstractType
         /** @var Secteur $secteur */
         $secteur = $options['secteur'];
 
+        $builder->add('nom', TextType::class, ['label' => 'Nom de la voie']);
+
+        // Voie validée : seuls le nom et la description restent modifiables.
+        if (!$options['trace']) {
+            $builder->add('description', TextareaType::class, ['label' => 'Description / consignes', 'required' => false]);
+
+            return;
+        }
+
         $builder
-            ->add('nom', TextType::class, ['label' => 'Nom de la voie'])
             ->add('photo', EntityType::class, [
                 'class' => Photo::class,
                 'label' => 'Photo existante du secteur',
@@ -77,7 +85,12 @@ class VoieType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults(['data_class' => Voie::class]);
+        $resolver->setDefaults([
+            'data_class' => Voie::class,
+            // false : formulaire réduit au nom et à la description (voie validée)
+            'trace' => true,
+        ]);
+        $resolver->setAllowedTypes('trace', 'bool');
         $resolver->setRequired('secteur');
         $resolver->setAllowedTypes('secteur', Secteur::class);
     }

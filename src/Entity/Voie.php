@@ -58,10 +58,16 @@ class Voie
     #[ORM\OneToMany(targetEntity: Prise::class, mappedBy: 'voie', cascade: ['persist'], orphanRemoval: true)]
     private Collection $prises;
 
+    /** @var Collection<int, Croix> */
+    #[ORM\OneToMany(targetEntity: Croix::class, mappedBy: 'voie')]
+    #[ORM\OrderBy(['creeLe' => 'ASC'])]
+    private Collection $croix;
+
     public function __construct()
     {
         $this->creeLe = new \DateTimeImmutable();
         $this->prises = new ArrayCollection();
+        $this->croix = new ArrayCollection();
     }
 
     public function getId(): ?int { return $this->id; }
@@ -156,6 +162,47 @@ class Voie
         $this->prises->removeElement($prise);
 
         return $this;
+    }
+
+    /** Remplace toutes les prises (les anciennes sont supprimées par orphanRemoval). */
+    public function remplacerPrises(iterable $prises): static
+    {
+        foreach ($this->prises->toArray() as $ancienne) {
+            $this->removePrise($ancienne);
+        }
+        foreach ($prises as $prise) {
+            $this->addPrise($prise);
+        }
+
+        return $this;
+    }
+
+    // --- Croix (réussites) -----------------------------------------------
+
+    /** @return Collection<int, Croix> */
+    public function getCroix(): Collection { return $this->croix; }
+
+    /** Croix posées par d'autres grimpeurs que l'auteur. */
+    public function getCroixValidantes(): array
+    {
+        return array_values($this->croix->filter(fn (Croix $c) => $c->getGrimpeur() !== $this->auteur)->toArray());
+    }
+
+    /** Une voie est validée dès qu'un autre grimpeur que son auteur l'a réussie. */
+    public function estValidee(): bool
+    {
+        return [] !== $this->getCroixValidantes();
+    }
+
+    public function getCroixDe(?User $user): ?Croix
+    {
+        foreach ($this->croix as $c) {
+            if ($c->getGrimpeur() === $user) {
+                return $c;
+            }
+        }
+
+        return null;
     }
 
     /** @return list<array{x: float, y: float, r: float, type: string}> */

@@ -12,6 +12,9 @@ Symfony 8.1 · Twig · Doctrine · JavaScript natif (pas de build).
   ou couleur (vert → blanc)
 - Affichage de la voie : photo assombrie, prises entourées
 - Liste des voies filtrable par secteur, échelle et plage de difficulté
+- Croix (« j'ai réussi cette voie »)
+- Modification d'une voie par son créateur : tout reste modifiable tant qu'aucun
+  autre grimpeur ne l'a réussie ; ensuite, seuls le nom et la description le restent
 
 ## Installation (macOS)
 
@@ -57,7 +60,6 @@ qui permet de trier et filtrer par difficulté.
 
 ## Prochaines étapes (V2/V3)
 
-- Modifier une voie existante
 - Plusieurs voies affichées sur une même photo
-- Page « Mes voies », croix (« réussie »), avis de cotation, commentaires
+- Page « Mes voies », avis de cotation, commentaires
 - Administration : modération, archivage des voies démontées
