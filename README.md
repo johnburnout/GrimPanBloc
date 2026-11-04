@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo/logo-inverse.svg">
+    <img src="assets/logo/logo.svg" alt="GrimpePan" width="330">
+  </picture>
+</p>
+
 # GrimpePan
 
 Création et affichage de blocs et de voies sur une structure artificielle d'escalade
@@ -16,7 +23,8 @@ JavaScript natif (aucune étape de build) · AssetMapper.
 
 - [Fonctionnalités](#fonctionnalités)
 - [Règles métier](#règles-métier)
-- [Installation sur un serveur Apache](#installation-sur-un-serveur-apache)
+- [Installation avec l'assistant web](#installation-avec-lassistant-web)
+- [Installation manuelle sur un serveur Apache](#installation-manuelle-sur-un-serveur-apache)
 - [Mise à jour du serveur](#mise-à-jour-du-serveur)
 - [Installation en développement (macOS)](#installation-en-développement-macos)
 - [Base de données MariaDB locale](#base-de-données-mariadb-locale)
@@ -43,7 +51,7 @@ JavaScript natif (aucune étape de build) · AssetMapper.
   - toucher la photo pose une prise ;
   - toucher une prise change son type, la faire glisser la déplace ;
   - la gomme efface une prise, « Annuler » revient en arrière ;
-  - le curseur « Taille » règle les prochaines prises **et la dernière placée**.
+  - le curseur « Taille » règle les prochaines prises **et la dernière posée ou déplacée**.
 - **Affichage d'une voie** : photo assombrie, prises entourées de la couleur de leur type.
 - **Liste des voies** filtrable par secteur, échelle et plage de difficulté.
 - **Croix** : « J'ai réussi cette voie », que l'on peut aussi retirer.
@@ -67,7 +75,65 @@ Précisions :
 - Supprimer une voie supprime aussi ses prises et ses croix.
 - Les règles de modification sont dans `src/Security/VoieVoter.php`. Le serveur vérifie toutes ces règles, pas seulement l'interface.
 
-## Installation sur un serveur Apache
+## Installation avec l'assistant web
+
+C'est la façon la plus simple d'installer GrimpePan, et elle convient aussi aux
+hébergements mutualisés sans accès SSH. L'assistant se trouve dans
+`public/setup/` et s'ouvre dans un navigateur.
+
+### Préparer la livraison
+
+L'assistant ne lance pas Composer : le dossier `vendor/` doit être livré avec
+le code. Sur ton poste :
+
+```bash
+git clone https://github.com/johnburnout/GrimpePan.git grimpepan
+cd grimpepan
+composer install --no-dev --optimize-autoloader --no-scripts
+cd .. && zip -rq grimpepan.zip grimpepan -x 'grimpepan/.git/*' 'grimpepan/var/*' 'grimpepan/.env.local'
+```
+
+Envoie le contenu de l'archive sur le serveur, puis fais pointer la racine web
+sur le dossier **`public/`**. Les prérequis sont les mêmes que pour
+l'installation manuelle : PHP 8.4, MariaDB 11.8, Apache avec `mod_rewrite`.
+
+### Lancer l'assistant
+
+Ouvre `https://ton-domaine/setup/`. Tant que GrimpePan n'est pas installé, la
+page d'accueil du site y redirige d'elle-même.
+
+| Étape | Ce que fait l'assistant |
+|---|---|
+| 1. Prérequis | Vérifie PHP, les extensions, les droits d'écriture et les limites d'envoi. Les points rouges bloquent, les orange sont des conseils. |
+| 2. Base de données | Teste la connexion MariaDB, crée la base si besoin, puis écrit `.env.local` (`APP_ENV=prod`, `APP_SECRET` aléatoire, `DATABASE_URL`). Si PHP n'a pas le droit de créer ce fichier, il affiche son contenu pour que tu le crées toi-même. |
+| 3. Tables | Exécute les migrations Doctrine. |
+| 4. Administrateur | Crée le premier compte, avec le rôle administrateur. |
+| 5. Finalisation | Compile les logos, prépare le cache, **se bloque puis supprime le dossier `public/setup/`**. |
+
+### Sécurité de l'assistant
+
+- **Lance l'installation juste après l'envoi des fichiers.** Avant l'étape 2,
+  n'importe quel visiteur pourrait ouvrir l'assistant.
+- Dès l'étape 2, l'installation est **réservée au navigateur qui l'a commencée**
+  (fichier `var/setup-en-cours.lock`). Un autre navigateur reçoit une erreur 403.
+- Une fois l'installation terminée, `var/installation.lock` bloque l'assistant
+  **définitivement**, même si le dossier `public/setup/` revient (après un
+  `git pull`, par exemple).
+- Sur un serveur installé à la main (avec un `.env.local` déjà présent),
+  l'assistant refuse aussi de fonctionner.
+- Si le serveur web n'a pas le droit de supprimer `public/setup/`, l'assistant
+  le signale : **supprime le dossier toi-même**.
+
+**Pour recommencer une installation** (en cas d'erreur ou de navigateur fermé),
+supprime sur le serveur `.env.local`, `var/setup-en-cours.lock` et
+`var/installation.lock`, remets le dossier `public/setup/` si besoin, puis
+rouvre `/setup/`.
+
+## Installation manuelle sur un serveur Apache
+
+Pour un serveur où tu as un accès SSH et la main sur Apache (VPS, serveur dédié).
+Cette méthode n'utilise pas l'assistant : supprime le dossier `public/setup/` après
+l'installation.
 
 Les commandes ci-dessous visent **Debian 13 (Trixie)**, qui fournit directement
 PHP 8.4 et MariaDB 11.8. Sur Ubuntu ou une Debian plus ancienne, il faut ajouter
@@ -215,6 +281,7 @@ Crée `/etc/apache2/sites-available/grimpepan.conf` :
     DocumentRoot /var/www/grimpepan/public
 
     <Directory /var/www/grimpepan/public>
+        DirectoryIndex index.php
         # Configuration complète ici : les .htaccess ne sont pas lus (plus rapide)
         AllowOverride None
         Require all granted
@@ -452,7 +519,13 @@ php bin/console lint:container
 php bin/console debug:router
 ```
 
-**Donner le rôle admin** à un utilisateur (il n'y a pas encore d'interface) :
+**Créer un compte administrateur** (le mot de passe est demandé de façon masquée) :
+
+```bash
+php bin/console app:utilisateur:creer admin@exemple.org Admin --admin
+```
+
+Pour donner le rôle à un compte existant (pas encore d'interface) :
 
 ```sql
 UPDATE utilisateur SET roles = '["ROLE_ADMIN"]' WHERE email = 'adresse@exemple.org';
@@ -478,6 +551,8 @@ L'utilisateur doit se déconnecter puis se reconnecter pour que le rôle soit pr
 | `public/css/app.css` | Styles (palette alignée sur le logo) |
 | `public/fonts/bricolage-grotesque/` | Police des titres et du logo, avec sa licence |
 | `assets/logo/` | Logos SVG et favicon |
+| `public/setup/` | Assistant d'installation web (supprimé après l'installation) |
+| `src/Command/CreerUtilisateurCommand.php` | Commande `app:utilisateur:creer` (compte administrateur…) |
 | `migrations/` | Migrations Doctrine (générées sur MariaDB) |
 | `public/.htaccess` | Réécriture d'URL pour Apache sans VirtualHost (`symfony/apache-pack`) |
 | `public/uploads/.htaccess` | N'autorise que les images dans le dossier des photos |
