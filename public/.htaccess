@@ -52,6 +52,12 @@ DirectoryIndex index.php
     RewriteCond %{ENV:REDIRECT_STATUS} =""
     RewriteRule ^index\.php(?:/(.*)|$) %{ENV:BASE}/$1 [R=308,L]
 
+    # GrimpePan : l'assistant d'installation (dossier setup/) est servi par Apache
+    # lui-même (setup/index.php), sans passer par le contrôleur frontal.
+    # Sans cette règle, /setup/ (un dossier) partirait vers index.php, qui
+    # redirige vers /setup/ : boucle de redirections.
+    RewriteRule ^setup(?:/|$) - [L]
+
     # If the requested filename exists, simply serve it.
     # We only want to let Apache serve files and not directories.
     # Rewrite all other queries to the front controller.

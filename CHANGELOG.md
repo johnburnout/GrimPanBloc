@@ -7,6 +7,14 @@ Toutes les évolutions notables de GrimpePan. Format inspiré de
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [1.0.1] - 2026-11-05
+
+### Corrigé
+- Assistant d'installation : boucle de redirections sur `/setup/` avec les
+  hébergements qui utilisent `public/.htaccess` (sans VirtualHost dédié).
+  `public/.htaccess` laisse désormais Apache servir le dossier `setup/`, et la
+  page d'accueil redirige vers `setup/index.php`.
+
 ## [1.0.0] - 2026-11-05
 
 Première version publique.

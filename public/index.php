@@ -41,7 +41,9 @@ use App\Kernel;
         && !is_file($racine.'/.env.local.php')
         && !is_dir($racine.'/vendor/symfony/web-profiler-bundle')
     ) {
-        header('Location: '.rtrim(dirname($_SERVER['SCRIPT_NAME']), '/').'/setup/', true, 302);
+        // Vers setup/index.php (et non setup/) : fonctionne même si le serveur ne sert
+        // pas index.php pour un dossier ou réécrit les dossiers vers ce contrôleur frontal.
+        header('Location: '.rtrim(dirname($_SERVER['SCRIPT_NAME']), '/').'/setup/index.php', true, 302);
         exit;
     }
 })();
