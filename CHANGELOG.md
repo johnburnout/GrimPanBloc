@@ -7,6 +7,14 @@ Toutes les évolutions notables de GrimpePan. Format inspiré de
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [1.0.2] - 2026-11-05
+
+### Corrigé
+- Assistant d'installation : si le transfert FTP a oublié les fichiers cachés
+  (`.env`, `public/.htaccess`, `public/uploads/.htaccess`), l'assistant les
+  recrée au lieu d'échouer avec « Unable to read the .env environment file ».
+  Sans copie disponible, il explique quel fichier envoyer.
+
 ## [1.0.1] - 2026-11-05
 
 ### Corrigé

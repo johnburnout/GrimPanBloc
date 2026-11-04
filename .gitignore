@@ -25,3 +25,4 @@
 .DS_Store
 ###< app ###
 /build/
+/public/setup/_inc/fichiers-caches.php

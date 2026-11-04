@@ -71,6 +71,17 @@ final class Installateur
     public function verifierPrerequis(): array
     {
         $r = [];
+
+        // Fichiers dont le nom commence par un point : souvent oubliés par les clients FTP.
+        ['restaures' => $restaures, 'manquants' => $manquants] = $this->restaurerFichiersCaches();
+        $r[] = $this->verif('Fichier .env', !\in_array('.env', $manquants, true),
+            'Absent : affichez les fichiers cachés dans votre client FTP et envoyez le fichier .env de l\'archive à la racine du projet.', true,
+            \in_array('.env', $restaures, true) ? 'Absent après le transfert : restauré par l\'assistant.' : '');
+        $htaccess = array_values(array_diff($manquants, ['.env']));
+        $r[] = $this->verif('Fichiers .htaccess', [] === $htaccess,
+            'Absents : '.implode(', ', $htaccess).'. Indispensables si Apache n\'a pas de VirtualHost dédié : envoyez-les depuis l\'archive.', false,
+            ($h = array_values(array_diff($restaures, ['.env']))) ? 'Restaurés par l\'assistant : '.implode(', ', $h) : '');
+
         $r[] = $this->verif('PHP '.preg_replace('/\.0$/', '', self::PHP_MIN).' ou plus', version_compare(\PHP_VERSION, self::PHP_MIN, '>='), 'Version installée : '.\PHP_VERSION, true, 'Version installée : '.\PHP_VERSION);
 
         $manquantes = array_values(array_filter(self::EXTENSIONS, fn ($e) => !\extension_loaded($e)));
@@ -108,6 +119,31 @@ final class Installateur
             'Les mots de passe transitent en clair : activez HTTPS avant d\'ouvrir le site.', false);
 
         return $r;
+    }
+
+    /**
+     * Recrée les fichiers cachés absents (.env, .htaccess) à partir des copies que
+     * bin/construire-release.sh place dans _inc/fichiers-caches.php.
+     *
+     * @return array{restaures: list<string>, manquants: list<string>}
+     */
+    public function restaurerFichiersCaches(): array
+    {
+        $copies = is_file(__DIR__.'/fichiers-caches.php') ? (array) require __DIR__.'/fichiers-caches.php' : [];
+        $restaures = $manquants = [];
+        foreach (['.env', 'public/.htaccess', 'public/uploads/.htaccess'] as $rel) {
+            $chemin = $this->racine.'/'.$rel;
+            if (is_file($chemin)) {
+                continue;
+            }
+            if (isset($copies[$rel]) && is_writable(\dirname($chemin)) && false !== @file_put_contents($chemin, $copies[$rel])) {
+                $restaures[] = $rel;
+            } else {
+                $manquants[] = $rel;
+            }
+        }
+
+        return ['restaures' => $restaures, 'manquants' => $manquants];
     }
 
     // --- Étape 2 : base de données --------------------------------------------------
@@ -206,6 +242,11 @@ final class Installateur
      */
     public function console(array $arguments): array
     {
+        $this->restaurerFichiersCaches();
+        if (!is_file($this->racine.'/.env')) {
+            throw new \RuntimeException('Le fichier .env est absent de la racine du projet ('.$this->racine.'). '
+                .'Affichez les fichiers cachés dans votre client FTP et envoyez le fichier .env de l\'archive.');
+        }
         require_once $this->racine.'/vendor/autoload.php';
         (new \Symfony\Component\Dotenv\Dotenv())->bootEnv($this->racine.'/.env');
 

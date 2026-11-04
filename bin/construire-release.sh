@@ -32,6 +32,18 @@ rsync -a \
 mkdir -p "$dest/var" "$dest/public/uploads/photos"
 touch "$dest/public/uploads/photos/.gitkeep"
 
+echo "→ Copie des fichiers cachés pour l'assistant (souvent oubliés par les clients FTP)"
+php -r '
+    $racine = $argv[1];
+    $copies = [];
+    foreach ([".env", "public/.htaccess", "public/uploads/.htaccess"] as $rel) {
+        $copies[$rel] = file_get_contents("$racine/$rel");
+    }
+    file_put_contents("$racine/public/setup/_inc/fichiers-caches.php",
+        "<?php\n\n// Généré par bin/construire-release.sh : copies des fichiers cachés, restaurées par l\x27assistant s\x27ils manquent.\n"
+        ."\\defined(\x27GRIMPEPAN_SETUP\x27) || exit;\n\nreturn ".var_export($copies, true).";\n");
+' "$dest"
+
 echo "→ Dépendances de production (composer install --no-dev)"
 composer install --working-dir="$dest" --no-dev --optimize-autoloader \
   --no-scripts --no-interaction --no-progress --prefer-dist --quiet

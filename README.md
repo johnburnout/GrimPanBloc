@@ -91,7 +91,12 @@ Elle contient tout ce qu'il faut, y compris `vendor/` : l'assistant ne lance pas
 Composer. L'empreinte de l'archive est fournie à côté (`.sha256`).
 
 Envoie le contenu du dossier `grimpepan/` sur le serveur, puis fais pointer la
-racine web sur le dossier **`public/`**. Les prérequis sont les mêmes que pour
+racine web sur le dossier **`public/`**.
+
+> **Fichiers cachés** : `.env`, `public/.htaccess` et `public/uploads/.htaccess`
+> commencent par un point, et beaucoup de clients FTP les ignorent par défaut
+> (FileZilla : *Serveur → Forcer l'affichage des fichiers cachés*). L'assistant
+> les recrée s'ils manquent ; vérifie quand même qu'ils sont bien sur le serveur. Les prérequis sont les mêmes que pour
 l'installation manuelle : PHP 8.4.1 ou plus, MariaDB 11.8, Apache avec
 `mod_rewrite`, et l'extension PHP `zip` pour les mises à jour en un clic.
 
