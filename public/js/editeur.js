@@ -23,6 +23,7 @@
     let W = 1000, H = 1000; // dimensions réelles de l'image
     let svg = null;
     let glisse = null; // {index, bouge, depart}
+    let derniere = null; // dernière prise créée, redimensionnée par le curseur de taille
 
     // --- Données -----------------------------------------------------------
 
@@ -156,7 +157,8 @@
                 return;
             }
             memoriser();
-            prises.push({ x: pt.x, y: pt.y, r: parseFloat(curseurTaille.value), type: outil });
+            derniere = { x: pt.x, y: pt.y, r: parseFloat(curseurTaille.value), type: outil };
+            prises.push(derniere);
             synchroniser();
         });
 
@@ -187,6 +189,17 @@
         outil = b.dataset.outil;
         boutonsOutils.forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
     }));
+
+    // Le curseur de taille règle aussi le dernier cercle créé, tant qu'il existe
+    // (effacé ou annulé, il n'est plus dans la liste et n'est plus concerné).
+    let reglageEnCours = false;
+    curseurTaille.addEventListener('input', () => {
+        if (!derniere || !prises.includes(derniere)) return;
+        if (!reglageEnCours) { memoriser(); reglageEnCours = true; } // un seul « Annuler » par réglage
+        derniere.r = parseFloat(curseurTaille.value);
+        synchroniser();
+    });
+    curseurTaille.addEventListener('change', () => { reglageEnCours = false; });
 
     document.getElementById('annuler').addEventListener('click', () => {
         if (!historique.length) return;
