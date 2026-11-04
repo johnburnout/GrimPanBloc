@@ -27,6 +27,9 @@
     --bord: #ddd8cf;
     --rayon: 10px;
 
+    /* Polices */
+    --police-titre: 'Bricolage Grotesque', system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
     /* Couleurs des prises */
     --p-depart: #22c55e;
     --p-main: #ffffff;
@@ -69,6 +72,9 @@ a { color: var(--accent-fonce); }
 
 h1 { font-size: 1.6rem; margin: .5rem 0 1rem; display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
 h2 { font-size: 1.15rem; margin: 0 0 .75rem; }
+h1, h2, h3 { font-family: var(--police-titre); letter-spacing: -0.01em; line-height: 1.2; }
+h1 { font-weight: 700; }
+h2, h3 { font-weight: 650; }
 
 .titre-actions { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; justify-content: space-between; }
 .fil { margin: 0; }
