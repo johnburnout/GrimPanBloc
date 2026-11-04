@@ -28,6 +28,7 @@ security:
                 lifetime: 2592000
 
     access_control:
+        - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/secteurs/nouveau, roles: ROLE_USER }
         - { path: ^/voies/nouvelle, roles: ROLE_USER }
 

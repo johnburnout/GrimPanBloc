@@ -226,3 +226,11 @@ ul:has(> li > .form-error), form ul { color: #b42318; padding-left: 1.2rem; marg
 .zone-danger form { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
 .zone-danger label { flex-basis: 100%; }
 .zone-danger input[type=text] { flex: 1 1 12rem; }
+
+/* Mises à jour */
+.bandeau-maj { background: var(--accent); color: #fff; text-align: center; padding: .5rem 1rem; }
+.bandeau-maj a { color: #fff; font-weight: 600; }
+.carte-form-large { background: var(--surface); border: 1px solid var(--bord); border-radius: var(--rayon); padding: 1.25rem; margin-bottom: 1rem; }
+.notes-version { background: var(--fond); border-radius: var(--rayon); padding: .75rem 1rem; }
+.journal { margin: 0; padding-left: 1.25rem; }
+.pied { max-width: 1100px; margin: 2rem auto 1rem; padding: 0 1rem; color: var(--texte-doux); font-size: .85rem; }

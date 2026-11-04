@@ -21,6 +21,9 @@
     <nav>
         <a href="{{ path('app_home') }}">Voies</a>
         <a href="{{ path('secteur_index') }}">Secteurs</a>
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('admin_mise_a_jour') }}">Mises à jour</a>
+        {% endif %}
         {% if app.user %}
             <span class="pseudo">{{ app.user.pseudo }}</span>
             <a href="{{ path('app_logout') }}">Déconnexion</a>
@@ -31,6 +34,16 @@
     </nav>
 </header>
 
+{% if is_granted('ROLE_ADMIN') %}
+    {% set maj = grimpepan_mise_a_jour() %}
+    {% if maj and not (app.current_route starts with 'admin_mise_a_jour') %}
+        <div class="bandeau-maj" role="status">
+            GrimpePan {{ maj.version }} est disponible (version installée : {{ grimpepan_version() }}).
+            <a href="{{ path('admin_mise_a_jour') }}">Voir la mise à jour</a>
+        </div>
+    {% endif %}
+{% endif %}
+
 <main class="contenu">
     {% for type, messages in app.flashes %}
         {% for message in messages %}
@@ -40,6 +53,8 @@
 
     {% block body %}{% endblock %}
 </main>
+
+<footer class="pied">GrimpePan {{ grimpepan_version() }}</footer>
 
 {% block javascripts %}{% endblock %}
 </body>

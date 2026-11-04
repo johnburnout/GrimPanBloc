@@ -1,0 +1,74 @@
+# Publie une release GitHub à chaque tag « vX.Y.Z ».
+#
+# 1. vérifie que le tag correspond au fichier VERSION ;
+# 2. construit l'archive prête à installer (bin/construire-release.sh) ;
+# 3. publie la release avec l'archive, son empreinte SHA-256 et les notes
+#    tirées de CHANGELOG.md.
+#
+# Les sites déjà installés détectent la release (une fois par jour) et
+# proposent la mise à jour en un clic à leurs administrateurs.
+
+name: Release
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Le tag correspond au fichier VERSION
+        run: |
+          version="$(tr -d '[:space:]' < VERSION)"
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::Le tag $GITHUB_REF_NAME ne correspond pas au fichier VERSION ($version)."
+            exit 1
+          fi
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: ctype, iconv, intl, gd, exif, zip, pdo_mysql, mbstring, xml
+          tools: composer:v2
+          coverage: none
+
+      - name: Vérifications
+        run: |
+          composer validate --no-check-publish
+          composer install --no-interaction --no-progress --prefer-dist
+          php bin/console lint:container --env=prod
+          php bin/console lint:twig templates
+          php bin/console lint:yaml config
+
+      - name: Archive de release
+        run: bin/construire-release.sh build
+
+      - name: Notes de version (CHANGELOG.md)
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" '
+            $0 ~ "^## \\[" v "\\]" { dedans = 1; next }
+            dedans && /^## \[/   { exit }
+            dedans               { print }
+          ' CHANGELOG.md > build/notes.md
+          if [ ! -s build/notes.md ]; then
+            echo "::error::Aucune section « ## [$version] » dans CHANGELOG.md."
+            exit 1
+          fi
+
+      - name: Publication
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "build/grimpepan-$GITHUB_REF_NAME.zip" \
+            "build/grimpepan-$GITHUB_REF_NAME.zip.sha256" \
+            --title "GrimpePan ${GITHUB_REF_NAME#v}" \
+            --notes-file build/notes.md \
+            --verify-tag

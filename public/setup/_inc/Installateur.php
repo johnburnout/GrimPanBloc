@@ -9,7 +9,7 @@
 
 final class Installateur
 {
-    public const PHP_MIN = '8.4.0';
+    public const PHP_MIN = '8.4.1';
     public const MARIADB_MIN = '11.8.0';
     public const EXTENSIONS = ['pdo_mysql', 'gd', 'exif', 'intl', 'ctype', 'iconv', 'mbstring', 'dom', 'xml', 'session', 'tokenizer'];
 
@@ -86,6 +86,8 @@ final class Installateur
                 is_dir($chemin) ? 'Donnez le droit d\'écriture à l\'utilisateur du serveur web.' : 'Dossier absent.', true);
         }
 
+        $r[] = $this->verif('Extension zip (mises à jour en un clic)', \extension_loaded('zip'),
+            'Sans elle, les mises à jour se feront en SSH (php bin/console app:mise-a-jour).', false);
         $r[] = $this->verif('Écriture du fichier .env.local', is_writable($this->racine),
             'Sinon, l\'assistant affichera son contenu pour que vous le créiez vous-même.', false);
         $r[] = $this->verif('Écriture dans public/ (logos compilés)', is_writable($this->racine.'/public'),

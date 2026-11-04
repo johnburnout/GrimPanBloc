@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mises à jour · GrimpePan{% endblock %}
+
+{% block body %}
+    <h1>Mises à jour</h1>
+
+    {% set journal = app.session.get('mise_a_jour_dernier_journal') %}
+    {% if journal %}
+        <section class="carte-form-large">
+            <h2>Dernière mise à jour</h2>
+            <ol class="journal">{% for ligne in journal %}<li>{{ ligne }}</li>{% endfor %}</ol>
+        </section>
+        {% do app.session.remove('mise_a_jour_dernier_journal') %}
+    {% endif %}
+
+    <section class="carte-form-large">
+        <p>Version installée : <strong>{{ versionInstallee }}</strong></p>
+
+        {% if release is null %}
+            <p class="aide">Impossible de connaître la dernière version publiée (aucune release, ou GitHub injoignable).</p>
+        {% elseif not disponible %}
+            <p class="flash flash-success">GrimpePan est à jour : la dernière version publiée est la {{ release.version }}.</p>
+        {% else %}
+            <p class="flash flash-info">
+                La version <strong>{{ release.version }}</strong> est disponible
+                {%- if release.publieeLe %} (publiée le {{ release.publieeLe|date('d/m/Y') }}){% endif %}.
+            </p>
+
+            {% if release.notes %}
+                <h2>Nouveautés</h2>
+                <div class="notes-version">{{ release.notes|nl2br }}</div>
+            {% endif %}
+            <p><a href="{{ release.url }}" rel="noopener" target="_blank">Voir la release sur GitHub ↗</a></p>
+
+            {% if not release.estInstallable %}
+                <p class="flash flash-error">Cette release ne contient pas d'archive installable : mettez à jour à la main (voir le README).</p>
+            {% elseif problemes is not empty %}
+                <div class="flash flash-error">
+                    <p>La mise à jour depuis le navigateur n'est pas possible sur ce serveur :</p>
+                    <ul>{% for p in problemes %}<li>{{ p }}</li>{% endfor %}</ul>
+                    <p>Lancez-la en SSH : <code>php bin/console app:mise-a-jour</code></p>
+                </div>
+            {% else %}
+                <h2>Installer</h2>
+                <ul class="aide">
+                    <li>Le site passe en maintenance pendant quelques secondes.</li>
+                    <li>Les photos, la configuration (<code>.env.local</code>) et la base sont conservées ; la base est mise à jour si besoin.</li>
+                    <li>Le code actuel est conservé dans <code>var/mise-a-jour/</code>.</li>
+                    <li><strong>Sauvegardez la base de données avant</strong> (outil de votre hébergeur ou <code>mariadb-dump</code>).</li>
+                </ul>
+                <form method="post" action="{{ path('admin_mise_a_jour_installer') }}"
+                      onsubmit="this.querySelector('button').disabled = true; this.querySelector('button').textContent = 'Mise à jour en cours…'">
+                    <input type="hidden" name="_token" value="{{ csrf_token('mise_a_jour') }}">
+                    <button class="btn">Mettre à jour vers la version {{ release.version }}</button>
+                </form>
+            {% endif %}
+        {% endif %}
+
+        <p class="meta"><a href="{{ path('admin_mise_a_jour', {verifier: 1}) }}">Vérifier maintenant</a>
+            (sinon, GrimpePan vérifie une fois par jour)</p>
+    </section>
+{% endblock %}

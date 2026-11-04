@@ -1,5 +1,7 @@
 parameters:
     photos_dir: '%kernel.project_dir%/public/uploads/photos'
+    # Mises à jour : dépôt GitHub dont on suit les releases (API surchargée dans les tests)
+    env(MISE_A_JOUR_API): 'https://api.github.com/repos/johnburnout/GrimpePan'
 
 services:
     _defaults:
@@ -7,6 +9,8 @@ services:
         autoconfigure: true
         bind:
             string $photosDir: '%photos_dir%'
+            string $racine: '%kernel.project_dir%'
+            string $apiReleases: '%env(MISE_A_JOUR_API)%'
 
     App\:
         resource: '../src/'

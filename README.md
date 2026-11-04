@@ -14,7 +14,7 @@ On photographie une zone du mur, on marque les prises de la voie sur la photo, o
 donne une cotation, et les autres grimpeurs peuvent la consulter puis la cocher
 comme réussie.
 
-**Pile technique** : Symfony 8.1 · PHP ≥ 8.4 · Twig · Doctrine ORM · MariaDB 11.8 ·
+**Pile technique** : Symfony 8.1 · PHP ≥ 8.4.1 · Twig · Doctrine ORM · MariaDB 11.8 ·
 JavaScript natif (aucune étape de build) · AssetMapper.
 
 ---
@@ -26,6 +26,7 @@ JavaScript natif (aucune étape de build) · AssetMapper.
 - [Installation avec l'assistant web](#installation-avec-lassistant-web)
 - [Installation manuelle sur un serveur Apache](#installation-manuelle-sur-un-serveur-apache)
 - [Mise à jour du serveur](#mise-à-jour-du-serveur)
+- [Publier une nouvelle version](#publier-une-nouvelle-version)
 - [Installation en développement (macOS)](#installation-en-développement-macos)
 - [Base de données MariaDB locale](#base-de-données-mariadb-locale)
 - [Commandes utiles](#commandes-utiles)
@@ -57,6 +58,7 @@ JavaScript natif (aucune étape de build) · AssetMapper.
 - **Croix** : « J'ai réussi cette voie », que l'on peut aussi retirer.
 - **Modification** d'une voie par son créateur, selon les règles ci-dessous.
 - **Suppression** par le créateur ou un admin, avec un garde-fou pour les voies déjà réussies.
+- **Mises à jour** : alerte aux admins quand une nouvelle version est publiée, et mise à jour en un clic.
 
 ## Règles métier
 
@@ -81,21 +83,20 @@ C'est la façon la plus simple d'installer GrimpePan, et elle convient aussi aux
 hébergements mutualisés sans accès SSH. L'assistant se trouve dans
 `public/setup/` et s'ouvre dans un navigateur.
 
-### Préparer la livraison
+### Récupérer l'archive
 
-L'assistant ne lance pas Composer : le dossier `vendor/` doit être livré avec
-le code. Sur ton poste :
+Télécharge **`grimpepan-vX.Y.Z.zip`** depuis la
+[page des releases](https://github.com/johnburnout/GrimpePan/releases/latest).
+Elle contient tout ce qu'il faut, y compris `vendor/` : l'assistant ne lance pas
+Composer. L'empreinte de l'archive est fournie à côté (`.sha256`).
 
-```bash
-git clone https://github.com/johnburnout/GrimpePan.git grimpepan
-cd grimpepan
-composer install --no-dev --optimize-autoloader --no-scripts
-cd .. && zip -rq grimpepan.zip grimpepan -x 'grimpepan/.git/*' 'grimpepan/var/*' 'grimpepan/.env.local'
-```
+Envoie le contenu du dossier `grimpepan/` sur le serveur, puis fais pointer la
+racine web sur le dossier **`public/`**. Les prérequis sont les mêmes que pour
+l'installation manuelle : PHP 8.4.1 ou plus, MariaDB 11.8, Apache avec
+`mod_rewrite`, et l'extension PHP `zip` pour les mises à jour en un clic.
 
-Envoie le contenu de l'archive sur le serveur, puis fais pointer la racine web
-sur le dossier **`public/`**. Les prérequis sont les mêmes que pour
-l'installation manuelle : PHP 8.4, MariaDB 11.8, Apache avec `mod_rewrite`.
+Pour construire l'archive toi-même à partir du code : `bin/construire-release.sh`
+(voir [Publier une nouvelle version](#publier-une-nouvelle-version)).
 
 ### Lancer l'assistant
 
@@ -360,26 +361,106 @@ l'hébergeur ou dans un `.user.ini`.
 
 ## Mise à jour du serveur
 
+GrimpePan vérifie **une fois par jour** si une nouvelle release a été publiée
+sur GitHub. Si c'est le cas, les administrateurs voient un bandeau en haut des
+pages, et le détail se trouve sur la page **Mises à jour** (`/admin/mise-a-jour`).
+
+> **Avant toute mise à jour, sauvegarde la base** (outil de l'hébergeur, ou
+> `mariadb-dump -u grimpepan -p grimpepan > grimpepan-$(date +%F).sql`).
+> Le code, lui, est sauvegardé automatiquement.
+
+### En un clic, depuis l'administration
+
+Sur la page **Mises à jour**, le bouton « Mettre à jour » :
+
+1. télécharge l'archive de la release et vérifie son **empreinte SHA-256** ;
+2. contrôle son contenu, puis passe le site **en maintenance** (page 503 pour les visiteurs) ;
+3. remplace le code. L'ancien est déplacé dans `var/mise-a-jour/precedente-X.Y.Z-…/` ;
+4. avec le nouveau code : vide le cache, lance les **migrations** de la base,
+   recompile les logos, puis **retire la maintenance**.
+
+Ne sont **jamais touchés** : `.env.local`, `var/` et les photos
+(`public/uploads/photos/`). L'assistant `public/setup/` n'est pas réinstallé.
+
+Cette méthode suppose que le serveur web (PHP) puisse écrire dans la racine du
+projet, dans `public/` et dans `var/` : c'est généralement le cas en
+hébergement mutualisé. Sinon, la page le signale et propose la commande SSH.
+
+### En SSH
+
+```bash
+cd /var/www/grimpepan
+php bin/console app:mise-a-jour --verifier   # y a-t-il une nouvelle version ?
+php bin/console app:mise-a-jour              # l'installer (même mécanisme qu'en un clic)
+sudo systemctl reload php8.4-fpm             # vide l'OPcache (validate_timestamps = 0)
+```
+
+Lance la commande avec l'utilisateur propriétaire des fichiers (`deploy` dans
+l'installation manuelle).
+
+### Revenir à la version précédente
+
+L'ancienne version reste dans `var/mise-a-jour/precedente-X.Y.Z-…/`, qui
+contient tous les fichiers remplacés. Pour revenir en arrière, remets ces
+éléments à la racine, restaure la sauvegarde de la base si une migration a été
+appliquée, puis vide le cache (`rm -rf var/cache/prod`).
+
+### Si une mise à jour est interrompue
+
+Le mode maintenance (`var/maintenance.lock`) se lève tout seul après
+**30 minutes**. Pour le lever tout de suite, supprime ce fichier.
+
+### Installation faite avec git (sans archive)
+
 ```bash
 cd /var/www/grimpepan
 git pull
 composer install --no-dev --optimize-autoloader
-composer dump-env prod
 php bin/console doctrine:migrations:migrate -n
 php bin/console asset-map:compile
 php bin/console cache:clear
-sudo systemctl reload php8.4-fpm     # vide l'OPcache (validate_timestamps = 0)
+sudo systemctl reload php8.4-fpm
 ```
 
-Après la mise à jour qui introduit la réduction des photos, lance une fois
-`php bin/console app:photos:reduire` pour réduire les photos déjà envoyées.
-Commence par `--simulation` pour voir ce qui sera fait.
+### Notes propres à certaines versions
 
-Avant une migration de base, fais une sauvegarde :
+- **Réduction des photos** : après la mise à jour qui l'introduit, lance une fois
+  `php bin/console app:photos:reduire` pour réduire les photos déjà envoyées.
+  Commence par `--simulation` pour voir ce qui sera fait.
 
-```bash
-mariadb-dump -u grimpepan -p grimpepan > ~/sauvegardes/grimpepan-$(date +%F).sql
-```
+## Publier une nouvelle version
+
+Les versions suivent [SemVer](https://semver.org/lang/fr/) : `MAJEURE.MINEURE.CORRECTIF`.
+
+1. Mets à jour le fichier **`VERSION`** (par exemple `1.1.0`).
+2. Ajoute une section **`## [1.1.0] - AAAA-MM-JJ`** en tête de `CHANGELOG.md` :
+   elle devient les notes de la release, que les administrateurs lisent avant
+   de mettre à jour.
+3. Commite, crée le tag et pousse :
+
+   ```bash
+   git commit -am "Version 1.1.0"
+   git tag -a v1.1.0 -m "GrimpePan 1.1.0"
+   git push && git push origin v1.1.0
+   ```
+
+Le workflow GitHub Actions `.github/workflows/release.yml` fait le reste :
+
+- il vérifie que le tag correspond au fichier `VERSION` ;
+- il construit l'archive `grimpepan-v1.1.0.zip` (code, `vendor/` sans les
+  paquets de dev, paquets JavaScript) et son empreinte `.sha256`, avec
+  `bin/construire-release.sh` ;
+- il publie la release.
+
+Les sites installés la proposent ensuite à leurs administrateurs, dans un délai
+de 24 h au plus.
+
+Pour construire l'archive en local (pour la tester, par exemple) :
+`bin/construire-release.sh build/`.
+
+> **Contrat entre versions** : la route `/admin/mise-a-jour/finaliser` et son
+> paramètre `jeton` doivent exister dans toutes les versions. C'est la
+> **nouvelle** version qui reçoit cette requête, juste après le remplacement du code.
 
 ## Installation en développement (macOS)
 
@@ -553,6 +634,12 @@ L'utilisateur doit se déconnecter puis se reconnecter pour que le rôle soit pr
 | `assets/logo/` | Logos SVG et favicon |
 | `public/setup/` | Assistant d'installation web (supprimé après l'installation) |
 | `src/Command/CreerUtilisateurCommand.php` | Commande `app:utilisateur:creer` (compte administrateur…) |
+| `src/MiseAJour/` | Vérification des releases GitHub, installation d'une mise à jour, mode maintenance |
+| `src/Controller/AdminMiseAJourController.php` | Page « Mises à jour » (`/admin/mise-a-jour`) |
+| `src/Command/MiseAJourCommand.php` | Commande `app:mise-a-jour` |
+| `VERSION`, `CHANGELOG.md` | Version installée et journal des versions |
+| `bin/construire-release.sh` | Construction de l'archive de release |
+| `.github/workflows/release.yml` | Publication automatique d'une release à chaque tag `vX.Y.Z` |
 | `migrations/` | Migrations Doctrine (générées sur MariaDB) |
 | `public/.htaccess` | Réécriture d'URL pour Apache sans VirtualHost (`symfony/apache-pack`) |
 | `public/uploads/.htaccess` | N'autorise que les images dans le dossier des photos |

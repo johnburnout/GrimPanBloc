@@ -24,3 +24,4 @@
 !/public/uploads/photos/.gitkeep
 .DS_Store
 ###< app ###
+/build/
