@@ -189,3 +189,10 @@ ul:has(> li > .form-error), form ul { color: #b42318; padding-left: 1.2rem; marg
 .flash-info { background: #e0f2fe; color: #0c4a6e; }
 .croix { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--bord); }
 .croix form { margin: .5rem 0; }
+
+/* Suppression d'une voie validée */
+.zone-danger { margin-top: 2rem; padding: 1rem; border: 1px solid #f3b4ae; border-radius: var(--rayon); background: #fff5f4; }
+.zone-danger h2 { margin-top: 0; color: #b42318; font-size: 1.1rem; }
+.zone-danger form { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.zone-danger label { flex-basis: 100%; }
+.zone-danger input[type=text] { flex: 1 1 12rem; }

@@ -24,6 +24,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class VoieController extends AbstractController
 {
     private const MAX_PRISES = 200;
+    public const MOT_CONFIRMATION = 'SUPPRIMER';
 
     public function __construct(
         private readonly EntityManagerInterface $em,
@@ -132,6 +133,13 @@ class VoieController extends AbstractController
         }
         if (!$this->isCsrfTokenValid('supprimer'.$voie->getId(), $request->getPayload()->getString('_token'))) {
             throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        // Garde-fou : supprimer une voie validée efface aussi les croix des autres grimpeurs.
+        if ($voie->estValidee() && self::MOT_CONFIRMATION !== trim($request->getPayload()->getString('confirmation'))) {
+            $this->addFlash('error', 'Suppression annulée : tapez '.self::MOT_CONFIRMATION.' pour confirmer.');
+
+            return $this->redirectToRoute('voie_show', ['id' => $voie->getId()]);
         }
 
         $secteurId = $voie->getPhoto()->getSecteur()->getId();

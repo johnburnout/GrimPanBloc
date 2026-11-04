@@ -12,11 +12,15 @@
                 <a href="{{ path('voie_edit', {id: voie.id}) }}" class="btn btn-secondaire">Modifier</a>
             {% endif %}
             {% if voie.auteur == app.user or is_granted('ROLE_ADMIN') %}
-                <form method="post" action="{{ path('voie_delete', {id: voie.id}) }}"
-                      onsubmit="return confirm('Supprimer cette voie ?')">
-                    <input type="hidden" name="_token" value="{{ csrf_token('supprimer' ~ voie.id) }}">
-                    <button class="btn btn-danger">Supprimer</button>
-                </form>
+                {% if voie.estValidee %}
+                    <a href="#suppression" class="btn btn-danger">Supprimer…</a>
+                {% else %}
+                    <form method="post" action="{{ path('voie_delete', {id: voie.id}) }}"
+                          onsubmit="return confirm('Supprimer cette voie ?')">
+                        <input type="hidden" name="_token" value="{{ csrf_token('supprimer' ~ voie.id) }}">
+                        <button class="btn btn-danger">Supprimer</button>
+                    </form>
+                {% endif %}
             {% endif %}
         </div>
     </div>
@@ -61,4 +65,23 @@
             {% endif %}
         {% endif %}
     </section>
+
+    {% if voie.estValidee and (voie.auteur == app.user or is_granted('ROLE_ADMIN')) %}
+        {% set mot = constant('App\\Controller\\VoieController::MOT_CONFIRMATION') %}
+        <section id="suppression" class="zone-danger">
+            <h2>Supprimer la voie</h2>
+            <p>
+                Cette voie a été réussie par {{ voie.croixValidantes|length }} autre(s) grimpeur(s).
+                La supprimer effacera aussi {{ voie.croix|length }} croix. Cette action est définitive.
+            </p>
+            <form method="post" action="{{ path('voie_delete', {id: voie.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('supprimer' ~ voie.id) }}">
+                <label for="confirmation">Tapez <strong>{{ mot }}</strong> pour confirmer</label>
+                <input type="text" id="confirmation" name="confirmation" required
+                       autocomplete="off" autocapitalize="characters" spellcheck="false"
+                       pattern="\s*{{ mot }}\s*" title="Tapez {{ mot }} en majuscules">
+                <button class="btn btn-danger">Supprimer définitivement</button>
+            </form>
+        </section>
+    {% endif %}
 {% endblock %}
