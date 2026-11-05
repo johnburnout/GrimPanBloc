@@ -7,6 +7,28 @@ Toutes les évolutions notables de GrimpePan. Format inspiré de
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [1.1.0] - 2026-11-05
+
+### Ajouté
+- **Cotation par consensus** : chaque grimpeur qui réussit une voie propose sa
+  cotation (modifiable sur la fiche). La cotation affichée est la plus proposée ;
+  en cas d'égalité, la proposition du créateur départage, sinon la médiane.
+  Les cotations et croix existantes sont reprises telles quelles.
+- **Mon compte** : modification de l'email et du mot de passe (pseudo non
+  modifiable), liste de ses croix et de ses voies.
+- **Administration** :
+  - réglages : nom et logo de la salle ou du club (en-tête et fiche), serveur
+    SMTP, mail de test, envoi d'un message à tous les utilisateurs ou aux admins ;
+  - utilisateurs : nommer / retirer un admin, désactiver / réactiver, supprimer
+    (les voies restent visibles sous le pseudo) ;
+  - fiche A4 à imprimer avec un QR code vers le site.
+
+### Corrigé
+- Mise à jour en un clic : la finalisation (migrations) ne dépend plus de
+  l'utilisateur connecté, ce qui la bloquait quand une version modifie la table
+  des utilisateurs.
+- Page de connexion : le vrai motif du refus est affiché (compte désactivé…).
+
 ## [1.0.2] - 2026-11-05
 
 ### Corrigé

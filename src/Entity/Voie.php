@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Cotation\ConsensusCotation;
 use App\Enum\CotationCouleur;
 use App\Enum\CotationFr;
 use App\Enum\SystemeCotation;
@@ -40,9 +41,13 @@ class Voie
     #[ORM\Column(enumType: SystemeCotation::class, length: 10)]
     private SystemeCotation $systeme = SystemeCotation::Francaise;
 
-    /** Valeur brute de la cotation : "6a", "bleu"… */
+    /** Cotation affichée (consensus), valeur brute : "6a", "bleu"… */
     #[ORM\Column(length: 10)]
     private string $cotation = '';
+
+    /** Cotation proposée par le créateur. */
+    #[ORM\Column(length: 10)]
+    private string $cotationAuteur = '';
 
     /** Rang numérique de difficulté dans son échelle, pour trier et filtrer. */
     #[ORM\Column]
@@ -90,23 +95,38 @@ class Voie
     public function getCreeLe(): \DateTimeImmutable { return $this->creeLe; }
 
     // --- Cotation -------------------------------------------------------
+    //
+    // « cotationAuteur » est la proposition du créateur ; « cotation » et « rang »
+    // sont la cotation AFFICHÉE (consensus des validateurs, voir ConsensusCotation),
+    // recalculée à chaque changement et utilisée pour trier et filtrer.
 
     public function getSysteme(): SystemeCotation { return $this->systeme; }
-    public function setSysteme(SystemeCotation $systeme): static { $this->systeme = $systeme; return $this; }
 
+    public function setSysteme(SystemeCotation $systeme): static
+    {
+        $this->systeme = $systeme;
+        $this->recalculerCotation();
+
+        return $this;
+    }
+
+    /** Cotation affichée (valeur brute : « 6a », « bleu »). */
     public function getCotation(): string { return $this->cotation; }
     public function getRang(): int { return $this->rang; }
 
+    /** Proposition du créateur (valeur brute). */
+    public function getCotationAuteur(): string { return $this->cotationAuteur; }
+
+    // Champs du formulaire : ils portent la proposition du créateur.
     public function getCotationFr(): ?CotationFr
     {
-        return SystemeCotation::Francaise === $this->systeme ? CotationFr::tryFrom($this->cotation) : null;
+        return SystemeCotation::Francaise === $this->systeme ? CotationFr::tryFrom($this->cotationAuteur) : null;
     }
 
     public function setCotationFr(?CotationFr $c): static
     {
         if (null !== $c && SystemeCotation::Francaise === $this->systeme) {
-            $this->cotation = $c->value;
-            $this->rang = $c->rang();
+            $this->setCotationAuteur($c->value);
         }
 
         return $this;
@@ -114,29 +134,80 @@ class Voie
 
     public function getCotationCouleur(): ?CotationCouleur
     {
-        return SystemeCotation::Couleur === $this->systeme ? CotationCouleur::tryFrom($this->cotation) : null;
+        return SystemeCotation::Couleur === $this->systeme ? CotationCouleur::tryFrom($this->cotationAuteur) : null;
     }
 
     public function setCotationCouleur(?CotationCouleur $c): static
     {
         if (null !== $c && SystemeCotation::Couleur === $this->systeme) {
-            $this->cotation = $c->value;
-            $this->rang = $c->rang();
+            $this->setCotationAuteur($c->value);
         }
 
         return $this;
     }
 
-    /** L'enum de cotation correspondant au système choisi. */
+    public function setCotationAuteur(string $valeur): static
+    {
+        $this->cotationAuteur = $valeur;
+        $this->recalculerCotation();
+
+        return $this;
+    }
+
+    /** Cotation affichée, sous forme d'enum de l'échelle de la voie. */
     public function getCotationEnum(): CotationFr|CotationCouleur|null
     {
-        return $this->getCotationFr() ?? $this->getCotationCouleur();
+        return $this->systeme->cotation($this->cotation);
+    }
+
+    public function getCotationAuteurEnum(): CotationFr|CotationCouleur|null
+    {
+        return $this->systeme->cotation($this->cotationAuteur);
+    }
+
+    /**
+     * Propositions des validateurs (cotations valides dans l'échelle de la voie).
+     *
+     * @return list<string>
+     */
+    public function getVotesCotation(): array
+    {
+        $votes = [];
+        foreach ($this->getCroixValidantes() as $c) {
+            if (null !== $this->systeme->cotation($c->getCotation())) {
+                $votes[] = $c->getCotation();
+            }
+        }
+
+        return $votes;
+    }
+
+    /**
+     * Nombre de propositions par cotation, de la plus facile à la plus dure.
+     *
+     * @return list<array{cotation: CotationFr|CotationCouleur, nombre: int}>
+     */
+    public function getRepartitionCotations(): array
+    {
+        $r = [];
+        foreach (ConsensusCotation::repartition($this->getVotesCotation(), $this->systeme->rang(...)) as $valeur => $n) {
+            $r[] = ['cotation' => $this->systeme->cotation((string) $valeur), 'nombre' => $n];
+        }
+
+        return $r;
+    }
+
+    /** Recalcule la cotation affichée à partir des propositions. */
+    public function recalculerCotation(): void
+    {
+        $this->cotation = ConsensusCotation::calculer($this->getVotesCotation(), $this->cotationAuteur, $this->systeme->rang(...));
+        $this->rang = $this->systeme->rang($this->cotation);
     }
 
     #[Assert\Callback]
     public function validerCotation(ExecutionContextInterface $context): void
     {
-        if (null === $this->getCotationEnum()) {
+        if (null === $this->getCotationAuteurEnum()) {
             $champ = SystemeCotation::Francaise === $this->systeme ? 'cotationFr' : 'cotationCouleur';
             $context->buildViolation('Choisissez une cotation.')->atPath($champ)->addViolation();
         }
@@ -192,6 +263,25 @@ class Voie
     public function estValidee(): bool
     {
         return [] !== $this->getCroixValidantes();
+    }
+
+    /** Pose (ou met à jour) la croix et recalcule la cotation affichée. */
+    public function ajouterCroix(Croix $croix): static
+    {
+        if (!$this->croix->contains($croix)) {
+            $this->croix->add($croix);
+        }
+        $this->recalculerCotation();
+
+        return $this;
+    }
+
+    public function retirerCroix(Croix $croix): static
+    {
+        $this->croix->removeElement($croix);
+        $this->recalculerCotation();
+
+        return $this;
     }
 
     public function getCroixDe(?User $user): ?Croix

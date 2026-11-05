@@ -11,7 +11,7 @@ final class Installateur
 {
     public const PHP_MIN = '8.4.1';
     public const MARIADB_MIN = '11.8.0';
-    public const EXTENSIONS = ['pdo_mysql', 'gd', 'exif', 'intl', 'ctype', 'iconv', 'mbstring', 'dom', 'xml', 'session', 'tokenizer'];
+    public const EXTENSIONS = ['pdo_mysql', 'gd', 'exif', 'intl', 'sodium', 'ctype', 'iconv', 'mbstring', 'dom', 'xml', 'session', 'tokenizer'];
 
     /** Installation terminée : l'assistant est définitivement bloqué. */
     public readonly string $verrouFin;

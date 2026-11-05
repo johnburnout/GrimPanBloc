@@ -1,0 +1,90 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réglages · Administration · GrimpePan{% endblock %}
+
+{% block body %}
+    <h1>Administration</h1>
+    {{ include('admin/_onglets.html.twig', {actif: 'reglages'}) }}
+
+    <section class="carte-form-large">
+        <h2>Identité de la salle ou du club</h2>
+        <p class="aide">Le logo s'affiche dans l'en-tête du site et sur la <a href="{{ path('admin_fiche') }}">fiche à imprimer</a>. PNG, JPEG ou WebP, 5 Mo au plus. Il est réduit à {{ constant('App\\Site\\IdentiteClub::COTE_MAX_LOGO') }} px.</p>
+        <form method="post" enctype="multipart/form-data">
+            <input type="hidden" name="_token" value="{{ csrf_token('admin_reglages') }}">
+            <input type="hidden" name="action" value="club">
+            <label for="nom_club">Nom de la salle ou du club</label>
+            <input type="text" id="nom_club" name="nom_club" maxlength="100" value="{{ clubNom }}" placeholder="Périgord Escalade — Veyrignac">
+            {% if clubLogo %}
+                <p class="apercu-logo"><img src="{{ asset(clubLogo) }}" alt="Logo actuel"></p>
+                <label class="case"><input type="checkbox" name="supprimer_logo" value="1"> Supprimer le logo</label>
+            {% endif %}
+            <label for="logo">{{ clubLogo ? 'Remplacer le logo' : 'Logo' }}</label>
+            <input type="file" id="logo" name="logo" accept="image/png,image/jpeg,image/webp">
+            <button class="btn">Enregistrer</button>
+        </form>
+    </section>
+
+    <section class="carte-form-large">
+        <h2>Serveur d'envoi des mails (SMTP)</h2>
+        <p class="aide">Les informations sont fournies par votre hébergeur ou votre messagerie. Le mot de passe est enregistré chiffré.</p>
+        <form method="post" autocomplete="off" class="grille-form">
+            <input type="hidden" name="_token" value="{{ csrf_token('admin_reglages') }}">
+            <input type="hidden" name="action" value="smtp">
+            <div class="ligne-form">
+                <div><label for="hote">Serveur</label><input type="text" id="hote" name="hote" value="{{ smtp.hote }}" placeholder="smtp.exemple.org"></div>
+                <div class="etroit"><label for="port">Port</label><input type="number" id="port" name="port" min="1" max="65535" required value="{{ smtp.port }}"></div>
+            </div>
+            <label for="chiffrement">Chiffrement</label>
+            <select id="chiffrement" name="chiffrement">
+                {% for valeur, libelle in chiffrements %}<option value="{{ valeur }}" {{ valeur == smtp.chiffrement ? 'selected' }}>{{ libelle }}</option>{% endfor %}
+            </select>
+            <div class="ligne-form">
+                <div><label for="utilisateur">Identifiant</label><input type="text" id="utilisateur" name="utilisateur" value="{{ smtp.utilisateur }}" autocomplete="off"></div>
+                <div>
+                    <label for="mot_de_passe">Mot de passe {% if smtp.mot_de_passe_defini %}<small>(enregistré : laissez vide pour le garder)</small>{% endif %}</label>
+                    <input type="password" id="mot_de_passe" name="mot_de_passe" autocomplete="new-password">
+                </div>
+            </div>
+            {% if smtp.mot_de_passe_defini %}
+                <label class="case"><input type="checkbox" name="effacer_mot_de_passe" value="1"> Effacer le mot de passe enregistré</label>
+            {% endif %}
+            <div class="ligne-form">
+                <div><label for="expediteur">Adresse d'expédition</label><input type="email" id="expediteur" name="expediteur" value="{{ smtp.expediteur }}" placeholder="contact@exemple.org"></div>
+                <div><label for="expediteur_nom">Nom d'expéditeur</label><input type="text" id="expediteur_nom" name="expediteur_nom" value="{{ smtp.expediteur_nom }}"></div>
+            </div>
+            <button class="btn">Enregistrer</button>
+        </form>
+    </section>
+
+    <section class="carte-form-large">
+        <h2>Mail de test</h2>
+        {% if not smtpConfigure %}<p class="flash flash-info">Renseignez d'abord le serveur et l'adresse d'expédition.</p>{% endif %}
+        <p class="aide">Envoie un message générique pour vérifier les réglages ci-dessus.</p>
+        <form method="post" class="form-en-ligne">
+            <input type="hidden" name="_token" value="{{ csrf_token('admin_reglages') }}">
+            <input type="hidden" name="action" value="test">
+            <label for="destinataire">Destinataire</label>
+            <input type="email" id="destinataire" name="destinataire" required value="{{ saisie.destinataire }}">
+            <button class="btn" {{ not smtpConfigure ? 'disabled' }}>Envoyer le mail de test</button>
+        </form>
+    </section>
+
+    <section class="carte-form-large">
+        <h2>Envoyer un message</h2>
+        <p class="aide">Un mail est envoyé à chaque destinataire : les adresses ne sont pas visibles des autres. Écrivez <code>{pseudo}</code> pour insérer le pseudo du destinataire. Les comptes désactivés ou supprimés ne reçoivent rien.</p>
+        <form method="post" onsubmit="return confirm('Envoyer ce message ?')">
+            <input type="hidden" name="_token" value="{{ csrf_token('admin_reglages') }}">
+            <input type="hidden" name="action" value="envoi_groupe">
+            <fieldset class="choix">
+                <legend>Destinataires</legend>
+                <label class="case"><input type="radio" name="cible" value="tous" {{ saisie.cible == 'tous' ? 'checked' }}> Tous les utilisateurs ({{ nbTous }})</label>
+                <label class="case"><input type="radio" name="cible" value="admins" {{ saisie.cible == 'admins' ? 'checked' }}> Les administrateurs ({{ nbAdmins }})</label>
+            </fieldset>
+            <label for="objet">Objet</label>
+            <input type="text" id="objet" name="objet" required maxlength="200" value="{{ saisie.objet }}">
+            <label for="corps">Message</label>
+            <textarea id="corps" name="corps" required rows="8">{{ saisie.corps }}</textarea>
+            <button class="btn" {{ not smtpConfigure ? 'disabled' }}>Envoyer</button>
+        </form>
+    </section>
+{% endblock %}

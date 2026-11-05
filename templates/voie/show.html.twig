@@ -42,26 +42,60 @@
     </p>
 
     <section class="croix">
-        {% set nb = voie.croix|length %}
+        <h2>Cotation</h2>
+        {% set repartition = voie.repartitionCotations %}
         <p>
-            {% if nb == 0 %}
-                Personne n'a encore réussi cette voie.
+            {{ include('voie/_badge.html.twig') }}
+            {% if repartition is empty %}
+                proposée par {{ voie.auteur.pseudo }} (créateur). Elle sera remplacée par l'avis des grimpeurs qui réussiront la voie.
             {% else %}
-                ✔ Réussie par {{ voie.croix|map(c => c.grimpeur.pseudo)|join(', ') }}
+                d'après {{ voie.votesCotation|length }} grimpeur(s) ayant réussi la voie
+                · proposition du créateur : <strong>{{ voie.cotationAuteurEnum ? voie.cotationAuteurEnum.libelle : voie.cotationAuteur }}</strong>
             {% endif %}
         </p>
+        {% if repartition is not empty %}
+            <ul class="repartition" aria-label="Cotations proposées">
+                {% for r in repartition %}
+                    <li{% if r.cotation.value == voie.cotation %} class="retenue"{% endif %}>
+                        <span class="badge badge-{{ voie.systeme.value }}" style="--couleur: {{ r.cotation.couleurBadge }}">{{ r.cotation.libelle }}</span>
+                        × {{ r.nombre }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        <h2>Réussites</h2>
+        <p>
+            {% if voie.croix is empty %}
+                Personne n'a encore réussi cette voie.
+            {% else %}
+                ✔ {{ voie.croix|map(c => c.grimpeur.pseudo ~ (c.cotation ? ' (' ~ c.cotation ~ ')' : ''))|join(', ') }}
+            {% endif %}
+        </p>
+
         {% if app.user %}
             {% set maCroix = voie.croixDe(app.user) %}
-            <form method="post" action="{{ path('voie_croix', {id: voie.id}) }}">
+            {% set estAuteur = voie.auteur == app.user %}
+            <form method="post" action="{{ path('voie_croix', {id: voie.id}) }}" class="form-croix">
                 <input type="hidden" name="_token" value="{{ csrf_token('croix' ~ voie.id) }}">
+                {% if not estAuteur %}
+                    {% set proposee = maCroix ? maCroix.cotation : voie.cotation %}
+                    <label for="cotation-proposee">{{ maCroix ? 'Ma cotation' : 'Cotation que je propose' }}</label>
+                    <select id="cotation-proposee" name="cotation" required>
+                        {% for c in voie.systeme.cotations %}
+                            <option value="{{ c.value }}" {{ c.value == proposee ? 'selected' }}>{{ c.libelle }}</option>
+                        {% endfor %}
+                    </select>
+                {% endif %}
                 {% if maCroix %}
-                    <button class="btn btn-secondaire">Retirer ma croix</button>
+                    {% if not estAuteur %}<button class="btn" name="action" value="modifier">Modifier ma cotation</button>{% endif %}
+                    <button class="btn btn-secondaire" name="action" value="retirer">Retirer ma croix</button>
                 {% else %}
-                    <button class="btn">J'ai réussi cette voie</button>
+                    <button class="btn" name="action" value="poser">J'ai réussi cette voie</button>
                 {% endif %}
             </form>
-            {% if voie.auteur == app.user and not maCroix %}
-                <p class="aide">Votre propre croix ne verrouille pas la voie : seule celle d'un autre grimpeur le fait.</p>
+            {% if estAuteur and not maCroix %}
+                <p class="aide">Votre propre croix ne verrouille pas la voie et ne vote pas : seules celles des autres grimpeurs comptent.</p>
             {% endif %}
         {% endif %}
     </section>

@@ -1,0 +1,64 @@
+{# Fiche A4 à imprimer : page autonome (sans l'en-tête du site). #}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fiche à imprimer · GrimpePan</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('logo/favicon.svg') }}">
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <style>
+        @page { size: A4 portrait; margin: 12mm; }
+        body { background: var(--fond); }
+        .barre { display: flex; gap: .75rem; align-items: center; justify-content: center; padding: 1rem; flex-wrap: wrap; }
+        .feuille {
+            background: #fff; color: #1c1f24; width: 210mm; min-height: 297mm; margin: 0 auto 2rem;
+            padding: 18mm 16mm; box-shadow: 0 2px 16px rgba(0,0,0,.12); box-sizing: border-box;
+            display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6mm;
+        }
+        .logos { display: flex; align-items: center; justify-content: center; gap: 8mm; flex-wrap: wrap; }
+        .logos img { max-height: 30mm; max-width: 75mm; object-fit: contain; }
+        .logos svg { height: 16mm; width: auto; }
+        .feuille h1 { font-size: 24pt; margin: 0; display: block; }
+        .feuille .accroche { font-size: 15pt; margin: 0; max-width: 150mm; }
+        .qr svg { width: 80mm; height: 80mm; display: block; }
+        .url { font-size: 14pt; font-weight: 600; word-break: break-all; margin: 0; }
+        .etapes { font-size: 12pt; text-align: left; margin: 0; padding-left: 1.4em; max-width: 140mm; }
+        .etapes li { margin: .3em 0; }
+        .pied-fiche { margin-top: auto; font-size: 10pt; color: #5c636b; }
+        @media print {
+            body { background: #fff; }
+            .barre { display: none; }
+            .feuille { box-shadow: none; margin: 0; width: auto; min-height: auto; padding: 0; break-inside: avoid; }
+        }
+        @media screen and (max-width: 230mm) { .feuille { width: auto; min-height: auto; margin: 0 16px 2rem; } }
+    </style>
+</head>
+<body>
+    <div class="barre">
+        <a class="btn btn-secondaire" href="{{ path('admin_reglages') }}">← Administration</a>
+        <button class="btn" type="button" onclick="window.print()">Imprimer</button>
+    </div>
+
+    <main class="feuille">
+        <div class="logos">
+            {% if club_logo() %}<img src="{{ asset(club_logo()) }}" alt="{{ club_nom() ?: 'Logo du club' }}">{% endif %}
+            {{ source('@logo/logo.svg') }}
+        </div>
+
+        <h1>{{ club_nom() ?: 'Les voies de la salle' }}</h1>
+        <p class="accroche">Toutes les voies du pan, leurs prises et leur cotation, sur votre téléphone.</p>
+
+        <div class="qr">{{ qr_code_svg(urlSite) }}</div>
+        <p class="url">{{ urlSite }}</p>
+
+        <ol class="etapes">
+            <li>Scannez le QR code avec l'appareil photo de votre téléphone.</li>
+            <li>Créez votre compte en quelques secondes.</li>
+            <li>Consultez les voies, cochez celles que vous réussissez et proposez leur cotation.</li>
+        </ol>
+
+        <p class="pied-fiche">GrimpePan</p>
+    </main>
+</body>
+</html>

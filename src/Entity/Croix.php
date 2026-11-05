@@ -7,7 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * « Croix » : un grimpeur indique qu'il a réussi la voie.
- * Une croix posée par un autre grimpeur que l'auteur valide la voie.
+ * Une croix posée par un autre grimpeur que l'auteur valide la voie, et porte
+ * la cotation qu'il propose (voir Voie::recalculerCotation()).
  */
 #[ORM\Entity(repositoryClass: CroixRepository::class)]
 #[ORM\UniqueConstraint(name: 'croix_unique', columns: ['voie_id', 'grimpeur_id'])]
@@ -26,6 +27,10 @@ class Croix
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private User $grimpeur;
 
+    /** Cotation proposée par le grimpeur (null pour l'auteur de la voie, qui propose la sienne sur la voie). */
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $cotation = null;
+
     #[ORM\Column]
     private \DateTimeImmutable $creeLe;
 
@@ -40,4 +45,7 @@ class Croix
     public function getVoie(): Voie { return $this->voie; }
     public function getGrimpeur(): User { return $this->grimpeur; }
     public function getCreeLe(): \DateTimeImmutable { return $this->creeLe; }
+
+    public function getCotation(): ?string { return $this->cotation; }
+    public function setCotation(?string $cotation): static { $this->cotation = $cotation; return $this; }
 }

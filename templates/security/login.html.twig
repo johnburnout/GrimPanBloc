@@ -7,7 +7,8 @@
     <h1>Connexion</h1>
 
     {% if error %}
-        <div class="flash flash-error">Email ou mot de passe incorrect.</div>
+        {# Motif réel (traduit en français par Symfony) : identifiants invalides, compte désactivé… #}
+        <div class="flash flash-error">{{ error.messageKey == 'Invalid credentials.' ? 'Email ou mot de passe incorrect.' : error.messageKey|trans(error.messageData, 'security') }}</div>
     {% endif %}
 
     <form method="post">

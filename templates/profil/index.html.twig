@@ -1,0 +1,22 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil · GrimpePan{% endblock %}
+
+{% block body %}
+    <h1>Mon compte</h1>
+    {{ include('profil/_onglets.html.twig', {actif: 'profil'}) }}
+
+    <section class="carte-form-large carte-etroite">
+        <p><span class="etiquette">Pseudo</span> <strong>{{ app.user.pseudo }}</strong>
+            <small class="aide">(non modifiable)</small></p>
+        <p><span class="etiquette">Inscrit le</span> {{ app.user.creeLe|date('d/m/Y') }}</p>
+
+        {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+        {{ form_errors(form) }}
+        {{ form_row(form.email) }}
+        {{ form_row(form.nouveauMotDePasse) }}
+        {{ form_row(form.motDePasseActuel) }}
+        <button class="btn">Enregistrer</button>
+        {{ form_end(form) }}
+    </section>
+{% endblock %}

@@ -14,6 +14,9 @@
     {# SVG insérés dans la page (et non en <img>) pour que le texte du logo
        utilise la police Bricolage Grotesque chargée par la page.
        Sur petit écran, le symbole seul laisse la place au menu. #}
+    {% if club_logo() %}
+        <img class="logo-club" src="{{ asset(club_logo()) }}" alt="{{ club_nom() ?: 'Logo du club' }}">
+    {% endif %}
     <a href="{{ path('app_home') }}" class="logo" aria-label="GrimpePan, accueil">
         <span class="logo-complet">{{ source('@logo/logo-inverse.svg') }}</span>
         <span class="logo-symbole">{{ source('@logo/mark-inverse.svg') }}</span>
@@ -22,10 +25,10 @@
         <a href="{{ path('app_home') }}">Voies</a>
         <a href="{{ path('secteur_index') }}">Secteurs</a>
         {% if is_granted('ROLE_ADMIN') %}
-            <a href="{{ path('admin_mise_a_jour') }}">Mises à jour</a>
+            <a href="{{ path('admin') }}">Administration</a>
         {% endif %}
         {% if app.user %}
-            <span class="pseudo">{{ app.user.pseudo }}</span>
+            <a href="{{ path('profil') }}" class="pseudo" title="Mon compte">{{ app.user.pseudo }}</a>
             <a href="{{ path('app_logout') }}">Déconnexion</a>
         {% else %}
             <a href="{{ path('app_login') }}">Connexion</a>

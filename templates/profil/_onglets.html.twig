@@ -1,0 +1,6 @@
+{# Onglets de l'espace personnel. Variable : actif ('profil' | 'croix' | 'voies') #}
+<nav class="onglets" aria-label="Mon compte">
+    <a href="{{ path('profil') }}" {{ actif == 'profil' ? 'aria-current="page"' }}>Profil</a>
+    <a href="{{ path('profil_croix') }}" {{ actif == 'croix' ? 'aria-current="page"' }}>Mes croix</a>
+    <a href="{{ path('profil_voies') }}" {{ actif == 'voies' ? 'aria-current="page"' }}>Mes voies</a>
+</nav>

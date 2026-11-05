@@ -21,7 +21,7 @@ jobs:
   release:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Le tag correspond au fichier VERSION
         run: |
@@ -45,6 +45,7 @@ jobs:
           php bin/console lint:container --env=prod
           php bin/console lint:twig templates
           php bin/console lint:yaml config
+          php bin/phpunit
 
       - name: Archive de release
         run: bin/construire-release.sh build

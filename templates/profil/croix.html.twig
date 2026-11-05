@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes croix · GrimpePan{% endblock %}
+
+{% block body %}
+    <h1>Mon compte</h1>
+    {{ include('profil/_onglets.html.twig', {actif: 'croix'}) }}
+
+    {% if croix is empty %}
+        <p class="vide">Vous n'avez encore coché aucune voie comme réussie.</p>
+    {% else %}
+        <div class="tableau-defilant">
+            <table class="tableau">
+                <thead><tr><th>Voie</th><th>Secteur</th><th>Cotation affichée</th><th>Ma cotation</th><th>Le</th></tr></thead>
+                <tbody>
+                    {% for c in croix %}
+                        {% set voie = c.voie %}
+                        <tr>
+                            <td><a href="{{ path('voie_show', {id: voie.id}) }}">{{ voie.nom }}</a></td>
+                            <td>{{ voie.photo.secteur.nom }}</td>
+                            <td>{{ include('voie/_badge.html.twig') }}</td>
+                            <td>{{ c.cotation ?? (voie.auteur == app.user ? '— (votre voie)' : '—') }}</td>
+                            <td>{{ c.creeLe|date('d/m/Y') }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <p class="aide">{{ croix|length }} voie(s) réussie(s). Pour changer la cotation que vous proposez, ouvrez la fiche de la voie.</p>
+    {% endif %}
+{% endblock %}

@@ -12,9 +12,16 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|js|uploads)/
             security: false
+        # Finalisation d'une mise à jour : exécutée par la NOUVELLE version avant les
+        # migrations, donc sans recharger l'utilisateur depuis la base (son schéma n'est
+        # peut-être pas encore à jour). Autorisée par le seul jeton de maintenance.
+        mise_a_jour_finaliser:
+            pattern: ^/admin/mise-a-jour/finaliser$
+            security: false
         main:
             lazy: true
             provider: app_user_provider
+            user_checker: App\Security\UserChecker
             form_login:
                 login_path: app_login
                 check_path: app_login
@@ -29,6 +36,7 @@ security:
 
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/profil, roles: ROLE_USER }
         - { path: ^/secteurs/nouveau, roles: ROLE_USER }
         - { path: ^/voies/nouvelle, roles: ROLE_USER }
 

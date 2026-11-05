@@ -97,7 +97,13 @@ class VoieController extends AbstractController
         return $this->render('voie/show.html.twig', ['voie' => $voie]);
     }
 
-    /** Pose ou retire la croix (« réussie ») de l'utilisateur connecté. */
+    /**
+     * Croix de l'utilisateur connecté (« j'ai réussi cette voie ») :
+     * - action « poser » : un validateur (autre que l'auteur) propose une cotation ;
+     * - action « modifier » : le validateur change la cotation qu'il propose ;
+     * - action « retirer » : la croix est supprimée.
+     * La cotation affichée est recalculée à chaque fois (Voie::recalculerCotation()).
+     */
     #[Route('/{id}/croix', name: 'voie_croix', requirements: ['id' => '\d+'], methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
     public function croix(Voie $voie, Request $request): Response
@@ -108,19 +114,46 @@ class VoieController extends AbstractController
 
         /** @var User $user */
         $user = $this->getUser();
+        $estAuteur = $voie->getAuteur() === $user;
         $existante = $voie->getCroixDe($user);
+        $action = $request->getPayload()->getString('action');
 
-        if ($existante) {
-            $voie->getCroix()->removeElement($existante);
-            $this->em->remove($existante);
-            $this->addFlash('success', 'Croix retirée.');
-        } else {
-            $croix = new Croix($voie, $user);
-            $voie->getCroix()->add($croix);
-            $this->em->persist($croix);
-            $this->addFlash('success', 'Bravo ! Voie cochée comme réussie.');
+        if ('retirer' === $action) {
+            if ($existante) {
+                $voie->retirerCroix($existante);
+                $this->em->remove($existante);
+                $this->em->flush();
+                $this->addFlash('success', 'Croix retirée.');
+            }
+
+            return $this->redirectToRoute('voie_show', ['id' => $voie->getId()]);
         }
+
+        if (!\in_array($action, ['poser', 'modifier'], true) || ('modifier' === $action && !$existante)) {
+            throw $this->createAccessDeniedException('Action inconnue.');
+        }
+
+        // L'auteur propose sa cotation sur la voie : sa croix n'en porte pas.
+        $cotation = null;
+        if (!$estAuteur) {
+            $valeur = $request->getPayload()->getString('cotation');
+            $cotation = $voie->getSysteme()->cotation($valeur)?->value;
+            if (null === $cotation) {
+                $this->addFlash('error', 'Choisissez la cotation que vous proposez.');
+
+                return $this->redirectToRoute('voie_show', ['id' => $voie->getId()]);
+            }
+        }
+
+        $croix = $existante ?? new Croix($voie, $user);
+        $croix->setCotation($cotation);
+        $voie->ajouterCroix($croix);
+        $this->em->persist($croix);
         $this->em->flush();
+
+        $this->addFlash('success', $existante
+            ? sprintf('Cotation proposée modifiée : %s.', $croix->getCotation())
+            : 'Bravo ! Voie cochée comme réussie.');
 
         return $this->redirectToRoute('voie_show', ['id' => $voie->getId()]);
     }

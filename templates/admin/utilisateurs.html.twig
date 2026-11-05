@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Utilisateurs · Administration · GrimpePan{% endblock %}
+
+{% block body %}
+    <h1>Administration</h1>
+    {{ include('admin/_onglets.html.twig', {actif: 'utilisateurs'}) }}
+
+    <div class="tableau-defilant">
+        <table class="tableau">
+            <thead>
+                <tr><th>Pseudo</th><th>Email</th><th>Inscrit le</th><th>Voies</th><th>Croix</th><th>Statut</th><th>Actions</th></tr>
+            </thead>
+            <tbody>
+                {% for l in lignes %}
+                    {% set u = l.utilisateur %}
+                    {% set moi = u == app.user %}
+                    <tr class="{{ u.estSupprime ? 'supprime' : (not u.actif ? 'inactif') }}">
+                        <td><strong>{{ u.pseudo }}</strong>{% if moi %} <small>(vous)</small>{% endif %}</td>
+                        <td>{{ u.estSupprime ? '—' : u.email }}</td>
+                        <td>{{ u.creeLe|date('d/m/Y') }}</td>
+                        <td>{{ l.voies }}</td>
+                        <td>{{ l.croix }}</td>
+                        <td>
+                            {% if u.estSupprime %}Supprimé le {{ u.supprimeLe|date('d/m/Y') }}
+                            {% elseif not u.actif %}Désactivé
+                            {% else %}Actif{% if u.admin %} · <strong>admin</strong>{% endif %}{% endif %}
+                        </td>
+                        <td class="actions-ligne">
+                            {% if not u.estSupprime %}
+                                {% set jeton = csrf_token('utilisateur' ~ u.id) %}
+                                <form method="post" action="{{ path('admin_utilisateur_admin', {id: u.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ jeton }}">
+                                    <button class="btn btn-petit btn-secondaire">{{ u.admin ? 'Retirer admin' : 'Nommer admin' }}</button>
+                                </form>
+                                {% if not moi %}
+                                    <form method="post" action="{{ path('admin_utilisateur_actif', {id: u.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ jeton }}">
+                                        <button class="btn btn-petit btn-secondaire">{{ u.actif ? 'Désactiver' : 'Réactiver' }}</button>
+                                    </form>
+                                    <a class="btn btn-petit btn-danger" href="{{ path('admin_utilisateur_supprimer', {id: u.id}) }}">Supprimer…</a>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <p class="aide">Un compte désactivé ne peut plus se connecter (réversible). Un compte supprimé perd son email et son mot de passe (irréversible) ; ses voies et ses croix restent visibles sous son pseudo.</p>
+{% endblock %}

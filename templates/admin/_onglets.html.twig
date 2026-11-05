@@ -1,0 +1,11 @@
+{# Onglets de l'administration. Variable : actif ('reglages' | 'utilisateurs' | 'fiche' | 'mise_a_jour')| 'utilisateurs' | 'mise_a_jour') #}
+<nav class="onglets" aria-label="Administration">
+    {% for cle, onglet in {
+        reglages: {route: 'admin_reglages', libelle: 'Réglages'},
+        utilisateurs: {route: 'admin_utilisateurs', libelle: 'Utilisateurs'},
+        fiche: {route: 'admin_fiche', libelle: 'Fiche à imprimer'},
+        mise_a_jour: {route: 'admin_mise_a_jour', libelle: 'Mises à jour'},
+    } %}
+        <a href="{{ path(onglet.route) }}" {{ cle == actif ? 'aria-current="page"' }}>{{ onglet.libelle }}</a>
+    {% endfor %}
+</nav>

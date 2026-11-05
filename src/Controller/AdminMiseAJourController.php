@@ -23,9 +23,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * ⚠ Contrat entre versions : la route « admin_mise_a_jour_finaliser » et son
  * paramètre « jeton » doivent exister dans toutes les versions futures, car
  * c'est la NOUVELLE version qui reçoit cette requête après le remplacement du code.
+ * Elle tourne AVANT les migrations : elle ne doit dépendre d'aucune entité (pas de
+ * pare-feu, pas d'utilisateur connecté, voir security.yaml) ; seul le jeton l'autorise.
  */
 #[Route('/admin/mise-a-jour')]
-#[IsGranted('ROLE_ADMIN')]
 class AdminMiseAJourController extends AbstractController
 {
     public function __construct(
@@ -36,6 +37,7 @@ class AdminMiseAJourController extends AbstractController
     }
 
     #[Route('', name: 'admin_mise_a_jour', methods: ['GET'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function index(Request $request): Response
     {
         $release = $this->verificateur->derniereRelease($request->query->getBoolean('verifier'));
@@ -49,6 +51,7 @@ class AdminMiseAJourController extends AbstractController
     }
 
     #[Route('/installer', name: 'admin_mise_a_jour_installer', methods: ['POST'])]
+    #[IsGranted('ROLE_ADMIN')]
     public function installer(Request $request): Response
     {
         if (!$this->isCsrfTokenValid('mise_a_jour', $request->getPayload()->getString('_token'))) {
@@ -83,7 +86,11 @@ class AdminMiseAJourController extends AbstractController
         return $reponse;
     }
 
-    /** Exécutée par la NOUVELLE version : migrations, logos, fin de la maintenance. */
+    /**
+     * Exécutée par la NOUVELLE version : migrations, logos, fin de la maintenance.
+     * Autorisée par le seul jeton (secret aléatoire, valable 30 min, remis à l'admin
+     * qui a lancé la mise à jour) : l'utilisateur n'est pas rechargé depuis la base.
+     */
     #[Route('/finaliser', name: 'admin_mise_a_jour_finaliser', methods: ['GET'])]
     public function finaliser(Request $request, Maintenance $maintenance, KernelInterface $kernel): Response
     {

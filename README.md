@@ -55,10 +55,16 @@ JavaScript natif (aucune étape de build) · AssetMapper.
   - le curseur « Taille » règle les prochaines prises **et la dernière posée ou déplacée**.
 - **Affichage d'une voie** : photo assombrie, prises entourées de la couleur de leur type.
 - **Liste des voies** filtrable par secteur, échelle et plage de difficulté.
-- **Croix** : « J'ai réussi cette voie », que l'on peut aussi retirer.
+- **Croix** : « J'ai réussi cette voie », avec la cotation que l'on propose ; on peut ensuite la modifier ou retirer sa croix.
+- **Cotation par consensus** : la cotation affichée est celle qui réunit le plus de grimpeurs ayant réussi la voie (voir les règles ci-dessous).
 - **Modification** d'une voie par son créateur, selon les règles ci-dessous.
 - **Suppression** par le créateur ou un admin, avec un garde-fou pour les voies déjà réussies.
-- **Mises à jour** : alerte aux admins quand une nouvelle version est publiée, et mise à jour en un clic.
+- **Mon compte** (clic sur son pseudo) : modifier son email et son mot de passe (le pseudo n'est pas modifiable), liste de ses croix et de ses voies.
+- **Administration** (réservée aux admins) :
+  - **Réglages** : nom et logo de la salle ou du club (affichés dans l'en-tête et sur la fiche), serveur SMTP, mail de test, envoi d'un message à tous les utilisateurs ou aux seuls admins ;
+  - **Utilisateurs** : nommer ou retirer un admin, désactiver ou réactiver un compte, supprimer un compte ;
+  - **Fiche à imprimer** : affiche A4 avec le logo du club et un QR code vers le site ;
+  - **Mises à jour** : alerte quand une nouvelle version est publiée, et mise à jour en un clic.
 
 ## Règles métier
 
@@ -76,6 +82,22 @@ Précisions :
 - Si toutes les croix des autres grimpeurs sont retirées, la voie redevient entièrement modifiable.
 - Supprimer une voie supprime aussi ses prises et ses croix.
 - Les règles de modification sont dans `src/Security/VoieVoter.php`. Le serveur vérifie toutes ces règles, pas seulement l'interface.
+
+### Cotation
+
+- Le **créateur** propose une cotation en créant la voie. Elle s'affiche tant que personne d'autre ne l'a réussie.
+- Chaque grimpeur qui **valide** la voie (pose sa croix) propose sa cotation, qu'il peut modifier ensuite sur la fiche de la voie.
+- Dès qu'il y a au moins une proposition de validateur, seules ces propositions comptent : la cotation affichée est **la plus proposée**.
+- **Égalité** : la proposition du créateur départage si elle fait partie des cotations à égalité ; sinon on prend la **médiane** des cotations à égalité (avec un nombre pair, la plus facile des deux du milieu).
+- La croix du créateur ne vote pas. La liste, le tri et les filtres utilisent la cotation affichée.
+- La règle est dans `src/Cotation/ConsensusCotation.php` (testée par `tests/Cotation/ConsensusCotationTest.php`).
+
+### Comptes
+
+- Un compte **désactivé** ne peut plus se connecter ; c'est réversible. Sa session en cours est fermée aussitôt.
+- Un compte **supprimé** perd son email et son mot de passe (irréversible). Son pseudo reste réservé et affiché sur ses voies et ses croix, qui restent visibles et continuent de compter ; seul un admin peut supprimer ses voies.
+- Il reste toujours au moins **un administrateur actif** : le dernier ne peut être ni rétrogradé, ni désactivé, ni supprimé.
+- Quand le rôle d'un compte change, sa session est fermée : il doit se reconnecter (les droits sont lus à la connexion).
 
 ## Installation avec l'assistant web
 
@@ -611,13 +633,7 @@ php bin/console debug:router
 php bin/console app:utilisateur:creer admin@exemple.org Admin --admin
 ```
 
-Pour donner le rôle à un compte existant (pas encore d'interface) :
-
-```sql
-UPDATE utilisateur SET roles = '["ROLE_ADMIN"]' WHERE email = 'adresse@exemple.org';
-```
-
-L'utilisateur doit se déconnecter puis se reconnecter pour que le rôle soit pris en compte.
+Pour donner le rôle à un compte existant : **Administration → Utilisateurs → Nommer admin**. La personne doit se reconnecter.
 
 ## Structure du projet
 
@@ -640,6 +656,14 @@ L'utilisateur doit se déconnecter puis se reconnecter pour que le rôle soit pr
 | `public/setup/` | Assistant d'installation web (supprimé après l'installation) |
 | `src/Command/CreerUtilisateurCommand.php` | Commande `app:utilisateur:creer` (compte administrateur…) |
 | `src/MiseAJour/` | Vérification des releases GitHub, installation d'une mise à jour, mode maintenance |
+| `src/Cotation/ConsensusCotation.php` | Cotation affichée à partir des propositions des validateurs |
+| `src/Controller/ProfilController.php` | Mon compte : profil, mes croix, mes voies |
+| `src/Controller/AdminReglagesController.php` | Réglages (club, SMTP, mail de test, envoi groupé) et fiche à imprimer |
+| `src/Controller/AdminUtilisateursController.php` | Liste des utilisateurs : admin, désactivation, suppression |
+| `src/Mail/` | Réglages SMTP (mot de passe chiffré avec `APP_SECRET`) et envoi des mails |
+| `src/Site/IdentiteClub.php` | Nom et logo du club (`public/uploads/logo/`) |
+| `src/Security/UserChecker.php` | Refus de connexion des comptes désactivés |
+| `tests/` | Tests PHPUnit (`php bin/phpunit`) |
 | `src/Controller/AdminMiseAJourController.php` | Page « Mises à jour » (`/admin/mise-a-jour`) |
 | `src/Command/MiseAJourCommand.php` | Commande `app:mise-a-jour` |
 | `VERSION`, `CHANGELOG.md` | Version installée et journal des versions |

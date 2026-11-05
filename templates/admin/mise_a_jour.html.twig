@@ -3,7 +3,8 @@
 {% block title %}Mises à jour · GrimpePan{% endblock %}
 
 {% block body %}
-    <h1>Mises à jour</h1>
+    <h1>Administration</h1>
+    {{ include('admin/_onglets.html.twig', {actif: 'mise_a_jour'}) }}
 
     {% set journal = app.session.get('mise_a_jour_dernier_journal') %}
     {% if journal %}

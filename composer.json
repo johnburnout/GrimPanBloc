@@ -7,6 +7,8 @@
         "php": ">=8.4.1",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-sodium": "*",
+        "chillerlan/php-qrcode": "^6.0",
         "doctrine/doctrine-bundle": "^3.3",
         "doctrine/doctrine-migrations-bundle": "^4.0",
         "doctrine/orm": "^3.7",

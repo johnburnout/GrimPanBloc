@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes voies · GrimpePan{% endblock %}
+
+{% block body %}
+    <h1>Mon compte</h1>
+    {{ include('profil/_onglets.html.twig', {actif: 'voies'}) }}
+
+    {% if voies is empty %}
+        <p class="vide">Vous n'avez encore créé aucune voie.</p>
+    {% else %}
+        {{ include('voie/_liste.html.twig') }}
+    {% endif %}
+{% endblock %}
