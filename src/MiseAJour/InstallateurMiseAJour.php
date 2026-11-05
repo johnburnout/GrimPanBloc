@@ -165,7 +165,7 @@ final class InstallateurMiseAJour
     private function telecharger(string $url, string $destination): void
     {
         $reponse = $this->httpClient->request('GET', $url, [
-            'headers' => ['User-Agent' => 'GrimpePan/'.$this->version->get()],
+            'headers' => ['User-Agent' => 'GrimPanBloc/'.$this->version->get()],
             'timeout' => 30,
             'max_duration' => 600,
         ]);
@@ -204,8 +204,14 @@ final class InstallateurMiseAJour
         $archive->extractTo($destination);
         $archive->close();
 
-        // L'archive contient un dossier « grimpepan/ »
-        $racine = is_file($destination.'/grimpepan/VERSION') ? $destination.'/grimpepan' : $destination;
+        // L'archive contient un dossier « grimpanbloc/ » (« grimpepan/ » avant la 1.3.0)
+        $racine = $destination;
+        foreach (['grimpanbloc', 'grimpepan'] as $dossier) {
+            if (is_file("$destination/$dossier/VERSION")) {
+                $racine = "$destination/$dossier";
+                break;
+            }
+        }
         if (!is_file($racine.'/VERSION')) {
             throw new \RuntimeException('Archive invalide : fichier VERSION introuvable.');
         }

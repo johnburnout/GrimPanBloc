@@ -52,7 +52,7 @@ DirectoryIndex index.php
     RewriteCond %{ENV:REDIRECT_STATUS} =""
     RewriteRule ^index\.php(?:/(.*)|$) %{ENV:BASE}/$1 [R=308,L]
 
-    # GrimpePan : l'assistant d'installation (dossier setup/) est servi par Apache
+    # GrimPanBloc : l'assistant d'installation (dossier setup/) est servi par Apache
     # lui-même (setup/index.php), sans passer par le contrôleur frontal.
     # Sans cette règle, /setup/ (un dossier) partirait vers index.php, qui
     # redirige vers /setup/ : boucle de redirections.

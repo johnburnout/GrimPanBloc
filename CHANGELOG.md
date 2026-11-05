@@ -1,11 +1,20 @@
 # Journal des versions
 
-Toutes les évolutions notables de GrimpePan. Format inspiré de
+Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format inspiré de
 [Keep a Changelog](https://keepachangelog.com/fr/1.1.0/), numérotation
 [SemVer](https://semver.org/lang/fr/) : `MAJEURE.MINEURE.CORRECTIF`.
 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
+
+## [1.3.0] - 2026-11-05
+
+### Modifié
+- L'application s'appelle désormais **GrimPanBloc** (anciennement GrimpePan) :
+  nouveaux logos, textes, titres des pages, mails et assistant d'installation.
+- Les releases portent l'archive `grimpanbloc-vX.Y.Z.zip`, plus une copie sous
+  l'ancien nom (`grimpepan-vX.Y.Z.zip`) pour que les installations antérieures se
+  mettent à jour normalement. Aucune action n'est nécessaire sur les sites installés.
 
 ## [1.2.0] - 2026-11-05
 

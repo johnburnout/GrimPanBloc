@@ -109,5 +109,7 @@
         "symfony/maker-bundle": "^1.0",
         "symfony/stopwatch": "8.1.*",
         "symfony/web-profiler-bundle": "8.1.*"
-    }
+    },
+    "name": "johnburnout/grimpanbloc",
+    "description": "GrimPanBloc : création et affichage de blocs et de voies sur un pan d'escalade"
 }

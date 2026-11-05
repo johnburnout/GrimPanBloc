@@ -59,7 +59,7 @@ class AdminMiseAJourController extends AbstractController
         }
         $release = $this->verificateur->miseAJourDisponible(true);
         if (!$release) {
-            $this->addFlash('info', 'GrimpePan est déjà à jour.');
+            $this->addFlash('info', 'GrimPanBloc est déjà à jour.');
 
             return $this->redirectToRoute('admin_mise_a_jour');
         }
@@ -120,7 +120,7 @@ class AdminMiseAJourController extends AbstractController
                 $this->addFlash('error', $avertissement);
             }
             $journal[] = 'Base de données à jour, maintenance terminée.';
-            $this->addFlash('success', sprintf('GrimpePan est passé de la version %s à la version %s.', $depuis, $this->version->get()));
+            $this->addFlash('success', sprintf('GrimPanBloc est passé de la version %s à la version %s.', $depuis, $this->version->get()));
         } catch (\Throwable $e) {
             $this->addFlash('error', $e->getMessage());
         }

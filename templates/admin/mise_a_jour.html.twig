@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mises à jour · GrimpePan{% endblock %}
+{% block title %}Mises à jour · GrimPanBloc{% endblock %}
 
 {% block body %}
     <h1>Administration</h1>
@@ -21,7 +21,7 @@
         {% if release is null %}
             <p class="aide">Impossible de connaître la dernière version publiée (aucune release, ou GitHub injoignable).</p>
         {% elseif not disponible %}
-            <p class="flash flash-success">GrimpePan est à jour : la dernière version publiée est la {{ release.version }}.</p>
+            <p class="flash flash-success">GrimPanBloc est à jour : la dernière version publiée est la {{ release.version }}.</p>
         {% else %}
             <p class="flash flash-info">
                 La version <strong>{{ release.version }}</strong> est disponible
@@ -59,6 +59,6 @@
         {% endif %}
 
         <p class="meta"><a href="{{ path('admin_mise_a_jour', {verifier: 1}) }}">Vérifier maintenant</a>
-            (sinon, GrimpePan vérifie une fois par jour)</p>
+            (sinon, GrimPanBloc vérifie une fois par jour)</p>
     </section>
 {% endblock %}

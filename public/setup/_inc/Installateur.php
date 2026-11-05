@@ -1,11 +1,11 @@
 <?php
 
 /*
- * Assistant d'installation de GrimpePan : logique (vérifications, configuration,
+ * Assistant d'installation de GrimPanBloc : logique (vérifications, configuration,
  * commandes Symfony). Ce fichier ne fait rien s'il est appelé directement.
  */
 
-\defined('GRIMPEPAN_SETUP') || exit;
+\defined('GRIMPANBLOC_SETUP') || exit;
 
 final class Installateur
 {
@@ -34,12 +34,12 @@ final class Installateur
     public function raisonBlocage(?string $jetonSession): ?string
     {
         if (is_file($this->verrouFin)) {
-            return 'GrimpePan est déjà installé.';
+            return 'GrimPanBloc est déjà installé.';
         }
         $configure = is_file($this->envLocal) || is_file($this->racine.'/.env.local.php');
         if (!is_file($this->verrouSession)) {
             // Configuré sans l'assistant (installation manuelle, voir le README) : on n'y touche pas.
-            return $configure ? 'GrimpePan est déjà configuré sur ce serveur (fichier .env.local présent).' : null;
+            return $configure ? 'GrimPanBloc est déjà configuré sur ce serveur (fichier .env.local présent).' : null;
         }
         $attendu = trim((string) file_get_contents($this->verrouSession));
         if (null === $jetonSession || !hash_equals($attendu, hash('sha256', $jetonSession))) {
@@ -175,7 +175,7 @@ final class Installateur
 
         $brute = (string) $pdo->query('SELECT VERSION()')->fetchColumn();
         if (!str_contains(strtolower($brute), 'mariadb')) {
-            throw new \RuntimeException("Le serveur n'est pas MariaDB ($brute). GrimpePan est prévu pour MariaDB ".self::MARIADB_MIN.' ou plus.');
+            throw new \RuntimeException("Le serveur n'est pas MariaDB ($brute). GrimPanBloc est prévu pour MariaDB ".self::MARIADB_MIN.' ou plus.');
         }
         preg_match('/^\d+\.\d+\.\d+/', $brute, $m);
         $version = $m[0] ?? '0.0.0';

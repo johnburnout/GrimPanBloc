@@ -16,13 +16,13 @@ final class MiseAJourExtension
     ) {
     }
 
-    #[AsTwigFunction('grimpepan_version')]
+    #[AsTwigFunction('grimpanbloc_version')]
     public function version(): string
     {
         return $this->version->get();
     }
 
-    #[AsTwigFunction('grimpepan_mise_a_jour')]
+    #[AsTwigFunction('grimpanbloc_mise_a_jour')]
     public function miseAJour(): ?Release
     {
         return $this->verificateur->miseAJourDisponible();

@@ -68,8 +68,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "$GITHUB_REF_NAME" \
+            "build/grimpanbloc-$GITHUB_REF_NAME.zip" \
+            "build/grimpanbloc-$GITHUB_REF_NAME.zip.sha256" \
             "build/grimpepan-$GITHUB_REF_NAME.zip" \
             "build/grimpepan-$GITHUB_REF_NAME.zip.sha256" \
-            --title "GrimpePan ${GITHUB_REF_NAME#v}" \
+            --title "GrimPanBloc ${GITHUB_REF_NAME#v}" \
             --notes-file build/notes.md \
             --verify-tag

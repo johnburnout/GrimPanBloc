@@ -17,7 +17,7 @@ use Symfony\Component\Process\Process;
  *   php bin/console app:mise-a-jour --verifier   # vérifie seulement
  *   php bin/console app:mise-a-jour              # installe la dernière release
  */
-#[AsCommand(name: 'app:mise-a-jour', description: 'Vérifie et installe la dernière release GitHub de GrimpePan')]
+#[AsCommand(name: 'app:mise-a-jour', description: 'Vérifie et installe la dernière release GitHub de GrimPanBloc')]
 class MiseAJourCommand
 {
     public function __construct(
@@ -40,7 +40,7 @@ class MiseAJourCommand
             return Command::FAILURE;
         }
         if (!$this->version->estDepasseePar($release->version)) {
-            $io->success("GrimpePan est à jour (dernière release : {$release->version}).");
+            $io->success("GrimPanBloc est à jour (dernière release : {$release->version}).");
 
             return Command::SUCCESS;
         }
@@ -86,7 +86,7 @@ class MiseAJourCommand
 
             return Command::FAILURE;
         }
-        $io->success("GrimpePan est passé à la version {$release->version}.");
+        $io->success("GrimPanBloc est passé à la version {$release->version}.");
         $io->note('Si OPcache est configuré avec validate_timestamps = 0, rechargez PHP-FPM : sudo systemctl reload php8.4-fpm');
 
         return Command::SUCCESS;

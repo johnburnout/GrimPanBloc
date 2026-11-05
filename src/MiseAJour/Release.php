@@ -6,7 +6,9 @@ namespace App\MiseAJour;
  * Release publiée sur GitHub, avec son archive prête à installer.
  *
  * Convention (voir .github/workflows/release.yml) : chaque release porte
- * deux fichiers, grimpepan-vX.Y.Z.zip et grimpepan-vX.Y.Z.zip.sha256.
+ * grimpanbloc-vX.Y.Z.zip et son empreinte grimpanbloc-vX.Y.Z.zip.sha256.
+ * Depuis le changement de nom (1.3.0), elle porte aussi grimpepan-vX.Y.Z.zip(.sha256),
+ * l'ancien nom, pour que les installations antérieures puissent se mettre à jour.
  */
 final readonly class Release
 {
@@ -29,13 +31,17 @@ final readonly class Release
         $tag = (string) ($d['tag_name'] ?? '');
         $archive = $empreinte = null;
         $taille = 0;
+        $assets = [];
         foreach ($d['assets'] ?? [] as $a) {
-            $nom = (string) ($a['name'] ?? '');
-            if ("grimpepan-$tag.zip" === $nom) {
-                $archive = (string) $a['browser_download_url'];
-                $taille = (int) ($a['size'] ?? 0);
-            } elseif ("grimpepan-$tag.zip.sha256" === $nom) {
-                $empreinte = (string) $a['browser_download_url'];
+            $assets[(string) ($a['name'] ?? '')] = $a;
+        }
+        // Nouveau nom d'abord, ancien nom (avant 1.3.0) à défaut
+        foreach (['grimpanbloc', 'grimpepan'] as $prefixe) {
+            if (isset($assets["$prefixe-$tag.zip"], $assets["$prefixe-$tag.zip.sha256"])) {
+                $archive = (string) $assets["$prefixe-$tag.zip"]['browser_download_url'];
+                $taille = (int) ($assets["$prefixe-$tag.zip"]['size'] ?? 0);
+                $empreinte = (string) $assets["$prefixe-$tag.zip.sha256"]['browser_download_url'];
+                break;
             }
         }
 

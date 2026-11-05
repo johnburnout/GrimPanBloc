@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 #
 # Construit l'archive de release prête à installer :
-#   grimpepan-vX.Y.Z.zip         (code + vendor/ sans les paquets de dev)
-#   grimpepan-vX.Y.Z.zip.sha256  (empreinte vérifiée par la mise à jour en un clic)
+#   grimpanbloc-vX.Y.Z.zip         (code + vendor/ sans les paquets de dev, dossier grimpanbloc/)
+#   grimpanbloc-vX.Y.Z.zip.sha256  (empreinte vérifiée par la mise à jour en un clic)
+# et sa copie sous l'ancien nom (grimpepan-vX.Y.Z.zip, dossier grimpepan/), que cherchent
+# les installations antérieures à la 1.3.0 pour se mettre à jour.
 #
 # Usage : bin/construire-release.sh [dossier de sortie]   (par défaut : build/)
 # La version est lue dans le fichier VERSION. Utilisé par .github/workflows/release.yml.
@@ -13,13 +15,14 @@ racine="$(cd "$(dirname "$0")/.." && pwd)"
 sortie="$(mkdir -p "${1:-$racine/build}" && cd "${1:-$racine/build}" && pwd)"
 version="$(tr -d '[:space:]' < "$racine/VERSION")"
 tag="v$version"
-archive="grimpepan-$tag.zip"
+archive="grimpanbloc-$tag.zip"
+ancienne="grimpepan-$tag.zip"   # compatibilité avant 1.3.0
 
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "VERSION invalide : « $version »" >&2; exit 1; }
 
 travail="$(mktemp -d)"
 trap 'rm -rf "$travail"' EXIT
-dest="$travail/grimpepan"
+dest="$travail/grimpanbloc"
 
 echo "→ Copie du code ($tag)"
 rsync -a \
@@ -41,7 +44,7 @@ php -r '
     }
     file_put_contents("$racine/public/setup/_inc/fichiers-caches.php",
         "<?php\n\n// Généré par bin/construire-release.sh : copies des fichiers cachés, restaurées par l\x27assistant s\x27ils manquent.\n"
-        ."\\defined(\x27GRIMPEPAN_SETUP\x27) || exit;\n\nreturn ".var_export($copies, true).";\n");
+        ."\\defined(\x27GRIMPANBLOC_SETUP\x27) || exit;\n\nreturn ".var_export($copies, true).";\n");
 ' "$dest"
 
 echo "→ Dépendances de production (composer install --no-dev)"
@@ -52,10 +55,12 @@ echo "→ Paquets JavaScript de l'importmap (assets/vendor/, nécessaires à ass
 (cd "$dest" && APP_ENV=prod APP_DEBUG=0 APP_SECRET=construction php bin/console importmap:install --no-interaction)
 rm -rf "$dest/var/cache"
 
-echo "→ Archive $archive"
-rm -f "$sortie/$archive" "$sortie/$archive.sha256"
-(cd "$travail" && zip -rqX "$sortie/$archive" grimpepan)
-(cd "$sortie" && shasum -a 256 "$archive" > "$archive.sha256")
+echo "→ Archives $archive et $ancienne (compatibilité)"
+rm -f "$sortie/$archive" "$sortie/$archive.sha256" "$sortie/$ancienne" "$sortie/$ancienne.sha256"
+(cd "$travail" && zip -rqX "$sortie/$archive" grimpanbloc)
+mv "$dest" "$travail/grimpepan"
+(cd "$travail" && zip -rqX "$sortie/$ancienne" grimpepan)
+(cd "$sortie" && shasum -a 256 "$archive" > "$archive.sha256" && shasum -a 256 "$ancienne" > "$ancienne.sha256")
 
 echo "✔ $sortie/$archive ($(du -h "$sortie/$archive" | cut -f1))"
-cat "$sortie/$archive.sha256"
+cat "$sortie/$archive.sha256" "$sortie/$ancienne.sha256"

@@ -1,11 +1,11 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/logo/logo-inverse.svg">
-    <img src="assets/logo/logo.svg" alt="GrimpePan" width="330">
+    <img src="assets/logo/logo.svg" alt="GrimPanBloc" width="330">
   </picture>
 </p>
 
-# GrimpePan
+# GrimPanBloc
 
 Création et affichage de blocs et de voies sur une structure artificielle d'escalade
 de type « pan ».
@@ -101,18 +101,18 @@ Précisions :
 
 ## Installation avec l'assistant web
 
-C'est la façon la plus simple d'installer GrimpePan, et elle convient aussi aux
+C'est la façon la plus simple d'installer GrimPanBloc, et elle convient aussi aux
 hébergements mutualisés sans accès SSH. L'assistant se trouve dans
 `public/setup/` et s'ouvre dans un navigateur.
 
 ### Récupérer l'archive
 
-Télécharge **`grimpepan-vX.Y.Z.zip`** depuis la
+Télécharge **`grimpanbloc-vX.Y.Z.zip`** depuis la
 [page des releases](https://github.com/johnburnout/GrimpePan/releases/latest).
 Elle contient tout ce qu'il faut, y compris `vendor/` : l'assistant ne lance pas
 Composer. L'empreinte de l'archive est fournie à côté (`.sha256`).
 
-Envoie le contenu du dossier `grimpepan/` sur le serveur, puis fais pointer la
+Envoie le contenu du dossier `grimpanbloc/` sur le serveur, puis fais pointer la
 racine web sur le dossier **`public/`**.
 
 > **Fichiers cachés** : `.env`, `public/.htaccess` et `public/uploads/.htaccess`
@@ -127,7 +127,7 @@ Pour construire l'archive toi-même à partir du code : `bin/construire-release.
 
 ### Lancer l'assistant
 
-Ouvre `https://ton-domaine/setup/`. Tant que GrimpePan n'est pas installé, la
+Ouvre `https://ton-domaine/setup/`. Tant que GrimPanBloc n'est pas installé, la
 page d'accueil du site y redirige d'elle-même.
 
 | Étape | Ce que fait l'assistant |
@@ -172,8 +172,8 @@ Conventions utilisées (à adapter) :
 
 | | Valeur |
 |---|---|
-| Domaine | `grimpepan.example.org` |
-| Dossier de l'application | `/var/www/grimpepan` |
+| Domaine | `grimpanbloc.example.org` |
+| Dossier de l'application | `/var/www/grimpanbloc` |
 | Utilisateur qui déploie | `deploy` |
 | Utilisateur d'Apache et de PHP-FPM | `www-data` |
 
@@ -211,7 +211,7 @@ sudo systemctl restart php8.4-fpm apache2
 ### 3. Réglages PHP
 
 Le formulaire accepte des photos jusqu'à 15 Mo, mais PHP les limite par défaut à
-2 Mo. Crée `/etc/php/8.4/fpm/conf.d/90-grimpepan.ini` :
+2 Mo. Crée `/etc/php/8.4/fpm/conf.d/90-grimpanbloc.ini` :
 
 ```ini
 upload_max_filesize = 16M
@@ -238,9 +238,9 @@ sudo mariadb
 ```
 
 ```sql
-CREATE DATABASE grimpepan CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER 'grimpepan'@'localhost' IDENTIFIED BY 'mot-de-passe-solide';
-GRANT ALL PRIVILEGES ON grimpepan.* TO 'grimpepan'@'localhost';
+CREATE DATABASE grimpanbloc CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'grimpanbloc'@'localhost' IDENTIFIED BY 'mot-de-passe-solide';
+GRANT ALL PRIVILEGES ON grimpanbloc.* TO 'grimpanbloc'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
@@ -250,20 +250,20 @@ faut l'encoder dans l'URL de connexion (par exemple `@` devient `%40`).
 ### 5. Code de l'application
 
 ```bash
-sudo mkdir -p /var/www/grimpepan
-sudo chown deploy:www-data /var/www/grimpepan
-git clone https://github.com/johnburnout/GrimpePan.git /var/www/grimpepan
-cd /var/www/grimpepan
+sudo mkdir -p /var/www/grimpanbloc
+sudo chown deploy:www-data /var/www/grimpanbloc
+git clone https://github.com/johnburnout/GrimpePan.git /var/www/grimpanbloc
+cd /var/www/grimpanbloc
 ```
 
-Crée `/var/www/grimpepan/.env.local`. Ce fichier n'est **pas versionné** et
+Crée `/var/www/grimpanbloc/.env.local`. Ce fichier n'est **pas versionné** et
 contient les secrets :
 
 ```bash
 APP_ENV=prod
 APP_DEBUG=0
 APP_SECRET=<résultat de : openssl rand -hex 32>
-DATABASE_URL="mysql://grimpepan:mot-de-passe-solide@127.0.0.1:3306/grimpepan?serverVersion=11.8.6-MariaDB&charset=utf8mb4"
+DATABASE_URL="mysql://grimpanbloc:mot-de-passe-solide@127.0.0.1:3306/grimpanbloc?serverVersion=11.8.6-MariaDB&charset=utf8mb4"
 ```
 
 ```bash
@@ -286,7 +286,7 @@ PHP-FPM (`www-data`) doit pouvoir écrire dans `var/` (cache, logs) et dans le
 dossier des photos. Il n'a besoin d'écrire nulle part ailleurs.
 
 ```bash
-cd /var/www/grimpepan
+cd /var/www/grimpanbloc
 sudo chown -R deploy:www-data .
 sudo find . -type d -exec chmod 750 {} +
 sudo find . -type f -exec chmod 640 {} +
@@ -301,14 +301,14 @@ sudo find var public/uploads/photos -type d -exec chmod g+s {} +   # nouveaux fi
 
 ### 7. VirtualHost
 
-Crée `/etc/apache2/sites-available/grimpepan.conf` :
+Crée `/etc/apache2/sites-available/grimpanbloc.conf` :
 
 ```apache
 <VirtualHost *:80>
-    ServerName grimpepan.example.org
-    DocumentRoot /var/www/grimpepan/public
+    ServerName grimpanbloc.example.org
+    DocumentRoot /var/www/grimpanbloc/public
 
-    <Directory /var/www/grimpepan/public>
+    <Directory /var/www/grimpanbloc/public>
         DirectoryIndex index.php
         # Configuration complète ici : les .htaccess ne sont pas lus (plus rapide)
         AllowOverride None
@@ -317,7 +317,7 @@ Crée `/etc/apache2/sites-available/grimpepan.conf` :
     </Directory>
 
     # Dossier des photos : uniquement des images, aucun script
-    <Directory /var/www/grimpepan/public/uploads>
+    <Directory /var/www/grimpanbloc/public/uploads>
         Options -Indexes -ExecCGI
         FallbackResource disabled
         <FilesMatch ".">
@@ -334,17 +334,17 @@ Crée `/etc/apache2/sites-available/grimpepan.conf` :
     </FilesMatch>
 
     # Cache navigateur longue durée pour les fichiers versionnés par AssetMapper
-    <Directory /var/www/grimpepan/public/assets>
+    <Directory /var/www/grimpanbloc/public/assets>
         Header set Cache-Control "public, max-age=31536000, immutable"
     </Directory>
 
-    ErrorLog ${APACHE_LOG_DIR}/grimpepan_error.log
-    CustomLog ${APACHE_LOG_DIR}/grimpepan_access.log combined
+    ErrorLog ${APACHE_LOG_DIR}/grimpanbloc_error.log
+    CustomLog ${APACHE_LOG_DIR}/grimpanbloc_access.log combined
 </VirtualHost>
 ```
 
 ```bash
-sudo a2ensite grimpepan
+sudo a2ensite grimpanbloc
 sudo a2dissite 000-default
 sudo apache2ctl configtest
 sudo systemctl reload apache2
@@ -354,7 +354,7 @@ sudo systemctl reload apache2
 
 ```bash
 sudo apt install certbot python3-certbot-apache
-sudo certbot --apache -d grimpepan.example.org
+sudo certbot --apache -d grimpanbloc.example.org
 ```
 
 Certbot crée le VirtualHost `*:443`, ajoute la redirection HTTP → HTTPS et
@@ -371,10 +371,10 @@ tournerait en boucle.
 
 ### 9. Vérification
 
-- https://grimpepan.example.org affiche la liste des voies ;
+- https://grimpanbloc.example.org affiche la liste des voies ;
 - créer un compte, un secteur, puis une voie avec une photo de plusieurs Mo ;
-- en cas d'erreur : `/var/log/apache2/grimpepan_error.log` et
-  `/var/www/grimpepan/var/log/prod.log`.
+- en cas d'erreur : `/var/log/apache2/grimpanbloc_error.log` et
+  `/var/www/grimpanbloc/var/log/prod.log`.
 
 ### Variante : hébergement mutualisé
 
@@ -397,12 +397,12 @@ l'hébergeur ou dans un `.user.ini`.
 
 ## Mise à jour du serveur
 
-GrimpePan vérifie **une fois par jour** si une nouvelle release a été publiée
+GrimPanBloc vérifie **une fois par jour** si une nouvelle release a été publiée
 sur GitHub. Si c'est le cas, les administrateurs voient un bandeau en haut des
 pages, et le détail se trouve sur la page **Mises à jour** (`/admin/mise-a-jour`).
 
 > **Avant toute mise à jour, sauvegarde la base** (outil de l'hébergeur, ou
-> `mariadb-dump -u grimpepan -p grimpepan > grimpepan-$(date +%F).sql`).
+> `mariadb-dump -u grimpanbloc -p grimpanbloc > grimpanbloc-$(date +%F).sql`).
 > Le code, lui, est sauvegardé automatiquement.
 
 ### En un clic, depuis l'administration
@@ -425,7 +425,7 @@ hébergement mutualisé. Sinon, la page le signale et propose la commande SSH.
 ### En SSH
 
 ```bash
-cd /var/www/grimpepan
+cd /var/www/grimpanbloc
 php bin/console app:mise-a-jour --verifier   # y a-t-il une nouvelle version ?
 php bin/console app:mise-a-jour              # l'installer (même mécanisme qu'en un clic)
 sudo systemctl reload php8.4-fpm             # vide l'OPcache (validate_timestamps = 0)
@@ -449,7 +449,7 @@ Le mode maintenance (`var/maintenance.lock`) se lève tout seul après
 ### Installation faite avec git (sans archive)
 
 ```bash
-cd /var/www/grimpepan
+cd /var/www/grimpanbloc
 git pull
 composer install --no-dev --optimize-autoloader
 php bin/console doctrine:migrations:migrate -n
@@ -476,16 +476,19 @@ Les versions suivent [SemVer](https://semver.org/lang/fr/) : `MAJEURE.MINEURE.CO
 
    ```bash
    git commit -am "Version 1.1.0"
-   git tag -a v1.1.0 -m "GrimpePan 1.1.0"
+   git tag -a v1.1.0 -m "GrimPanBloc 1.1.0"
    git push && git push origin v1.1.0
    ```
 
 Le workflow GitHub Actions `.github/workflows/release.yml` fait le reste :
 
 - il vérifie que le tag correspond au fichier `VERSION` ;
-- il construit l'archive `grimpepan-v1.1.0.zip` (code, `vendor/` sans les
+- il construit l'archive `grimpanbloc-v1.1.0.zip` (code, `vendor/` sans les
   paquets de dev, paquets JavaScript) et son empreinte `.sha256`, avec
   `bin/construire-release.sh` ;
+- il en publie aussi une copie sous l'ancien nom de l'application,
+  `grimpepan-v1.1.0.zip` : c'est elle que cherchent les installations antérieures
+  à la 1.3.0 pour se mettre à jour ;
 - il publie la release.
 
 Les sites installés la proposent ensuite à leurs administrateurs, dans un délai
@@ -520,7 +523,7 @@ symfony check:requirements
 
 ```bash
 git clone https://github.com/johnburnout/GrimpePan.git
-cd GrimpePan
+cd GrimPanBloc
 composer install
 
 # Base de données (MariaDB doit tourner sur le port 3307, voir plus bas)

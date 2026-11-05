@@ -13,7 +13,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  */
 final class VerificateurMiseAJour
 {
-    private const CLE_CACHE = 'grimpepan_derniere_release';
+    private const CLE_CACHE = 'grimpanbloc_derniere_release';
     private const DUREE_CACHE = 86400;      // 24 h
     private const DUREE_CACHE_ECHEC = 3600; // GitHub injoignable : on réessaie dans 1 h
 
@@ -35,7 +35,7 @@ final class VerificateurMiseAJour
         $donnees = $this->cache->get(self::CLE_CACHE, function (ItemInterface $item): ?array {
             try {
                 $reponse = $this->httpClient->request('GET', rtrim($this->apiReleases, '/').'/releases/latest', [
-                    'headers' => ['Accept' => 'application/vnd.github+json', 'User-Agent' => 'GrimpePan/'.$this->version->get()],
+                    'headers' => ['Accept' => 'application/vnd.github+json', 'User-Agent' => 'GrimPanBloc/'.$this->version->get()],
                     'timeout' => 4,
                     'max_duration' => 8,
                 ]);

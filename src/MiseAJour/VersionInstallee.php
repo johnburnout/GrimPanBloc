@@ -2,7 +2,7 @@
 
 namespace App\MiseAJour;
 
-/** Version de GrimpePan installée, lue dans le fichier VERSION à la racine. */
+/** Version de GrimPanBloc installée, lue dans le fichier VERSION à la racine. */
 final class VersionInstallee
 {
     private ?string $version = null;

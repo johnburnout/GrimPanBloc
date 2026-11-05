@@ -24,8 +24,8 @@ final class MailerSite
         $this->envoyer(
             (new Email())
                 ->to($destinataire)
-                ->subject('GrimpePan : mail de test')
-                ->text("Bonjour,\n\nCe message confirme que GrimpePan peut envoyer des mails avec le serveur SMTP configuré.\n\nEnvoyé le ".date('d/m/Y à H:i').".\n\n— GrimpePan"),
+                ->subject('GrimPanBloc : mail de test')
+                ->text("Bonjour,\n\nCe message confirme que GrimPanBloc peut envoyer des mails avec le serveur SMTP configuré.\n\nEnvoyé le ".date('d/m/Y à H:i').".\n\n— GrimPanBloc"),
         );
     }
 
@@ -66,7 +66,7 @@ final class MailerSite
     {
         $r = $this->reglages->lire();
 
-        return $email->from(new Address($r['expediteur'], $r['expediteur_nom'] ?: 'GrimpePan'));
+        return $email->from(new Address($r['expediteur'], $r['expediteur_nom'] ?: 'GrimPanBloc'));
     }
 
     private function mailer(): Mailer

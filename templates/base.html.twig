@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}GrimpePan{% endblock %}</title>
+    <title>{% block title %}GrimPanBloc{% endblock %}</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('logo/favicon.svg') }}">
     <link rel="preload" href="{{ asset('fonts/bricolage-grotesque/bricolage-grotesque-latin-wght-normal.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
@@ -17,7 +17,7 @@
     {% if club_logo() %}
         <img class="logo-club" src="{{ asset(club_logo()) }}" alt="{{ club_nom() ?: 'Logo du club' }}">
     {% endif %}
-    <a href="{{ path('app_home') }}" class="logo" aria-label="GrimpePan, accueil">
+    <a href="{{ path('app_home') }}" class="logo" aria-label="GrimPanBloc, accueil">
         <span class="logo-complet">{{ source('@logo/logo-inverse.svg') }}</span>
         <span class="logo-symbole">{{ source('@logo/mark-inverse.svg') }}</span>
     </a>
@@ -38,10 +38,10 @@
 </header>
 
 {% if is_granted('ROLE_ADMIN') %}
-    {% set maj = grimpepan_mise_a_jour() %}
+    {% set maj = grimpanbloc_mise_a_jour() %}
     {% if maj and not (app.current_route starts with 'admin_mise_a_jour') %}
         <div class="bandeau-maj" role="status">
-            GrimpePan {{ maj.version }} est disponible (version installée : {{ grimpepan_version() }}).
+            GrimPanBloc {{ maj.version }} est disponible (version installée : {{ grimpanbloc_version() }}).
             <a href="{{ path('admin_mise_a_jour') }}">Voir la mise à jour</a>
         </div>
     {% endif %}
@@ -57,7 +57,7 @@
     {% block body %}{% endblock %}
 </main>
 
-<footer class="pied">GrimpePan {{ grimpepan_version() }}</footer>
+<footer class="pied">GrimPanBloc {{ grimpanbloc_version() }}</footer>
 
 {% block javascripts %}{% endblock %}
 </body>

@@ -23,9 +23,9 @@ use App\Kernel;
     header('Retry-After: 30');
     header('Content-Type: text/html; charset=UTF-8');
     echo '<!DOCTYPE html><html lang="fr"><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">'
-        .'<meta http-equiv="refresh" content="15"><title>Mise à jour en cours · GrimpePan</title>'
+        .'<meta http-equiv="refresh" content="15"><title>Mise à jour en cours · GrimPanBloc</title>'
         .'<body style="font-family:system-ui,sans-serif;background:#f4f2ee;color:#1c1f24;display:grid;place-items:center;min-height:90vh;text-align:center">'
-        .'<div><h1>Mise à jour en cours</h1><p>GrimpePan revient dans quelques instants.</p></div></body></html>';
+        .'<div><h1>Mise à jour en cours</h1><p>GrimPanBloc revient dans quelques instants.</p></div></body></html>';
     exit;
 })();
 

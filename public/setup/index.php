@@ -1,16 +1,16 @@
 <?php
 
 /*
- * Assistant d'installation de GrimpePan (https://votre-domaine/setup/).
+ * Assistant d'installation de GrimPanBloc (https://votre-domaine/setup/).
  *
  * Étapes : 1. prérequis · 2. base de données · 3. tables · 4. administrateur · 5. finalisation.
  * À la fin, l'assistant se bloque (var/installation.lock) puis supprime ce dossier.
- * Il refuse aussi de fonctionner si GrimpePan a déjà été configuré à la main (.env.local).
+ * Il refuse aussi de fonctionner si GrimPanBloc a déjà été configuré à la main (.env.local).
  */
 
 declare(strict_types=1);
 
-const GRIMPEPAN_SETUP = true;
+const GRIMPANBLOC_SETUP = true;
 $racine = dirname(__DIR__, 2);
 
 require __DIR__.'/_inc/Installateur.php';
@@ -21,7 +21,7 @@ $installateur = new Installateur($racine);
 // --- Session propre à l'assistant ---------------------------------------------
 
 $https = ($_SERVER['HTTPS'] ?? '') === 'on' || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
-session_name('grimpepan_setup');
+session_name('grimpanbloc_setup');
 session_set_cookie_params([
     'path' => rtrim(dirname($_SERVER['SCRIPT_NAME']), '/').'/',
     'httponly' => true,
@@ -146,7 +146,7 @@ if ('POST' === $_SERVER['REQUEST_METHOD']) {
                     session_destroy();
                     $supprime = $installateur->supprimerAssistant(__DIR__);
 
-                    $html = '<div class="msg msg-ok">GrimpePan est installé.</div>';
+                    $html = '<div class="msg msg-ok">GrimPanBloc est installé.</div>';
                     foreach ($avertissements as $a) {
                         $html .= '<div class="msg msg-alerte">'.h($a).'</div>';
                     }
@@ -171,7 +171,7 @@ switch ($etape) {
     case 1:
         $verifs = $installateur->verifierPrerequis();
         $bloque = (bool) array_filter($verifs, fn ($v) => $v['bloquant'] && !$v['ok']);
-        $html = '<p>L\'assistant vérifie que le serveur peut faire tourner GrimpePan.</p><ul class="verifs">';
+        $html = '<p>L\'assistant vérifie que le serveur peut faire tourner GrimPanBloc.</p><ul class="verifs">';
         foreach ($verifs as $v) {
             [$icone, $classe] = $v['ok'] ? ['✔', 'i-ok'] : ($v['bloquant'] ? ['✘', 'i-ko'] : ['!', 'i-alerte']);
             $html .= '<li><span class="'.$classe.'" aria-hidden="true">'.$icone.'</span><span>'.h($v['libelle'])
@@ -203,7 +203,7 @@ switch ($etape) {
             page('Base de données', 2, $etapeMax, $html, $erreur, $racine);
             break;
         }
-        $b = ($_SESSION['base'] ?? []) + ['hote' => 'localhost', 'port' => '3306', 'base' => 'grimpepan', 'utilisateur' => ''];
+        $b = ($_SESSION['base'] ?? []) + ['hote' => 'localhost', 'port' => '3306', 'base' => 'grimpanbloc', 'utilisateur' => ''];
         $html = '<p>Indiquez la base MariaDB fournie par votre hébergeur. Si elle n\'existe pas, l\'assistant essaie de la créer.</p>'
             .'<form method="post" autocomplete="off">'.$csrf
             .'<div class="ligne"><div><label for="hote">Serveur</label><input type="text" id="hote" name="hote" required value="'.h($b['hote']).'"></div>'
@@ -223,7 +223,7 @@ switch ($etape) {
             $html .= '<p class="msg msg-alerte">La base contient déjà '.(int) $i['tables'].' table(s). Seules les tables manquantes seront créées : '
                 .'les données existantes sont conservées.</p>';
         }
-        $html .= '<p>L\'assistant va créer les tables de GrimpePan (utilisateurs, secteurs, photos, voies, prises, croix).</p>';
+        $html .= '<p>L\'assistant va créer les tables de GrimPanBloc (utilisateurs, secteurs, photos, voies, prises, croix).</p>';
         if (isset($_SESSION['sortie_tables']) && $etapeMax > 3) {
             $html .= '<pre>'.h($_SESSION['sortie_tables']).'</pre>';
         }

@@ -1,11 +1,11 @@
 <?php
 
 /*
- * Assistant d'installation de GrimpePan : mise en page.
+ * Assistant d'installation de GrimPanBloc : mise en page.
  * Ce fichier ne fait rien s'il est appelé directement.
  */
 
-\defined('GRIMPEPAN_SETUP') || exit;
+\defined('GRIMPANBLOC_SETUP') || exit;
 
 const ETAPES = [
     1 => 'Prérequis',
@@ -35,7 +35,7 @@ function sortieConsole(string $sortie): string
  */
 function page(string $titre, int $etape, int $etapeMax, string $contenu, ?string $erreur = null, ?string $racine = null): void
 {
-    $logo = $racine && is_file($racine.'/assets/logo/logo.svg') ? file_get_contents($racine.'/assets/logo/logo.svg') : '<strong>GrimpePan</strong>';
+    $logo = $racine && is_file($racine.'/assets/logo/logo.svg') ? file_get_contents($racine.'/assets/logo/logo.svg') : '<strong>GrimPanBloc</strong>';
     header('Content-Type: text/html; charset=UTF-8');
     header('X-Robots-Tag: noindex, nofollow');
     header('Cache-Control: no-store');
@@ -48,7 +48,7 @@ function page(string $titre, int $etape, int $etapeMax, string $contenu, ?string
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
-    <title><?= h($titre) ?> · Installation de GrimpePan</title>
+    <title><?= h($titre) ?> · Installation de GrimPanBloc</title>
     <style>
         @font-face {
             font-family: 'Bricolage Grotesque'; font-weight: 200 800; font-display: swap;

@@ -31,7 +31,7 @@ final class ReglagesSmtp
             'chiffrement' => (string) $this->reglages->valeur('smtp.chiffrement', 'starttls'),
             'utilisateur' => (string) $this->reglages->valeur('smtp.utilisateur', ''),
             'expediteur' => (string) $this->reglages->valeur('smtp.expediteur', ''),
-            'expediteur_nom' => (string) $this->reglages->valeur('smtp.expediteur_nom', 'GrimpePan'),
+            'expediteur_nom' => (string) $this->reglages->valeur('smtp.expediteur_nom', 'GrimPanBloc'),
             'mot_de_passe_defini' => '' !== (string) $this->reglages->valeur('smtp.mot_de_passe', ''),
         ];
     }
@@ -86,6 +86,8 @@ final class ReglagesSmtp
 
     private function cle(): string
     {
+        // Ne pas modifier ce préfixe (ancien nom de l'application) : il sert à dériver la clé
+        // qui chiffre les mots de passe SMTP déjà enregistrés.
         return sodium_crypto_generichash('grimpepan-smtp|'.$this->secret, '', SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
     }
 }
