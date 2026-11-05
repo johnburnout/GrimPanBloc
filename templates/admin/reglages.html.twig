@@ -7,6 +7,25 @@
     {{ include('admin/_onglets.html.twig', {actif: 'reglages'}) }}
 
     <section class="carte-form-large">
+        <h2>Sécurité de la connexion</h2>
+        {% if not enHttps %}
+            <p class="flash flash-error">Cette page est ouverte en <strong>HTTP</strong> : les mots de passe circulent en clair.
+                Ouvrez-la en <a href="https://{{ app.request.httpHost }}{{ path('admin_reglages') }}">HTTPS</a> pour activer la redirection.</p>
+        {% endif %}
+        <form method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token('admin_reglages') }}">
+            <input type="hidden" name="action" value="https">
+            <label class="case">
+                <input type="checkbox" name="forcer_https" value="1" {{ forcerHttps ? 'checked' }} {{ not enHttps and not forcerHttps ? 'disabled' }}>
+                Toujours utiliser HTTPS : les visiteurs arrivant en <code>http://</code> sont redirigés vers <code>https://</code>
+            </label>
+            <p class="aide">À n'activer que si le certificat HTTPS est en place et renouvelé automatiquement (c'est le cas chez la plupart des hébergeurs, avec Let's Encrypt).
+                Les navigateurs retiennent ce choix pendant 30 jours.</p>
+            <button class="btn">Enregistrer</button>
+        </form>
+    </section>
+
+    <section class="carte-form-large">
         <h2>Identité de la salle ou du club</h2>
         <p class="aide">Le logo s'affiche dans l'en-tête du site et sur la <a href="{{ path('admin_fiche') }}">fiche à imprimer</a>. PNG, JPEG ou WebP, 5 Mo au plus. Il est réduit à {{ constant('App\\Site\\IdentiteClub::COTE_MAX_LOGO') }} px.</p>
         <form method="post" enctype="multipart/form-data">

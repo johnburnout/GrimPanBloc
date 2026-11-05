@@ -3,6 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\EventSubscriber\ForcerHttpsSubscriber;
+use App\Repository\ReglageRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use App\Mail\MailerSite;
 use App\Mail\ReglagesSmtp;
 use App\Repository\UserRepository;
@@ -25,6 +28,8 @@ class AdminReglagesController extends AbstractController
         private readonly MailerSite $mailer,
         private readonly UserRepository $utilisateurs,
         private readonly IdentiteClub $club,
+        private readonly ReglageRepository $reglages,
+        private readonly EntityManagerInterface $em,
     ) {
     }
 
@@ -48,6 +53,19 @@ class AdminReglagesController extends AbstractController
             }
 
             switch ($p->getString('action')) {
+                case 'https':
+                    $activer = $p->getBoolean('forcer_https');
+                    if ($activer && !$request->isSecure()) {
+                        // Garde-fou : si PHP ne voit pas le HTTPS, la redirection bouclerait.
+                        $this->addFlash('error', 'Ouvrez d\'abord cette page en HTTPS (https://…) pour activer ce réglage.');
+                        break;
+                    }
+                    $this->reglages->definir(ForcerHttpsSubscriber::CLE, $activer ? '1' : '0');
+                    $this->em->flush();
+                    $this->addFlash('success', $activer ? 'Le site utilise désormais toujours HTTPS.' : 'Redirection vers HTTPS désactivée.');
+
+                    return $this->redirectToRoute('admin_reglages');
+
                 case 'club':
                     $this->club->definirNom($p->getString('nom_club'));
                     try {
@@ -146,6 +164,8 @@ class AdminReglagesController extends AbstractController
 
         return $this->render('admin/reglages.html.twig', [
             'clubNom' => $this->club->nom(),
+            'forcerHttps' => '1' === $this->reglages->valeur(ForcerHttpsSubscriber::CLE),
+            'enHttps' => $request->isSecure(),
             'clubLogo' => $this->club->logo(),
             'smtp' => $this->smtp->lire(),
             'smtpConfigure' => $this->smtp->estConfigure(),

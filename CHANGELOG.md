@@ -7,6 +7,13 @@ Toutes les évolutions notables de GrimpePan. Format inspiré de
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [1.2.0] - 2026-11-05
+
+### Ajouté
+- Réglage **« Toujours utiliser HTTPS »** (Administration → Réglages) : redirige
+  les visiteurs arrivant en `http://` vers `https://` et envoie l'en-tête HSTS
+  (30 jours). Il ne peut être activé que depuis une page ouverte en HTTPS.
+
 ## [1.1.0] - 2026-11-05
 
 ### Ajouté
