@@ -1,7 +1,7 @@
 parameters:
     photos_dir: '%kernel.project_dir%/public/uploads/photos'
     # Mises à jour : dépôt GitHub dont on suit les releases (API surchargée dans les tests)
-    env(MISE_A_JOUR_API): 'https://api.github.com/repos/johnburnout/GrimpePan'
+    env(MISE_A_JOUR_API): 'https://api.github.com/repos/johnburnout/GrimPanBloc'
 
 services:
     _defaults:

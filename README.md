@@ -108,7 +108,7 @@ hébergements mutualisés sans accès SSH. L'assistant se trouve dans
 ### Récupérer l'archive
 
 Télécharge **`grimpanbloc-vX.Y.Z.zip`** depuis la
-[page des releases](https://github.com/johnburnout/GrimpePan/releases/latest).
+[page des releases](https://github.com/johnburnout/GrimPanBloc/releases/latest).
 Elle contient tout ce qu'il faut, y compris `vendor/` : l'assistant ne lance pas
 Composer. L'empreinte de l'archive est fournie à côté (`.sha256`).
 
@@ -252,7 +252,7 @@ faut l'encoder dans l'URL de connexion (par exemple `@` devient `%40`).
 ```bash
 sudo mkdir -p /var/www/grimpanbloc
 sudo chown deploy:www-data /var/www/grimpanbloc
-git clone https://github.com/johnburnout/GrimpePan.git /var/www/grimpanbloc
+git clone https://github.com/johnburnout/GrimPanBloc.git /var/www/grimpanbloc
 cd /var/www/grimpanbloc
 ```
 
@@ -522,7 +522,7 @@ symfony check:requirements
 ### Mise en route
 
 ```bash
-git clone https://github.com/johnburnout/GrimpePan.git
+git clone https://github.com/johnburnout/GrimPanBloc.git
 cd GrimPanBloc
 composer install
 
