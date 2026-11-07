@@ -8,6 +8,7 @@ use App\Entity\Voie;
 use App\Enum\CotationCouleur;
 use App\Enum\CotationFr;
 use App\Enum\SystemeCotation;
+use App\Form\DataTransformer\PrisesJsonTransformer;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -18,7 +19,11 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Image;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class VoieType extends AbstractType
 {
@@ -55,10 +60,16 @@ class VoieType extends AbstractType
                 'constraints' => [
                     new Image(maxSize: '15M', mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
                         mimeTypesMessage: 'Formats acceptés : JPEG, PNG, WebP.'),
+                    new Callback(self::exigerUnePhoto(...)),
                 ],
             ])
             // Les prises sont dessinées en JS et envoyées en JSON dans ce champ caché.
-            ->add('prises', HiddenType::class, ['mapped' => false, 'attr' => ['data-prises' => '']])
+            ->add('prises', HiddenType::class, [
+                'attr' => ['data-prises' => ''],
+                'getter' => fn (Voie $v) => $v->getPrises()->toArray(),
+                'setter' => fn (Voie $v, array $prises) => $v->remplacerPrises($prises),
+                'constraints' => [new Count(min: 1, minMessage: 'Marquez au moins une prise sur la photo.')],
+            ])
             // L'ordre compte : le système doit être défini avant la cotation.
             ->add('systeme', EnumType::class, [
                 'class' => SystemeCotation::class,
@@ -81,6 +92,17 @@ class VoieType extends AbstractType
                 'choice_label' => fn (CotationCouleur $c) => $c->libelle(),
             ])
             ->add('description', TextareaType::class, ['label' => 'Description / consignes', 'required' => false]);
+
+        $builder->get('prises')->addModelTransformer(new PrisesJsonTransformer());
+    }
+
+    /** Sans nouvelle photo, il faut en avoir choisi une existante. */
+    private static function exigerUnePhoto(?UploadedFile $fichier, ExecutionContextInterface $context): void
+    {
+        $voie = $context->getRoot()->getData();
+        if (null === $fichier && null === $voie?->getPhoto()) {
+            $context->addViolation('Envoyez une photo ou choisissez-en une existante.');
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -19,3 +19,8 @@ services:
             - '../src/Entity/'
             - '../src/Enum/'
             - '../src/Kernel.php'
+
+when@test:
+    parameters:
+        # Les tests n'écrivent jamais dans les vraies photos (public/uploads/)
+        photos_dir: '%kernel.project_dir%/var/test/photos'
