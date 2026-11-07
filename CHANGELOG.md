@@ -7,6 +7,22 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [1.3.1] - 2026-11-07
+
+### Modifié
+- **Administration → Réglages** : chaque section (HTTPS, club, SMTP, mail de test,
+  envoi d'un message) a son propre formulaire. Une saisie refusée est signalée
+  sous le champ concerné, et la saisie est conservée.
+- Un logo refusé (format ou taille) n'enregistre plus le reste de la section :
+  corrigez le logo, puis enregistrez à nouveau.
+- Un formulaire resté ouvert trop longtemps affiche « Le formulaire a expiré :
+  rechargez la page et recommencez » au lieu d'une page d'erreur.
+
+### Technique
+- Code réorganisé (voies, croix, réglages, mises à jour) et couvert par des tests
+  automatiques, dont l'installation des mises à jour et son retour arrière en cas
+  d'échec. Aucune action n'est nécessaire sur les sites installés.
+
 ## [1.3.0] - 2026-11-05
 
 ### Modifié
