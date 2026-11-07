@@ -4,26 +4,36 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\EventSubscriber\ForcerHttpsSubscriber;
-use App\Repository\ReglageRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Form\Reglages\ClubType;
+use App\Form\Reglages\EnvoiGroupeType;
+use App\Form\Reglages\HttpsType;
+use App\Form\Reglages\MailTestType;
+use App\Form\Reglages\SmtpType;
 use App\Mail\MailerSite;
 use App\Mail\ReglagesSmtp;
+use App\Repository\ReglageRepository;
 use App\Repository\UserRepository;
 use App\Site\IdentiteClub;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-/** Réglages du site : serveur SMTP, mail de test, envoi d'un message aux utilisateurs. */
+/**
+ * Réglages du site. Une seule page (GET), cinq formulaires postant chacun vers
+ * sa route ; un formulaire invalide est réaffiché avec ses erreurs, les autres
+ * avec les valeurs enregistrées.
+ */
 #[Route('/admin')]
 #[IsGranted('ROLE_ADMIN')]
 class AdminReglagesController extends AbstractController
 {
-    public const LONGUEUR_MAX_CORPS = 20000;
-
     public function __construct(
         private readonly ReglagesSmtp $smtp,
         private readonly MailerSite $mailer,
@@ -40,138 +50,114 @@ class AdminReglagesController extends AbstractController
         return $this->redirectToRoute('admin_reglages');
     }
 
-    #[Route('/reglages', name: 'admin_reglages', methods: ['GET', 'POST'])]
-    #[IsCsrfTokenValid('admin_reglages', methods: ['POST'])]
-    public function reglages(Request $request): Response
+    #[Route('/reglages', name: 'admin_reglages', methods: ['GET'])]
+    public function reglages(Request $request, #[CurrentUser] User $admin): Response
     {
-        /** @var User $admin */
-        $admin = $this->getUser();
-        $p = $request->getPayload();
-        $saisie = ['destinataire' => $admin->getEmail(), 'objet' => '', 'corps' => '', 'cible' => 'tous'];
+        return $this->page($request, $admin);
+    }
 
-        if ($request->isMethod('POST')) {
-            switch ($p->getString('action')) {
-                case 'https':
-                    $activer = $p->getBoolean('forcer_https');
-                    if ($activer && !$request->isSecure()) {
-                        // Garde-fou : si PHP ne voit pas le HTTPS, la redirection bouclerait.
-                        $this->addFlash('error', 'Ouvrez d\'abord cette page en HTTPS (https://…) pour activer ce réglage.');
-                        break;
-                    }
-                    $this->reglages->definir(ForcerHttpsSubscriber::CLE, $activer ? '1' : '0');
-                    $this->em->flush();
-                    $this->addFlash('success', $activer ? 'Le site utilise désormais toujours HTTPS.' : 'Redirection vers HTTPS désactivée.');
+    #[Route('/reglages/https', name: 'admin_reglages_https', methods: ['POST'])]
+    public function https(Request $request, #[CurrentUser] User $admin): Response
+    {
+        $form = $this->formulaire('https', $admin)->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $activer = (bool) $form->get('forcer_https')->getData();
+            if ($activer && !$request->isSecure()) {
+                // Garde-fou : si PHP ne voit pas le HTTPS, la redirection bouclerait.
+                $form->addError(new FormError('Ouvrez d\'abord cette page en HTTPS (https://…) pour activer ce réglage.'));
+            } else {
+                $this->reglages->definir(ForcerHttpsSubscriber::CLE, $activer ? '1' : '0');
+                $this->em->flush();
 
-                    return $this->redirectToRoute('admin_reglages');
-
-                case 'club':
-                    $this->club->definirNom($p->getString('nom_club'));
-                    try {
-                        if ($p->getBoolean('supprimer_logo')) {
-                            $this->club->supprimerLogo();
-                        } elseif ($fichier = $request->files->get('logo')) {
-                            if (!$fichier->isValid()) {
-                                throw new \InvalidArgumentException('Envoi du logo impossible : '.$fichier->getErrorMessage());
-                            }
-                            if ($fichier->getSize() > 5 * 1024 * 1024) {
-                                throw new \InvalidArgumentException('Le logo ne doit pas dépasser 5 Mo.');
-                            }
-                            $this->club->definirLogo($fichier);
-                        }
-                        $this->addFlash('success', 'Identité du club enregistrée.');
-
-                        return $this->redirectToRoute('admin_reglages');
-                    } catch (\InvalidArgumentException $e) {
-                        $this->addFlash('error', $e->getMessage());
-                    }
-                    break;
-
-                case 'smtp':
-                    $hote = trim($p->getString('hote'));
-                    $expediteur = trim($p->getString('expediteur'));
-                    $port = $p->getInt('port');
-                    if ('' !== $hote && !preg_match('/^[A-Za-z0-9.\-]+$/', $hote)) {
-                        $this->addFlash('error', 'Nom de serveur SMTP invalide.');
-                    } elseif ('' !== $expediteur && !filter_var($expediteur, FILTER_VALIDATE_EMAIL)) {
-                        $this->addFlash('error', 'Adresse d\'expédition invalide.');
-                    } elseif ($port < 1 || $port > 65535) {
-                        $this->addFlash('error', 'Port invalide.');
-                    } else {
-                        $motDePasse = $p->getBoolean('effacer_mot_de_passe') ? '' : ('' === $p->getString('mot_de_passe') ? null : $p->getString('mot_de_passe'));
-                        $this->smtp->enregistrer([
-                            'hote' => $hote, 'port' => $port, 'chiffrement' => $p->getString('chiffrement'),
-                            'utilisateur' => $p->getString('utilisateur'), 'expediteur' => $expediteur,
-                            'expediteur_nom' => $p->getString('expediteur_nom'),
-                        ], $motDePasse);
-                        $this->addFlash('success', 'Réglages SMTP enregistrés.');
-
-                        return $this->redirectToRoute('admin_reglages');
-                    }
-                    break;
-
-                case 'test':
-                    $saisie['destinataire'] = trim($p->getString('destinataire'));
-                    if (!filter_var($saisie['destinataire'], FILTER_VALIDATE_EMAIL)) {
-                        $this->addFlash('error', 'Adresse du destinataire invalide.');
-                        break;
-                    }
-                    try {
-                        $this->mailer->envoyerTest($saisie['destinataire']);
-                        $this->addFlash('success', 'Mail de test envoyé à '.$saisie['destinataire'].'.');
-
-                        return $this->redirectToRoute('admin_reglages');
-                    } catch (\Throwable $e) {
-                        $this->addFlash('error', 'Échec de l\'envoi : '.$e->getMessage());
-                    }
-                    break;
-
-                case 'envoi_groupe':
-                    $saisie = ['objet' => trim($p->getString('objet')), 'corps' => trim($p->getString('corps')),
-                        'cible' => 'admins' === $p->getString('cible') ? 'admins' : 'tous'] + $saisie;
-                    if ('' === $saisie['objet'] || '' === $saisie['corps']) {
-                        $this->addFlash('error', 'L\'objet et le message sont obligatoires.');
-                        break;
-                    }
-                    if (mb_strlen($saisie['corps']) > self::LONGUEUR_MAX_CORPS || mb_strlen($saisie['objet']) > 200) {
-                        $this->addFlash('error', 'Message trop long.');
-                        break;
-                    }
-                    $destinataires = $this->utilisateurs->actifs('admins' === $saisie['cible']);
-                    set_time_limit(max(60, 5 * \count($destinataires)));
-                    try {
-                        $r = $this->mailer->envoyerGroupe($destinataires, $saisie['objet'], $saisie['corps']);
-                    } catch (\Throwable $e) {
-                        $this->addFlash('error', 'Échec de l\'envoi : '.$e->getMessage());
-                        break;
-                    }
-                    if ($r['envoyes'] > 0) {
-                        $this->addFlash('success', sprintf('Message envoyé à %d destinataire(s).', $r['envoyes']));
-                    }
-                    foreach (\array_slice($r['erreurs'], 0, 10) as $erreur) {
-                        $this->addFlash('error', 'Échec pour '.$erreur);
-                    }
-                    if ([] === $r['erreurs']) {
-                        return $this->redirectToRoute('admin_reglages');
-                    }
-                    break;
-
-                default:
-                    throw $this->createAccessDeniedException('Action inconnue.');
+                return $this->enregistre($activer ? 'Le site utilise désormais toujours HTTPS.' : 'Redirection vers HTTPS désactivée.');
             }
         }
 
-        return $this->render('admin/reglages.html.twig', [
-            'clubNom' => $this->club->nom(),
-            'forcerHttps' => '1' === $this->reglages->valeur(ForcerHttpsSubscriber::CLE),
-            'enHttps' => $request->isSecure(),
-            'clubLogo' => $this->club->logo(),
-            'smtp' => $this->smtp->lire(),
-            'smtpConfigure' => $this->smtp->estConfigure(),
-            'chiffrements' => ReglagesSmtp::CHIFFREMENTS,
-            'saisie' => $saisie,
-            'nbTous' => \count($this->utilisateurs->actifs()),
-            'nbAdmins' => $this->utilisateurs->nombreAdminsActifs(),
-        ]);
+        return $this->page($request, $admin, $form);
+    }
+
+    #[Route('/reglages/club', name: 'admin_reglages_club', methods: ['POST'])]
+    public function club(Request $request, #[CurrentUser] User $admin): Response
+    {
+        $form = $this->formulaire('club', $admin)->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $donnees = $form->getData();
+            try {
+                if ($donnees['supprimer_logo']) {
+                    $this->club->supprimerLogo();
+                } elseif (null !== $donnees['logo']) {
+                    $this->club->definirLogo($donnees['logo']);
+                }
+                $this->club->definirNom($donnees['nom_club']);
+
+                return $this->enregistre('Identité du club enregistrée.');
+            } catch (\InvalidArgumentException $e) {
+                $form->get('logo')->addError(new FormError($e->getMessage()));
+            }
+        }
+
+        return $this->page($request, $admin, $form);
+    }
+
+    #[Route('/reglages/smtp', name: 'admin_reglages_smtp', methods: ['POST'])]
+    public function smtp(Request $request, #[CurrentUser] User $admin): Response
+    {
+        $form = $this->formulaire('smtp', $admin)->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $saisi = (string) $form->get('mot_de_passe')->getData();
+            // '' = effacé, null = inchangé
+            $motDePasse = $form->get('effacer_mot_de_passe')->getData() ? '' : ('' === $saisi ? null : $saisi);
+            $this->smtp->enregistrer($form->getData(), $motDePasse);
+
+            return $this->enregistre('Réglages SMTP enregistrés.');
+        }
+
+        return $this->page($request, $admin, $form);
+    }
+
+    #[Route('/reglages/mail-test', name: 'admin_reglages_mail_test', methods: ['POST'])]
+    public function mailTest(Request $request, #[CurrentUser] User $admin): Response
+    {
+        $form = $this->formulaire('mail_test', $admin)->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $destinataire = $form->get('destinataire')->getData();
+            try {
+                $this->mailer->envoyerTest($destinataire);
+
+                return $this->enregistre('Mail de test envoyé à '.$destinataire.'.');
+            } catch (\Throwable $e) {
+                $form->addError(new FormError('Échec de l\'envoi : '.$e->getMessage()));
+            }
+        }
+
+        return $this->page($request, $admin, $form);
+    }
+
+    #[Route('/reglages/envoi-groupe', name: 'admin_reglages_envoi_groupe', methods: ['POST'])]
+    public function envoiGroupe(Request $request, #[CurrentUser] User $admin): Response
+    {
+        $form = $this->formulaire('envoi_groupe', $admin)->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            ['cible' => $cible, 'objet' => $objet, 'corps' => $corps] = $form->getData();
+            $destinataires = $this->utilisateurs->actifs('admins' === $cible);
+            set_time_limit(max(60, 5 * \count($destinataires)));
+            try {
+                $r = $this->mailer->envoyerGroupe($destinataires, $objet, $corps);
+                if ($r['envoyes'] > 0) {
+                    $this->addFlash('success', \sprintf('Message envoyé à %d destinataire(s).', $r['envoyes']));
+                }
+                if ([] === $r['erreurs']) {
+                    return $this->redirectToRoute('admin_reglages');
+                }
+                foreach (\array_slice($r['erreurs'], 0, 10) as $erreur) {
+                    $form->addError(new FormError('Échec pour '.$erreur));
+                }
+            } catch (\Throwable $e) {
+                $form->addError(new FormError('Échec de l\'envoi : '.$e->getMessage()));
+            }
+        }
+
+        return $this->page($request, $admin, $form);
     }
 
     /** Fiche A4 à imprimer : logo du club et QR code vers le site. */
@@ -179,7 +165,53 @@ class AdminReglagesController extends AbstractController
     public function fiche(): Response
     {
         return $this->render('admin/fiche.html.twig', [
-            'urlSite' => $this->generateUrl('app_home', [], \Symfony\Component\Routing\Generator\UrlGeneratorInterface::ABSOLUTE_URL),
+            'urlSite' => $this->generateUrl('app_home', [], UrlGeneratorInterface::ABSOLUTE_URL),
         ]);
+    }
+
+    // ---------------------------------------------------------------------------
+
+    /** Formulaire d'une section, prérempli avec les valeurs enregistrées. */
+    private function formulaire(string $section, User $admin): FormInterface
+    {
+        [$type, $donnees] = match ($section) {
+            'https' => [HttpsType::class, ['forcer_https' => '1' === $this->reglages->valeur(ForcerHttpsSubscriber::CLE)]],
+            'club' => [ClubType::class, ['nom_club' => $this->club->nom(), 'supprimer_logo' => false, 'logo' => null]],
+            'smtp' => [SmtpType::class, $this->smtp->lire()],
+            'mail_test' => [MailTestType::class, ['destinataire' => $admin->getEmail()]],
+            'envoi_groupe' => [EnvoiGroupeType::class, ['cible' => 'tous', 'objet' => '', 'corps' => '']],
+        };
+
+        return $this->createForm($type, $donnees, [
+            'action' => $this->generateUrl('admin_reglages_'.$section),
+            'csrf_token_id' => 'admin_reglages_'.$section,
+            'csrf_message' => 'Le formulaire a expiré : rechargez la page et recommencez.',
+        ]);
+    }
+
+    /** La page complète ; $soumis remplace le formulaire de sa section. */
+    private function page(Request $request, User $admin, ?FormInterface $soumis = null): Response
+    {
+        $formulaires = [];
+        foreach (['https', 'club', 'smtp', 'mail_test', 'envoi_groupe'] as $section) {
+            $formulaires[$section] = $soumis && $soumis->getName() === $section ? $soumis : $this->formulaire($section, $admin);
+        }
+
+        return $this->render('admin/reglages.html.twig', $formulaires + [
+            'forcerHttps' => '1' === $this->reglages->valeur(ForcerHttpsSubscriber::CLE),
+            'enHttps' => $request->isSecure(),
+            'clubLogo' => $this->club->logo(),
+            'smtpDefini' => $this->smtp->lire()['mot_de_passe_defini'],
+            'smtpConfigure' => $this->smtp->estConfigure(),
+            'nbTous' => \count($this->utilisateurs->actifs()),
+            'nbAdmins' => $this->utilisateurs->nombreAdminsActifs(),
+        ]);
+    }
+
+    private function enregistre(string $message): Response
+    {
+        $this->addFlash('success', $message);
+
+        return $this->redirectToRoute('admin_reglages');
     }
 }

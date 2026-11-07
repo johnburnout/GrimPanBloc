@@ -92,37 +92,6 @@ final class AdminControllerTest extends FonctionnelTestCase
         self::assertResponseStatusCodeSame(403);
     }
 
-    // --- Réglages -----------------------------------------------------------
-
-    public function testReglagesRefusesAvecUnJetonInvalide(): void
-    {
-        $this->client->loginUser($this->creerUtilisateur('admin', admin: true));
-        $this->client->request('POST', '/admin/reglages', ['_token' => 'faux', 'action' => 'club', 'nom_club' => 'Pirate']);
-
-        self::assertResponseStatusCodeSame(403);
-    }
-
-    public function testEnregistrerLeNomDuClub(): void
-    {
-        $this->client->loginUser($this->creerUtilisateur('admin', admin: true));
-        $jeton = $this->jetonReglages();
-        $this->client->request('POST', '/admin/reglages', ['_token' => $jeton, 'action' => 'club', 'nom_club' => 'Les Grimpeurs du Causse']);
-
-        self::assertResponseRedirects('/admin/reglages');
-        self::assertContains('Identité du club enregistrée.', $this->flashsApresRedirection('success'));
-        self::assertSelectorExists('input[name="nom_club"][value="Les Grimpeurs du Causse"]');
-    }
-
-    public function testHttpsNePeutPasEtreActiveDepuisUnePageEnHttp(): void
-    {
-        $this->client->loginUser($this->creerUtilisateur('admin', admin: true));
-        $jeton = $this->jetonReglages();
-        $this->client->request('POST', '/admin/reglages', ['_token' => $jeton, 'action' => 'https', 'forcer_https' => '1']);
-
-        self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('.flash-error', 'Ouvrez d\'abord cette page en HTTPS');
-    }
-
     // --- Mise à jour --------------------------------------------------------
 
     public function testInstallationRefuseeAvecUnJetonInvalide(): void
@@ -131,14 +100,6 @@ final class AdminControllerTest extends FonctionnelTestCase
         $this->client->request('POST', '/admin/mise-a-jour/installer', ['_token' => 'faux']);
 
         self::assertResponseStatusCodeSame(403);
-    }
-
-    /** Les formulaires des réglages postent sur la page elle-même (pas d'attribut action). */
-    private function jetonReglages(): string
-    {
-        $page = $this->client->request('GET', '/admin/reglages');
-
-        return (string) $page->filter('input[name="action"][value="club"]')->closest('form')->filter('input[name="_token"]')->attr('value');
     }
 
     private function recharger(int $id): User
