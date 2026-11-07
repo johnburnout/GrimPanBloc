@@ -3,17 +3,14 @@
 namespace App\Controller;
 
 use App\MiseAJour\InstallateurMiseAJour;
+use App\MiseAJour\LanceurCommandes;
 use App\MiseAJour\Maintenance;
 use App\MiseAJour\VerificateurMiseAJour;
 use App\MiseAJour\VersionInstallee;
-use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -91,22 +88,13 @@ class AdminMiseAJourController extends AbstractController
      * qui a lancé la mise à jour) : l'utilisateur n'est pas rechargé depuis la base.
      */
     #[Route('/finaliser', name: 'admin_mise_a_jour_finaliser', methods: ['GET'])]
-    public function finaliser(Request $request, Maintenance $maintenance, KernelInterface $kernel): Response
+    public function finaliser(Request $request, Maintenance $maintenance, LanceurCommandes $lanceur): Response
     {
         if (!$maintenance->jetonValide($request->query->getString('jeton'))) {
             $this->addFlash('error', 'Lien de finalisation invalide ou expiré.');
 
             return $this->redirectToRoute('admin_mise_a_jour');
         }
-
-        $console = function (array $arguments) use ($kernel): array {
-            $application = new Application($kernel);
-            $application->setAutoExit(false);
-            $sortie = new BufferedOutput();
-            $code = $application->run(new ArrayInput($arguments + ['--no-interaction' => true]), $sortie);
-
-            return ['code' => $code, 'sortie' => trim($sortie->fetch())];
-        };
 
         $session = $request->getSession();
         $journal = (array) $session->get('mise_a_jour_journal', []);
@@ -115,7 +103,7 @@ class AdminMiseAJourController extends AbstractController
         $session->remove('mise_a_jour_depuis');
 
         try {
-            foreach ($this->installateur->finaliser($console) as $avertissement) {
+            foreach ($this->installateur->finaliser($lanceur->lancer(...)) as $avertissement) {
                 $this->addFlash('error', $avertissement);
             }
             $journal[] = 'Base de données à jour, maintenance terminée.';
