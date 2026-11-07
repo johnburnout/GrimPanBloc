@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /** Réglages du site : serveur SMTP, mail de test, envoi d'un message aux utilisateurs. */
@@ -40,6 +41,7 @@ class AdminReglagesController extends AbstractController
     }
 
     #[Route('/reglages', name: 'admin_reglages', methods: ['GET', 'POST'])]
+    #[IsCsrfTokenValid('admin_reglages', methods: ['POST'])]
     public function reglages(Request $request): Response
     {
         /** @var User $admin */
@@ -48,10 +50,6 @@ class AdminReglagesController extends AbstractController
         $saisie = ['destinataire' => $admin->getEmail(), 'objet' => '', 'corps' => '', 'cible' => 'tous'];
 
         if ($request->isMethod('POST')) {
-            if (!$this->isCsrfTokenValid('admin_reglages', $p->getString('_token'))) {
-                throw $this->createAccessDeniedException('Jeton CSRF invalide.');
-            }
-
             switch ($p->getString('action')) {
                 case 'https':
                     $activer = $p->getBoolean('forcer_https');

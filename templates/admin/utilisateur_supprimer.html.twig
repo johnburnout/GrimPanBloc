@@ -12,7 +12,7 @@
             <li>Ses {{ ligne ? ligne.voies : 0 }} voie(s) et ses {{ ligne ? ligne.croix : 0 }} croix restent visibles sous le pseudo « {{ cible.pseudo }} ». Seul un administrateur pourra supprimer ces voies.</li>
             <li>Le pseudo reste réservé. Cette action est définitive.</li>
         </ul>
-        {% set mot = constant('App\\Controller\\VoieController::MOT_CONFIRMATION') %}
+        {% set mot = constant('App\\Security\\ConfirmationSuppression::MOT') %}
         <form method="post">
             <input type="hidden" name="_token" value="{{ csrf_token('utilisateur' ~ cible.id) }}">
             <label for="confirmation">Tapez <strong>{{ mot }}</strong> pour confirmer</label>

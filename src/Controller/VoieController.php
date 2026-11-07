@@ -9,22 +9,24 @@ use App\Entity\User;
 use App\Entity\Voie;
 use App\Enum\TypePrise;
 use App\Form\VoieType;
+use App\Security\ConfirmationSuppression;
 use App\Security\VoieVoter;
 use App\Service\PhotoUploader;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/voies')]
 class VoieController extends AbstractController
 {
     private const MAX_PRISES = 200;
-    public const MOT_CONFIRMATION = 'SUPPRIMER';
 
     public function __construct(
         private readonly EntityManagerInterface $em,
@@ -106,12 +108,9 @@ class VoieController extends AbstractController
      */
     #[Route('/{id}/croix', name: 'voie_croix', requirements: ['id' => '\d+'], methods: ['POST'])]
     #[IsGranted('ROLE_USER')]
+    #[IsCsrfTokenValid(new Expression('"croix" ~ args["voie"].getId()'))]
     public function croix(Voie $voie, Request $request): Response
     {
-        if (!$this->isCsrfTokenValid('croix'.$voie->getId(), $request->getPayload()->getString('_token'))) {
-            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
-        }
-
         /** @var User $user */
         $user = $this->getUser();
         $estAuteur = $voie->getAuteur() === $user;
@@ -159,18 +158,13 @@ class VoieController extends AbstractController
     }
 
     #[Route('/{id}/supprimer', name: 'voie_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
+    #[IsGranted(VoieVoter::SUPPRIMER, subject: 'voie')]
+    #[IsCsrfTokenValid(new Expression('"supprimer" ~ args["voie"].getId()'))]
     public function delete(Voie $voie, Request $request): Response
     {
-        if ($voie->getAuteur() !== $this->getUser() && !$this->isGranted('ROLE_ADMIN')) {
-            throw $this->createAccessDeniedException();
-        }
-        if (!$this->isCsrfTokenValid('supprimer'.$voie->getId(), $request->getPayload()->getString('_token'))) {
-            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
-        }
-
         // Garde-fou : supprimer une voie validée efface aussi les croix des autres grimpeurs.
-        if ($voie->estValidee() && self::MOT_CONFIRMATION !== trim($request->getPayload()->getString('confirmation'))) {
-            $this->addFlash('error', 'Suppression annulée : tapez '.self::MOT_CONFIRMATION.' pour confirmer.');
+        if ($voie->estValidee() && !ConfirmationSuppression::estConfirmee($request->getPayload()->getString('confirmation'))) {
+            $this->addFlash('error', ConfirmationSuppression::MESSAGE_ANNULATION);
 
             return $this->redirectToRoute('voie_show', ['id' => $voie->getId()]);
         }

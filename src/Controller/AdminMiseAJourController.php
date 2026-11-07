@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
@@ -52,11 +53,9 @@ class AdminMiseAJourController extends AbstractController
 
     #[Route('/installer', name: 'admin_mise_a_jour_installer', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
+    #[IsCsrfTokenValid('mise_a_jour')]
     public function installer(Request $request): Response
     {
-        if (!$this->isCsrfTokenValid('mise_a_jour', $request->getPayload()->getString('_token'))) {
-            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
-        }
         $release = $this->verificateur->miseAJourDisponible(true);
         if (!$release) {
             $this->addFlash('info', 'GrimPanBloc est déjà à jour.');

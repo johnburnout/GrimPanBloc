@@ -4,11 +4,14 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Security\ConfirmationSuppression;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
@@ -33,9 +36,10 @@ class AdminUtilisateursController extends AbstractController
     }
 
     #[Route('/{id}/admin', name: 'admin_utilisateur_admin', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function basculerAdmin(User $cible, Request $request): Response
+    #[IsCsrfTokenValid(new Expression('"utilisateur" ~ args["cible"].getId()'))]
+    public function basculerAdmin(User $cible): Response
     {
-        $this->verifier($request, $cible);
+        $this->refuserSiSupprime($cible);
         if ($cible->isAdmin()) {
             if ($this->dernierAdmin($cible)) {
                 return $this->refuser('Il doit rester au moins un administrateur actif.');
@@ -57,9 +61,10 @@ class AdminUtilisateursController extends AbstractController
     }
 
     #[Route('/{id}/actif', name: 'admin_utilisateur_actif', requirements: ['id' => '\d+'], methods: ['POST'])]
-    public function basculerActif(User $cible, Request $request): Response
+    #[IsCsrfTokenValid(new Expression('"utilisateur" ~ args["cible"].getId()'))]
+    public function basculerActif(User $cible): Response
     {
-        $this->verifier($request, $cible);
+        $this->refuserSiSupprime($cible);
         if ($cible === $this->getUser()) {
             return $this->refuser('Vous ne pouvez pas désactiver votre propre compte.');
         }
@@ -74,6 +79,7 @@ class AdminUtilisateursController extends AbstractController
     }
 
     #[Route('/{id}/supprimer', name: 'admin_utilisateur_supprimer', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    #[IsCsrfTokenValid(new Expression('"utilisateur" ~ args["cible"].getId()'), methods: ['POST'])]
     public function supprimer(User $cible, Request $request): Response
     {
         if ($cible->estSupprime()) {
@@ -87,9 +93,8 @@ class AdminUtilisateursController extends AbstractController
         }
 
         if ($request->isMethod('POST')) {
-            $this->verifier($request, $cible);
-            if (VoieController::MOT_CONFIRMATION !== trim($request->getPayload()->getString('confirmation'))) {
-                $this->addFlash('error', 'Suppression annulée : tapez '.VoieController::MOT_CONFIRMATION.' pour confirmer.');
+            if (!ConfirmationSuppression::estConfirmee($request->getPayload()->getString('confirmation'))) {
+                $this->addFlash('error', ConfirmationSuppression::MESSAGE_ANNULATION);
 
                 return $this->redirectToRoute('admin_utilisateur_supprimer', ['id' => $cible->getId()]);
             }
@@ -106,11 +111,8 @@ class AdminUtilisateursController extends AbstractController
         return $this->render('admin/utilisateur_supprimer.html.twig', ['cible' => $cible, 'ligne' => $ligne]);
     }
 
-    private function verifier(Request $request, User $cible): void
+    private function refuserSiSupprime(User $cible): void
     {
-        if (!$this->isCsrfTokenValid('utilisateur'.$cible->getId(), $request->getPayload()->getString('_token'))) {
-            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
-        }
         if ($cible->estSupprime()) {
             throw $this->createAccessDeniedException('Ce compte est supprimé.');
         }

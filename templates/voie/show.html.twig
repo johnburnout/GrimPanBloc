@@ -11,7 +11,7 @@
             {% if is_granted('VOIE_MODIFIER', voie) %}
                 <a href="{{ path('voie_edit', {id: voie.id}) }}" class="btn btn-secondaire">Modifier</a>
             {% endif %}
-            {% if voie.auteur == app.user or is_granted('ROLE_ADMIN') %}
+            {% if is_granted('VOIE_SUPPRIMER', voie) %}
                 {% if voie.estValidee %}
                     <a href="#suppression" class="btn btn-danger">Supprimer…</a>
                 {% else %}
@@ -100,8 +100,8 @@
         {% endif %}
     </section>
 
-    {% if voie.estValidee and (voie.auteur == app.user or is_granted('ROLE_ADMIN')) %}
-        {% set mot = constant('App\\Controller\\VoieController::MOT_CONFIRMATION') %}
+    {% if voie.estValidee and is_granted('VOIE_SUPPRIMER', voie) %}
+        {% set mot = constant('App\\Security\\ConfirmationSuppression::MOT') %}
         <section id="suppression" class="zone-danger">
             <h2>Supprimer la voie</h2>
             <p>

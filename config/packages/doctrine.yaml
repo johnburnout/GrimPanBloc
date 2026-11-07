@@ -12,3 +12,9 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
+
+when@test:
+    doctrine:
+        dbal:
+            # Base séparée (grimpepan_test) : les tests ne touchent jamais la base de dev
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
