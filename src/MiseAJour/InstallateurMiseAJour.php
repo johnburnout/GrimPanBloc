@@ -3,13 +3,12 @@
 namespace App\MiseAJour;
 
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
  * Installe une release GitHub par-dessus la version en place.
  *
- *  1. télécharge l'archive et vérifie son empreinte SHA-256 ;
- *  2. l'extrait et contrôle son contenu (VERSION, vendor/) ;
+ *  1. télécharge l'archive et vérifie son empreinte SHA-256 (ArchiveRelease) ;
+ *  2. l'extrait et contrôle son contenu : VERSION, vendor/ (ArchiveRelease) ;
  *  3. active le mode maintenance ;
  *  4. remplace le code : l'ancien est déplacé (et non supprimé) dans
  *     var/mise-a-jour/precedente-X.Y.Z/, ce qui sert de sauvegarde ;
@@ -21,10 +20,13 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  *
  * Jamais touchés : .env.local, .env.local.php, var/, public/uploads/ (photos).
  * Jamais réinstallé : public/setup/ (assistant d'installation).
+ *
+ * ⚠ Après l'étape 4, les fichiers sur disque sont ceux de la NOUVELLE version :
+ * ce processus ne doit plus charger de classe de l'application qu'il n'a pas
+ * déjà chargée (d'où les dépendances injectées, instanciées avant).
  */
 final class InstallateurMiseAJour
 {
-    private const TAILLE_MAX = 300 * 1024 * 1024;
     /** Éléments de la racine conservés tels quels. */
     private const CONSERVES_RACINE = ['var', '.env.local', '.env.local.php', 'public'];
     /** Éléments de public/ traités à part. */
@@ -33,7 +35,7 @@ final class InstallateurMiseAJour
     private readonly Filesystem $fs;
 
     public function __construct(
-        private readonly HttpClientInterface $httpClient,
+        private readonly ArchiveRelease $archive,
         private readonly VersionInstallee $version,
         private readonly Maintenance $maintenance,
         private readonly string $racine,
@@ -89,26 +91,11 @@ final class InstallateurMiseAJour
 
         // 1. Téléchargement et empreinte
         $zip = $travail.'/telechargement.zip';
-        $this->telecharger($release->urlArchive, $zip);
-        $attendue = strtolower(strtok(trim($this->httpClient->request('GET', $release->urlEmpreinte, ['timeout' => 20])->getContent()), " \t"));
-        $obtenue = hash_file('sha256', $zip);
-        if (!preg_match('/^[0-9a-f]{64}$/', $attendue) || !hash_equals($attendue, $obtenue)) {
-            @unlink($zip);
-            throw new \RuntimeException('L\'empreinte SHA-256 de l\'archive ne correspond pas : téléchargement corrompu ou modifié.');
-        }
-        $journal(sprintf('Archive téléchargée (%s Mo), empreinte SHA-256 vérifiée.', number_format(filesize($zip) / 1048576, 1, ',', ' ')));
+        $taille = $this->archive->telecharger($release, $zip);
+        $journal(\sprintf('Archive téléchargée (%s Mo), empreinte SHA-256 vérifiée.', number_format($taille / 1048576, 1, ',', ' ')));
 
         // 2. Extraction et contrôle
-        $nouvelle = $this->extraire($zip, $travail.'/nouvelle');
-        $versionArchive = trim((string) @file_get_contents($nouvelle.'/VERSION'));
-        if ($versionArchive !== $release->version) {
-            throw new \RuntimeException("L'archive annonce la version « $versionArchive » au lieu de {$release->version}.");
-        }
-        foreach (['vendor/autoload_runtime.php', 'bin/console', 'public/index.php', 'src/Kernel.php'] as $f) {
-            if (!is_file($nouvelle.'/'.$f)) {
-                throw new \RuntimeException("Archive incomplète : $f est absent.");
-            }
-        }
+        $nouvelle = $this->archive->extraire($release, $zip, $travail.'/nouvelle');
         $journal('Archive extraite et contrôlée.');
 
         // 3. Maintenance
@@ -161,63 +148,6 @@ final class InstallateurMiseAJour
     }
 
     // ---------------------------------------------------------------------------
-
-    private function telecharger(string $url, string $destination): void
-    {
-        $reponse = $this->httpClient->request('GET', $url, [
-            'headers' => ['User-Agent' => 'GrimPanBloc/'.$this->version->get()],
-            'timeout' => 30,
-            'max_duration' => 600,
-        ]);
-        if (200 !== $reponse->getStatusCode()) {
-            throw new \RuntimeException('Téléchargement impossible (HTTP '.$reponse->getStatusCode().').');
-        }
-        $f = fopen($destination, 'w');
-        $taille = 0;
-        foreach ($this->httpClient->stream($reponse) as $morceau) {
-            $taille += \strlen($morceau->getContent());
-            if ($taille > self::TAILLE_MAX) {
-                fclose($f);
-                @unlink($destination);
-                throw new \RuntimeException('Archive trop volumineuse.');
-            }
-            fwrite($f, $morceau->getContent());
-        }
-        fclose($f);
-    }
-
-    /** Extrait l'archive et renvoie le dossier racine de l'application qu'elle contient. */
-    private function extraire(string $zip, string $destination): string
-    {
-        $archive = new \ZipArchive();
-        if (true !== $archive->open($zip)) {
-            throw new \RuntimeException('Archive illisible.');
-        }
-        for ($i = 0; $i < $archive->numFiles; ++$i) {
-            $nom = (string) $archive->getNameIndex($i);
-            // Protection « zip slip » : aucun chemin absolu ni remontée de dossier
-            if (str_starts_with($nom, '/') || str_contains($nom, '\\') || preg_match('#(^|/)\.\.(/|$)#', $nom)) {
-                $archive->close();
-                throw new \RuntimeException("Chemin interdit dans l'archive : $nom");
-            }
-        }
-        $archive->extractTo($destination);
-        $archive->close();
-
-        // L'archive contient un dossier « grimpanbloc/ » (« grimpepan/ » avant la 1.3.0)
-        $racine = $destination;
-        foreach (['grimpanbloc', 'grimpepan'] as $dossier) {
-            if (is_file("$destination/$dossier/VERSION")) {
-                $racine = "$destination/$dossier";
-                break;
-            }
-        }
-        if (!is_file($racine.'/VERSION')) {
-            throw new \RuntimeException('Archive invalide : fichier VERSION introuvable.');
-        }
-
-        return $racine;
-    }
 
     /**
      * Remplace le code en place par celui de $nouvelle, élément par élément, en
