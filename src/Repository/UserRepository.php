@@ -6,6 +6,7 @@ use App\Entity\Croix;
 use App\Entity\User;
 use App\Entity\Voie;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -26,16 +27,23 @@ class UserRepository extends ServiceEntityRepository
      */
     public function listeAdministration(): array
     {
-        $lignes = $this->createQueryBuilder('u')
-            ->select('u AS utilisateur')
-            ->addSelect(sprintf('(SELECT COUNT(v.id) FROM %s v WHERE v.auteur = u) AS voies', Voie::class))
-            ->addSelect(sprintf('(SELECT COUNT(c.id) FROM %s c WHERE c.grimpeur = u) AS croix', Croix::class))
+        $lignes = $this->administration()
             ->addSelect('CASE WHEN u.supprimeLe IS NULL THEN 0 ELSE 1 END AS HIDDEN estSupprime')
             ->orderBy('estSupprime', 'ASC')
             ->addOrderBy('u.pseudo', 'ASC')
             ->getQuery()->getResult();
 
-        return array_map(fn (array $l) => ['utilisateur' => $l['utilisateur'], 'voies' => (int) $l['voies'], 'croix' => (int) $l['croix']], $lignes);
+        return array_map($this->ligne(...), $lignes);
+    }
+
+    /** @return array{utilisateur: User, voies: int, croix: int}|null */
+    public function ligneAdministration(User $utilisateur): ?array
+    {
+        $ligne = $this->administration()
+            ->andWhere('u = :u')->setParameter('u', $utilisateur)
+            ->getQuery()->getOneOrNullResult();
+
+        return null === $ligne ? null : $this->ligne($ligne);
     }
 
     /**
@@ -45,17 +53,43 @@ class UserRepository extends ServiceEntityRepository
      */
     public function actifs(bool $adminsSeulement = false): array
     {
-        $comptes = $this->createQueryBuilder('u')
-            ->andWhere('u.actif = true')
-            ->andWhere('u.supprimeLe IS NULL')
-            ->orderBy('u.pseudo', 'ASC')
-            ->getQuery()->getResult();
+        return $this->qbActifs($adminsSeulement)->orderBy('u.pseudo', 'ASC')->getQuery()->getResult();
+    }
 
-        return $adminsSeulement ? array_values(array_filter($comptes, fn (User $u) => $u->isAdmin())) : $comptes;
+    public function nombreActifs(bool $adminsSeulement = false): int
+    {
+        return (int) $this->qbActifs($adminsSeulement)->select('COUNT(u.id)')->getQuery()->getSingleScalarResult();
     }
 
     public function nombreAdminsActifs(): int
     {
-        return \count($this->actifs(true));
+        return $this->nombreActifs(true);
+    }
+
+    private function qbActifs(bool $adminsSeulement): QueryBuilder
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->andWhere('u.actif = true')
+            ->andWhere('u.supprimeLe IS NULL');
+        if ($adminsSeulement) {
+            // Colonne JSON : ["ROLE_ADMIN", …]
+            $qb->andWhere('u.roles LIKE :role')->setParameter('role', '%"ROLE_ADMIN"%');
+        }
+
+        return $qb;
+    }
+
+    private function administration(): QueryBuilder
+    {
+        return $this->createQueryBuilder('u')
+            ->select('u AS utilisateur')
+            ->addSelect(\sprintf('(SELECT COUNT(v.id) FROM %s v WHERE v.auteur = u) AS voies', Voie::class))
+            ->addSelect(\sprintf('(SELECT COUNT(c.id) FROM %s c WHERE c.grimpeur = u) AS croix', Croix::class));
+    }
+
+    /** @return array{utilisateur: User, voies: int, croix: int} */
+    private function ligne(array $l): array
+    {
+        return ['utilisateur' => $l['utilisateur'], 'voies' => (int) $l['voies'], 'croix' => (int) $l['croix']];
     }
 }

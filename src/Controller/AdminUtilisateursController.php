@@ -106,7 +106,7 @@ class AdminUtilisateursController extends AbstractController
             return $this->redirectToRoute('admin_utilisateurs');
         }
 
-        $ligne = array_values(array_filter($this->utilisateurs->listeAdministration(), fn ($l) => $l['utilisateur'] === $cible))[0] ?? null;
+        $ligne = $this->utilisateurs->ligneAdministration($cible);
 
         return $this->render('admin/utilisateur_supprimer.html.twig', ['cible' => $cible, 'ligne' => $ligne]);
     }

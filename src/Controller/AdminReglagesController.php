@@ -203,7 +203,7 @@ class AdminReglagesController extends AbstractController
             'clubLogo' => $this->club->logo(),
             'smtpDefini' => $this->smtp->lire()['mot_de_passe_defini'],
             'smtpConfigure' => $this->smtp->estConfigure(),
-            'nbTous' => \count($this->utilisateurs->actifs()),
+            'nbTous' => $this->utilisateurs->nombreActifs(),
             'nbAdmins' => $this->utilisateurs->nombreAdminsActifs(),
         ]);
     }
