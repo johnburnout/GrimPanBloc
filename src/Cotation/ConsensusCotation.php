@@ -17,9 +17,9 @@ namespace App\Cotation;
 final class ConsensusCotation
 {
     /**
-     * @param list<string>          $votes  cotations proposées par les validateurs
-     * @param string                $auteur cotation proposée par l'auteur
-     * @param callable(string): int $rang   rang de difficulté d'une cotation
+     * @param list<string> $votes cotations proposées par les validateurs
+     * @param string $auteur cotation proposée par l'auteur
+     * @param callable(string): int $rang rang de difficulté d'une cotation
      */
     public static function calculer(array $votes, string $auteur, callable $rang): string
     {

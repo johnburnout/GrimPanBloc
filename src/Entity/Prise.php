@@ -38,22 +38,70 @@ class Prise
     #[ORM\Column(enumType: TypePrise::class, length: 10)]
     private TypePrise $type = TypePrise::Main;
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getVoie(): ?Voie { return $this->voie; }
-    public function setVoie(?Voie $voie): static { $this->voie = $voie; return $this; }
+    public function getVoie(): ?Voie
+    {
+        return $this->voie;
+    }
 
-    public function getX(): float { return $this->x; }
-    public function setX(float $x): static { $this->x = max(0, min(100, $x)); return $this; }
+    public function setVoie(?Voie $voie): static
+    {
+        $this->voie = $voie;
 
-    public function getY(): float { return $this->y; }
-    public function setY(float $y): static { $this->y = max(0, min(100, $y)); return $this; }
+        return $this;
+    }
 
-    public function getRayon(): float { return $this->rayon; }
-    public function setRayon(float $rayon): static { $this->rayon = max(0.5, min(20, $rayon)); return $this; }
+    public function getX(): float
+    {
+        return $this->x;
+    }
 
-    public function getType(): TypePrise { return $this->type; }
-    public function setType(TypePrise $type): static { $this->type = $type; return $this; }
+    public function setX(float $x): static
+    {
+        $this->x = max(0, min(100, $x));
+
+        return $this;
+    }
+
+    public function getY(): float
+    {
+        return $this->y;
+    }
+
+    public function setY(float $y): static
+    {
+        $this->y = max(0, min(100, $y));
+
+        return $this;
+    }
+
+    public function getRayon(): float
+    {
+        return $this->rayon;
+    }
+
+    public function setRayon(float $rayon): static
+    {
+        $this->rayon = max(0.5, min(20, $rayon));
+
+        return $this;
+    }
+
+    public function getType(): TypePrise
+    {
+        return $this->type;
+    }
+
+    public function setType(TypePrise $type): static
+    {
+        $this->type = $type;
+
+        return $this;
+    }
 
     /** @return array{x: float, y: float, r: float, type: string} */
     public function toArray(): array

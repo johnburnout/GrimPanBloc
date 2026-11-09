@@ -49,27 +49,81 @@ class Photo
         $this->voies = new ArrayCollection();
     }
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getFichier(): ?string { return $this->fichier; }
-    public function setFichier(string $fichier): static { $this->fichier = $fichier; return $this; }
+    public function getFichier(): ?string
+    {
+        return $this->fichier;
+    }
 
-    public function getLargeur(): int { return $this->largeur; }
-    public function setLargeur(int $largeur): static { $this->largeur = $largeur; return $this; }
+    public function setFichier(string $fichier): static
+    {
+        $this->fichier = $fichier;
 
-    public function getHauteur(): int { return $this->hauteur; }
-    public function setHauteur(int $hauteur): static { $this->hauteur = $hauteur; return $this; }
+        return $this;
+    }
 
-    public function getSecteur(): ?Secteur { return $this->secteur; }
-    public function setSecteur(?Secteur $secteur): static { $this->secteur = $secteur; return $this; }
+    public function getLargeur(): int
+    {
+        return $this->largeur;
+    }
 
-    public function getAuteur(): ?User { return $this->auteur; }
-    public function setAuteur(?User $auteur): static { $this->auteur = $auteur; return $this; }
+    public function setLargeur(int $largeur): static
+    {
+        $this->largeur = $largeur;
 
-    public function getCreeLe(): \DateTimeImmutable { return $this->creeLe; }
+        return $this;
+    }
+
+    public function getHauteur(): int
+    {
+        return $this->hauteur;
+    }
+
+    public function setHauteur(int $hauteur): static
+    {
+        $this->hauteur = $hauteur;
+
+        return $this;
+    }
+
+    public function getSecteur(): ?Secteur
+    {
+        return $this->secteur;
+    }
+
+    public function setSecteur(?Secteur $secteur): static
+    {
+        $this->secteur = $secteur;
+
+        return $this;
+    }
+
+    public function getAuteur(): ?User
+    {
+        return $this->auteur;
+    }
+
+    public function setAuteur(?User $auteur): static
+    {
+        $this->auteur = $auteur;
+
+        return $this;
+    }
+
+    public function getCreeLe(): \DateTimeImmutable
+    {
+        return $this->creeLe;
+    }
 
     /** @return Collection<int, Voie> */
-    public function getVoies(): Collection { return $this->voies; }
+    public function getVoies(): Collection
+    {
+        return $this->voies;
+    }
 
     public function getChemin(): string
     {

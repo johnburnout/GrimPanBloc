@@ -75,24 +75,75 @@ class Voie
         $this->croix = new ArrayCollection();
     }
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getNom(): ?string { return $this->nom; }
-    public function setNom(string $nom): static { $this->nom = $nom; return $this; }
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
 
-    public function getDescription(): ?string { return $this->description; }
-    public function setDescription(?string $description): static { $this->description = $description; return $this; }
+    public function setNom(string $nom): static
+    {
+        $this->nom = $nom;
 
-    public function getPhoto(): ?Photo { return $this->photo; }
-    public function setPhoto(?Photo $photo): static { $this->photo = $photo; return $this; }
+        return $this;
+    }
 
-    public function getAuteur(): ?User { return $this->auteur; }
-    public function setAuteur(?User $auteur): static { $this->auteur = $auteur; return $this; }
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
 
-    public function isActive(): bool { return $this->active; }
-    public function setActive(bool $active): static { $this->active = $active; return $this; }
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
 
-    public function getCreeLe(): \DateTimeImmutable { return $this->creeLe; }
+        return $this;
+    }
+
+    public function getPhoto(): ?Photo
+    {
+        return $this->photo;
+    }
+
+    public function setPhoto(?Photo $photo): static
+    {
+        $this->photo = $photo;
+
+        return $this;
+    }
+
+    public function getAuteur(): ?User
+    {
+        return $this->auteur;
+    }
+
+    public function setAuteur(?User $auteur): static
+    {
+        $this->auteur = $auteur;
+
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    public function setActive(bool $active): static
+    {
+        $this->active = $active;
+
+        return $this;
+    }
+
+    public function getCreeLe(): \DateTimeImmutable
+    {
+        return $this->creeLe;
+    }
 
     // --- Cotation -------------------------------------------------------
     //
@@ -100,7 +151,10 @@ class Voie
     // sont la cotation AFFICHÉE (consensus des validateurs, voir ConsensusCotation),
     // recalculée à chaque changement et utilisée pour trier et filtrer.
 
-    public function getSysteme(): SystemeCotation { return $this->systeme; }
+    public function getSysteme(): SystemeCotation
+    {
+        return $this->systeme;
+    }
 
     public function setSysteme(SystemeCotation $systeme): static
     {
@@ -111,11 +165,21 @@ class Voie
     }
 
     /** Cotation affichée (valeur brute : « 6a », « bleu »). */
-    public function getCotation(): string { return $this->cotation; }
-    public function getRang(): int { return $this->rang; }
+    public function getCotation(): string
+    {
+        return $this->cotation;
+    }
+
+    public function getRang(): int
+    {
+        return $this->rang;
+    }
 
     /** Proposition du créateur (valeur brute). */
-    public function getCotationAuteur(): string { return $this->cotationAuteur; }
+    public function getCotationAuteur(): string
+    {
+        return $this->cotationAuteur;
+    }
 
     // Champs du formulaire : ils portent la proposition du créateur.
     public function getCotationFr(): ?CotationFr
@@ -216,7 +280,10 @@ class Voie
     // --- Prises ---------------------------------------------------------
 
     /** @return Collection<int, Prise> */
-    public function getPrises(): Collection { return $this->prises; }
+    public function getPrises(): Collection
+    {
+        return $this->prises;
+    }
 
     public function addPrise(Prise $prise): static
     {
@@ -251,7 +318,10 @@ class Voie
     // --- Croix (réussites) -----------------------------------------------
 
     /** @return Collection<int, Croix> */
-    public function getCroix(): Collection { return $this->croix; }
+    public function getCroix(): Collection
+    {
+        return $this->croix;
+    }
 
     /** Croix posées par d'autres grimpeurs que l'auteur. */
     public function getCroixValidantes(): array

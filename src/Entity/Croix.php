@@ -41,11 +41,35 @@ class Croix
         $this->creeLe = new \DateTimeImmutable();
     }
 
-    public function getId(): ?int { return $this->id; }
-    public function getVoie(): Voie { return $this->voie; }
-    public function getGrimpeur(): User { return $this->grimpeur; }
-    public function getCreeLe(): \DateTimeImmutable { return $this->creeLe; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getCotation(): ?string { return $this->cotation; }
-    public function setCotation(?string $cotation): static { $this->cotation = $cotation; return $this; }
+    public function getVoie(): Voie
+    {
+        return $this->voie;
+    }
+
+    public function getGrimpeur(): User
+    {
+        return $this->grimpeur;
+    }
+
+    public function getCreeLe(): \DateTimeImmutable
+    {
+        return $this->creeLe;
+    }
+
+    public function getCotation(): ?string
+    {
+        return $this->cotation;
+    }
+
+    public function setCotation(?string $cotation): static
+    {
+        $this->cotation = $cotation;
+
+        return $this;
+    }
 }

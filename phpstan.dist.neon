@@ -1,0 +1,22 @@
+# Analyse statique : vendor/bin/phpstan analyse
+includes:
+    - phpstan-baseline.neon
+    - vendor/phpstan/phpstan-symfony/extension.neon
+    - vendor/phpstan/phpstan-symfony/rules.neon
+    - vendor/phpstan/phpstan-doctrine/extension.neon
+    - vendor/phpstan/phpstan-doctrine/rules.neon
+
+parameters:
+    level: 6
+    paths:
+        - src
+        - tests
+        - public/setup
+    tmpDir: var/cache/phpstan
+    symfony:
+        # Conteneur compilé (dev) : types des services et des paramètres
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+    doctrine:
+        # Propriétés d'entité non initialisées tant que l'objet n'est pas rempli :
+        # nullables côté PHP, obligatoires en base (convention de make:entity)
+        allowNullablePropertyForRequiredField: true

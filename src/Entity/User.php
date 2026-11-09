@@ -57,15 +57,39 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
         $this->creeLe = new \DateTimeImmutable();
     }
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getEmail(): ?string { return $this->email; }
-    public function setEmail(string $email): static { $this->email = mb_strtolower($email); return $this; }
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
 
-    public function getPseudo(): ?string { return $this->pseudo; }
-    public function setPseudo(string $pseudo): static { $this->pseudo = $pseudo; return $this; }
+    public function setEmail(string $email): static
+    {
+        $this->email = mb_strtolower($email);
 
-    public function getUserIdentifier(): string { return (string) $this->email; }
+        return $this;
+    }
+
+    public function getPseudo(): ?string
+    {
+        return $this->pseudo;
+    }
+
+    public function setPseudo(string $pseudo): static
+    {
+        $this->pseudo = $pseudo;
+
+        return $this;
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
 
     public function getRoles(): array
     {
@@ -76,18 +100,51 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     }
 
     /** @param list<string> $roles */
-    public function setRoles(array $roles): static { $this->roles = $roles; return $this; }
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
 
-    public function getPassword(): ?string { return $this->password; }
-    public function setPassword(string $password): static { $this->password = $password; return $this; }
+        return $this;
+    }
 
-    public function getCreeLe(): \DateTimeImmutable { return $this->creeLe; }
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
 
-    public function isActif(): bool { return $this->actif; }
-    public function setActif(bool $actif): static { $this->actif = $actif; return $this; }
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
 
-    public function getSupprimeLe(): ?\DateTimeImmutable { return $this->supprimeLe; }
-    public function estSupprime(): bool { return null !== $this->supprimeLe; }
+        return $this;
+    }
+
+    public function getCreeLe(): \DateTimeImmutable
+    {
+        return $this->creeLe;
+    }
+
+    public function isActif(): bool
+    {
+        return $this->actif;
+    }
+
+    public function setActif(bool $actif): static
+    {
+        $this->actif = $actif;
+
+        return $this;
+    }
+
+    public function getSupprimeLe(): ?\DateTimeImmutable
+    {
+        return $this->supprimeLe;
+    }
+
+    public function estSupprime(): bool
+    {
+        return null !== $this->supprimeLe;
+    }
 
     /** Supprime le compte en gardant le pseudo (voir $supprimeLe). Irréversible. */
     public function supprimer(): static
@@ -101,7 +158,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
         return $this;
     }
 
-    public function isAdmin(): bool { return \in_array('ROLE_ADMIN', $this->roles, true); }
+    public function isAdmin(): bool
+    {
+        return \in_array('ROLE_ADMIN', $this->roles, true);
+    }
 
     public function setAdmin(bool $admin): static
     {

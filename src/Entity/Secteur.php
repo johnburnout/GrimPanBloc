@@ -9,7 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Une zone de la salle : un pan, un mur, un dévers…
+ * Une zone de la salle : un pan, un mur, un dévers….
  */
 #[ORM\Entity(repositoryClass: SecteurRepository::class)]
 class Secteur
@@ -37,16 +37,40 @@ class Secteur
         $this->photos = new ArrayCollection();
     }
 
-    public function getId(): ?int { return $this->id; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-    public function getNom(): ?string { return $this->nom; }
-    public function setNom(string $nom): static { $this->nom = $nom; return $this; }
+    public function getNom(): ?string
+    {
+        return $this->nom;
+    }
 
-    public function getDescription(): ?string { return $this->description; }
-    public function setDescription(?string $description): static { $this->description = $description; return $this; }
+    public function setNom(string $nom): static
+    {
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): static
+    {
+        $this->description = $description;
+
+        return $this;
+    }
 
     /** @return Collection<int, Photo> */
-    public function getPhotos(): Collection { return $this->photos; }
+    public function getPhotos(): Collection
+    {
+        return $this->photos;
+    }
 
     public function __toString(): string
     {

@@ -1,0 +1,193 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Method Installateur\:\:console\(\) has parameter \$arguments with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: public/setup/_inc/Installateur.php
+
+		-
+			message: '#^Method Installateur\:\:contenuEnv\(\) has parameter \$p with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: public/setup/_inc/Installateur.php
+
+		-
+			message: '#^Method Installateur\:\:verif\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: public/setup/_inc/Installateur.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: string$#'
+			identifier: match.unhandled
+			count: 1
+			path: src/Controller/AdminReglagesController.php
+
+		-
+			message: '#^Method App\\Controller\\AdminReglagesController\:\:formulaire\(\) return type with generic interface Symfony\\Component\\Form\\FormInterface does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Controller/AdminReglagesController.php
+
+		-
+			message: '#^Method App\\Controller\\AdminReglagesController\:\:page\(\) has parameter \$soumis with generic interface Symfony\\Component\\Form\\FormInterface but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Controller/AdminReglagesController.php
+
+		-
+			message: '#^Method App\\Entity\\Voie\:\:getCroixValidantes\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Entity/Voie.php
+
+		-
+			message: '#^Method App\\Entity\\Voie\:\:remplacerPrises\(\) has parameter \$prises with no value type specified in iterable type iterable\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Entity/Voie.php
+
+		-
+			message: '#^Class App\\Form\\ProfilType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/ProfilType.php
+
+		-
+			message: '#^Class App\\Form\\RegistrationFormType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/RegistrationFormType.php
+
+		-
+			message: '#^Class App\\Form\\Reglages\\ClubType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Reglages/ClubType.php
+
+		-
+			message: '#^Class App\\Form\\Reglages\\EnvoiGroupeType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Reglages/EnvoiGroupeType.php
+
+		-
+			message: '#^Class App\\Form\\Reglages\\HttpsType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Reglages/HttpsType.php
+
+		-
+			message: '#^Class App\\Form\\Reglages\\MailTestType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Reglages/MailTestType.php
+
+		-
+			message: '#^Class App\\Form\\Reglages\\SmtpType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/Reglages/SmtpType.php
+
+		-
+			message: '#^Class App\\Form\\SecteurType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/SecteurType.php
+
+		-
+			message: '#^Class App\\Form\\VoieType extends generic class Symfony\\Component\\Form\\AbstractType but does not specify its types\: TData$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Form/VoieType.php
+
+		-
+			message: '#^Method App\\MiseAJour\\InstallateurMiseAJour\:\:finaliser\(\) has parameter \$console with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/MiseAJour/InstallateurMiseAJour.php
+
+		-
+			message: '#^Method App\\MiseAJour\\Release\:\:depuisApi\(\) has parameter \$d with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/MiseAJour/Release.php
+
+		-
+			message: '#^Method App\\Repository\\UserRepository\:\:ligne\(\) has parameter \$l with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Repository/UserRepository.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: string$#'
+			identifier: match.unhandled
+			count: 1
+			path: src/Security/VoieVoter.php
+
+		-
+			message: '#^Using nullsafe property access "\?\-\>value" on left side of \?\? is unnecessary\. Use \-\> instead\.$#'
+			identifier: nullsafe.neverNull
+			count: 1
+			path: src/Service/GestionCroix.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\HttpFoundation\\Session\\SessionInterface\:\:getFlashBag\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: tests/Fonctionnel/AdminMiseAJourTest.php
+
+		-
+			message: '#^Method App\\Tests\\Fonctionnel\\AdminMiseAJourTest\:\:lancer\(\) has parameter \$arguments with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/Fonctionnel/AdminMiseAJourTest.php
+
+		-
+			message: '#^Method App\\Tests\\Fonctionnel\\AdminMiseAJourTest\:\:lancer\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/Fonctionnel/AdminMiseAJourTest.php
+
+		-
+			message: '#^Strict comparison using \=\=\= between null and Symfony\\Component\\HttpFoundation\\Request will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
+			count: 1
+			path: tests/Fonctionnel/AdminReglagesTest.php
+
+		-
+			message: '#^Symfony\\Component\\DomCrawler\\Form does not accept Symfony\\Component\\HttpFoundation\\File\\UploadedFile\.$#'
+			identifier: offsetAssign.valueType
+			count: 2
+			path: tests/Fonctionnel/VoieFormulaireTest.php
+
+		-
+			message: '#^Symfony\\Component\\DomCrawler\\Form does not accept string\|false\.$#'
+			identifier: offsetAssign.valueType
+			count: 5
+			path: tests/Fonctionnel/VoieFormulaireTest.php
+
+		-
+			message: '#^Match expression does not handle remaining value\: string$#'
+			identifier: match.unhandled
+			count: 1
+			path: tests/MiseAJour/InstallateurMiseAJourTest.php
+
+		-
+			message: '#^Method App\\Tests\\MiseAJour\\ReleaseTest\:\:api\(\) has parameter \$noms with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/MiseAJour/ReleaseTest.php
+
+		-
+			message: '#^Method App\\Tests\\MiseAJour\\ReleaseTest\:\:api\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/MiseAJour/ReleaseTest.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''Symfony\\\\Component\\\\Dotenv\\\\Dotenv'' and ''bootEnv'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: tests/bootstrap.php

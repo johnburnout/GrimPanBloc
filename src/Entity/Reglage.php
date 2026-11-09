@@ -22,7 +22,20 @@ class Reglage
     ) {
     }
 
-    public function getCle(): string { return $this->cle; }
-    public function getValeur(): ?string { return $this->valeur; }
-    public function setValeur(?string $valeur): static { $this->valeur = $valeur; return $this; }
+    public function getCle(): string
+    {
+        return $this->cle;
+    }
+
+    public function getValeur(): ?string
+    {
+        return $this->valeur;
+    }
+
+    public function setValeur(?string $valeur): static
+    {
+        $this->valeur = $valeur;
+
+        return $this;
+    }
 }
