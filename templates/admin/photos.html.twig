@@ -11,11 +11,14 @@
     {% if photos is empty %}
         <p class="vide">Aucune photo inutilisée.</p>
     {% else %}
-        <ul class="grille-voies">
+        <ul class="grille-photos">
             {% for photo in photos %}
                 <li class="carte-photo">
                     <div class="cadre-photo">
-                        <img src="{{ asset(photo.chemin) }}" alt="Photo du secteur {{ photo.secteur.nom }}" loading="lazy">
+                        {# Clic : la photo en grand, dans un nouvel onglet #}
+                        <a href="{{ asset(photo.chemin) }}" target="_blank" rel="noopener" title="Voir la photo en grand">
+                            <img src="{{ asset(photo.chemin) }}" alt="Photo du secteur {{ photo.secteur.nom }}" loading="lazy">
+                        </a>
                     </div>
                     <div class="carte-infos">
                         <strong><a href="{{ path('secteur_show', {id: photo.secteur.id}) }}">{{ photo.secteur.nom }}</a></strong><br>
