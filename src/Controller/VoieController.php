@@ -30,6 +30,7 @@ class VoieController extends AbstractController
     }
 
     #[Route('/nouvelle/{id}', name: 'voie_new', requirements: ['id' => '\d+'])]
+    #[IsGranted('ROLE_USER')] // en plus d'access_control, qui dépend de l'URL
     public function new(Secteur $secteur, Request $request, #[CurrentUser] User $user): Response
     {
         $voie = (new Voie())->setAuteur($user);

@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/secteurs')]
 class SecteurController extends AbstractController
@@ -22,6 +23,7 @@ class SecteurController extends AbstractController
     }
 
     #[Route('/nouveau', name: 'secteur_new')]
+    #[IsGranted('ROLE_USER')] // en plus d'access_control, qui dépend de l'URL
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $secteur = new Secteur();

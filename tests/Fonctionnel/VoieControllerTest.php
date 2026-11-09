@@ -3,6 +3,7 @@
 namespace App\Tests\Fonctionnel;
 
 use App\Entity\Croix;
+use App\Entity\Secteur;
 
 final class VoieControllerTest extends FonctionnelTestCase
 {
@@ -59,6 +60,21 @@ final class VoieControllerTest extends FonctionnelTestCase
 
         self::assertResponseRedirects('/connexion');
         self::assertTrue($this->voieExiste($id));
+    }
+
+    public function testUnVisiteurAnonymeNePeutRienCreer(): void
+    {
+        $secteurId = $this->creerVoie($this->creerUtilisateur('auteur'))->getPhoto()->getSecteur()->getId();
+        $avant = $this->em->getRepository(Secteur::class)->count();
+
+        foreach (['/secteurs/nouveau', "/voies/nouvelle/$secteurId"] as $url) {
+            $this->client->request('GET', $url);
+            self::assertResponseRedirects('/connexion', message: $url);
+        }
+        $this->client->request('POST', '/secteurs/nouveau', ['secteur' => ['nom' => 'Intrus']]);
+
+        self::assertResponseRedirects('/connexion');
+        self::assertSame($avant, $this->em->getRepository(Secteur::class)->count());
     }
 
     public function testSuppressionRefuseeAvecUnJetonInvalide(): void
