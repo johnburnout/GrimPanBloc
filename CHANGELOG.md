@@ -7,7 +7,7 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
-## [Non publié]
+## [1.3.9] - 2026-11-09
 
 ### Corrigé
 - Après une mise à jour, les navigateurs pouvaient garder l'ancienne mise en page
