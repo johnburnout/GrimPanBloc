@@ -9,6 +9,11 @@ aux administrateurs sur la page « Mises à jour ».
 
 ## [Non publié]
 
+### Modifié
+- **Administration → Photos** : au-delà de 30 photos inutilisées, la liste est
+  découpée en pages, avec le nombre total de photos. Après une suppression, on
+  reste sur la même page.
+
 ### Technique
 - Retrait d'un composant de notifications (Notifier) qui n'a jamais servi. Aucune
   action n'est nécessaire sur les sites installés.
