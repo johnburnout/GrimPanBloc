@@ -16,6 +16,13 @@ aux administrateurs sur la page « Mises à jour ».
   du navigateur. Une page « Finalisation de la mise à jour… » s'affiche quelques
   secondes. Les mises à jour depuis les versions précédentes fonctionnent comme
   avant. Aucune action n'est nécessaire sur les sites installés.
+- Création de secteurs et de voies : l'obligation d'être connecté est vérifiée
+  directement sur ces pages, en plus de la règle par adresse.
+
+### Technique
+- Retrait d'un composant d'envoi différé des mails (Messenger) qui n'a jamais servi :
+  les mails partaient déjà directement. La mise à jour supprime sa table, restée
+  vide, dans la base de données.
 
 ## [1.3.2] - 2026-11-09
 
