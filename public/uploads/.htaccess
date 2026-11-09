@@ -14,3 +14,9 @@ Options -Indexes -ExecCGI
 <IfModule mod_php.c>
     php_flag engine off
 </IfModule>
+
+# Photos servies directement par Apache, sans passer par Symfony : le navigateur
+# doit s'en tenir au type annoncé (en-tête posé seulement si mod_headers est actif).
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>
