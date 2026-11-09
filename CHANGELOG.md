@@ -7,6 +7,13 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Modifié
+- **Administration → Photos** : les photos s'affichent en miniatures (environ
+  5 par ligne sur ordinateur, 2 sur téléphone). Un clic sur une miniature ouvre
+  la photo en grand dans un nouvel onglet.
+
 ## [1.3.7] - 2026-11-09
 
 ### Corrigé
