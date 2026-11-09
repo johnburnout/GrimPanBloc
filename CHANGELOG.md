@@ -7,6 +7,13 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Technique
+- Le réglage « Toujours utiliser HTTPS » est gardé en cache au lieu d'être relu
+  dans la base de données à chaque page. Il s'applique toujours dès son
+  enregistrement. Aucune action n'est nécessaire sur les sites installés.
+
 ## [1.3.3] - 2026-11-09
 
 ### Sécurité
