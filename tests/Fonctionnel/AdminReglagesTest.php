@@ -2,9 +2,9 @@
 
 namespace App\Tests\Fonctionnel;
 
-use App\EventSubscriber\ForcerHttpsSubscriber;
 use App\Mail\ReglagesSmtp;
 use App\Repository\ReglageRepository;
+use App\Site\ReglageHttps;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -27,7 +27,7 @@ final class AdminReglagesTest extends FonctionnelTestCase
         $this->soumettre('Sécurité de la connexion', ['forcer_https' => '1']);
 
         $this->assertErreurAffichee('Ouvrez d\'abord cette page en HTTPS');
-        self::assertNotSame('1', $this->reglage(ForcerHttpsSubscriber::CLE));
+        self::assertNotSame('1', $this->reglage(ReglageHttps::CLE));
     }
 
     public function testHttpsPeutEtreDesactive(): void
@@ -36,7 +36,40 @@ final class AdminReglagesTest extends FonctionnelTestCase
 
         self::assertResponseRedirects('/admin/reglages');
         self::assertContains('Redirection vers HTTPS désactivée.', $this->flashsApresRedirection('success'));
-        self::assertSame('0', $this->reglage(ForcerHttpsSubscriber::CLE));
+        self::assertSame('0', $this->reglage(ReglageHttps::CLE));
+    }
+
+    /** Activé puis désactivé depuis une page en HTTPS : chaque changement s'applique aussitôt. */
+    public function testHttpsActiveRedirigeLeHttpPuisSeDesactive(): void
+    {
+        $this->client->request('GET', 'https://localhost/admin/reglages');
+        $this->soumettre('Sécurité de la connexion', ['forcer_https' => '1']);
+        self::assertResponseRedirects('/admin/reglages');
+
+        $this->client->request('GET', 'http://localhost/secteurs');
+        self::assertResponseRedirects('https://localhost/secteurs', 301);
+        $this->client->request('GET', 'https://localhost/secteurs');
+        self::assertResponseHeaderSame('Strict-Transport-Security', 'max-age=2592000');
+
+        $this->soumettre('Sécurité de la connexion', ['forcer_https' => false]);
+        // Sans effacement du cache, la redirection survivrait à la désactivation.
+        $this->client->request('GET', 'http://localhost/secteurs');
+        self::assertResponseIsSuccessful();
+    }
+
+    /** La valeur vient du cache : pas de requête SQL à chaque page. */
+    public function testLeReglageHttpsEstLuDansLeCache(): void
+    {
+        $reglage = static::getContainer()->get(ReglageHttps::class);
+        self::assertFalse($reglage->actif());
+
+        // Écriture directe en base, sans passer par ReglageHttps::definir()
+        static::getContainer()->get(ReglageRepository::class)->definir(ReglageHttps::CLE, '1');
+        $this->em->flush();
+
+        self::assertFalse($reglage->actif(), 'Valeur en cache, base non relue.');
+        $reglage->definir(true);
+        self::assertTrue($reglage->actif());
     }
 
     // --- Club ---------------------------------------------------------------

@@ -689,6 +689,7 @@ Pour donner le rôle à un compte existant : **Administration → Utilisateurs �
 | `src/Controller/AdminUtilisateursController.php` | Liste des utilisateurs : admin, désactivation, suppression |
 | `src/Mail/` | Réglages SMTP (mot de passe chiffré avec `APP_SECRET`) et envoi des mails |
 | `src/Site/IdentiteClub.php` | Nom et logo du club (`public/uploads/logo/`) |
+| `src/Site/ReglageHttps.php` | Réglage « Toujours utiliser HTTPS », gardé en cache (appliqué par `ForcerHttpsSubscriber`) |
 | `src/Security/UserChecker.php` | Refus de connexion des comptes désactivés |
 | `tests/` | Tests PHPUnit (`php bin/phpunit`) |
 | `phpstan.dist.neon`, `phpstan-baseline.neon` | Analyse statique (`vendor/bin/phpstan analyse`) ; la baseline liste les erreurs existantes tolérées |

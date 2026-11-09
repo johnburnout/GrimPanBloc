@@ -2,7 +2,7 @@
 
 namespace App\EventSubscriber;
 
-use App\Repository\ReglageRepository;
+use App\Site\ReglageHttps;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
@@ -15,14 +15,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
  *
  * Le réglage ne peut être activé que depuis une page ouverte en HTTPS : cela
  * prouve que PHP détecte bien le HTTPS, sinon la redirection tournerait en boucle.
+ * Sa valeur est lue dans le cache de l'application (voir ReglageHttps).
  */
 final class ForcerHttpsSubscriber implements EventSubscriberInterface
 {
-    public const CLE = 'site.forcer_https';
-
-    private ?bool $actif = null;
-
-    public function __construct(private readonly ReglageRepository $reglages)
+    public function __construct(private readonly ReglageHttps $reglage)
     {
     }
 
@@ -38,7 +35,7 @@ final class ForcerHttpsSubscriber implements EventSubscriberInterface
     public function rediriger(RequestEvent $event): void
     {
         $request = $event->getRequest();
-        if (!$event->isMainRequest() || $request->isSecure() || !$this->actif()) {
+        if (!$event->isMainRequest() || $request->isSecure() || !$this->reglage->actif()) {
             return;
         }
         // 301 pour une page, 308 pour un formulaire (conserve la méthode POST)
@@ -48,22 +45,9 @@ final class ForcerHttpsSubscriber implements EventSubscriberInterface
 
     public function entetes(ResponseEvent $event): void
     {
-        if ($event->isMainRequest() && $event->getRequest()->isSecure() && $this->actif()) {
+        if ($event->isMainRequest() && $event->getRequest()->isSecure() && $this->reglage->actif()) {
             // Le navigateur passe lui-même en HTTPS pendant 30 jours (durée volontairement courte).
             $event->getResponse()->headers->set('Strict-Transport-Security', 'max-age=2592000');
         }
-    }
-
-    private function actif(): bool
-    {
-        if (null === $this->actif) {
-            try {
-                $this->actif = '1' === $this->reglages->valeur(self::CLE);
-            } catch (\Throwable) {
-                $this->actif = false; // base pas encore installée ou pas encore migrée
-            }
-        }
-
-        return $this->actif;
     }
 }

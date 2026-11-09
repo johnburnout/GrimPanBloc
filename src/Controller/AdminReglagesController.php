@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\EventSubscriber\ForcerHttpsSubscriber;
 use App\Form\Reglages\ClubType;
 use App\Form\Reglages\EnvoiGroupeType;
 use App\Form\Reglages\HttpsType;
@@ -11,10 +10,9 @@ use App\Form\Reglages\MailTestType;
 use App\Form\Reglages\SmtpType;
 use App\Mail\MailerSite;
 use App\Mail\ReglagesSmtp;
-use App\Repository\ReglageRepository;
 use App\Repository\UserRepository;
 use App\Site\IdentiteClub;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Site\ReglageHttps;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
@@ -39,8 +37,7 @@ class AdminReglagesController extends AbstractController
         private readonly MailerSite $mailer,
         private readonly UserRepository $utilisateurs,
         private readonly IdentiteClub $club,
-        private readonly ReglageRepository $reglages,
-        private readonly EntityManagerInterface $em,
+        private readonly ReglageHttps $https,
     ) {
     }
 
@@ -66,8 +63,7 @@ class AdminReglagesController extends AbstractController
                 // Garde-fou : si PHP ne voit pas le HTTPS, la redirection bouclerait.
                 $form->addError(new FormError('Ouvrez d\'abord cette page en HTTPS (https://…) pour activer ce réglage.'));
             } else {
-                $this->reglages->definir(ForcerHttpsSubscriber::CLE, $activer ? '1' : '0');
-                $this->em->flush();
+                $this->https->definir($activer);
 
                 return $this->enregistre($activer ? 'Le site utilise désormais toujours HTTPS.' : 'Redirection vers HTTPS désactivée.');
             }
@@ -175,7 +171,7 @@ class AdminReglagesController extends AbstractController
     private function formulaire(string $section, User $admin): FormInterface
     {
         [$type, $donnees] = match ($section) {
-            'https' => [HttpsType::class, ['forcer_https' => '1' === $this->reglages->valeur(ForcerHttpsSubscriber::CLE)]],
+            'https' => [HttpsType::class, ['forcer_https' => $this->https->actif()]],
             'club' => [ClubType::class, ['nom_club' => $this->club->nom(), 'supprimer_logo' => false, 'logo' => null]],
             'smtp' => [SmtpType::class, $this->smtp->lire()],
             'mail_test' => [MailTestType::class, ['destinataire' => $admin->getEmail()]],
@@ -198,7 +194,7 @@ class AdminReglagesController extends AbstractController
         }
 
         return $this->render('admin/reglages.html.twig', $formulaires + [
-            'forcerHttps' => '1' === $this->reglages->valeur(ForcerHttpsSubscriber::CLE),
+            'forcerHttps' => $this->https->actif(),
             'enHttps' => $request->isSecure(),
             'clubLogo' => $this->club->logo(),
             'smtpDefini' => $this->smtp->lire()['mot_de_passe_defini'],

@@ -31,6 +31,8 @@ abstract class FonctionnelTestCase extends WebTestCase
         $this->client->disableReboot();
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
         $this->em->getConnection()->beginTransaction();
+        // Le cache (réglage HTTPS…) survit aux transactions annulées : on repart de zéro
+        static::getContainer()->get('cache.app')->clear();
     }
 
     protected function tearDown(): void
