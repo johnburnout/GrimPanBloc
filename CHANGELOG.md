@@ -7,6 +7,14 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Ajouté
+- **Administration → Photos** : liste des photos qu'aucune voie n'utilise, avec
+  leur secteur, et un bouton pour les supprimer définitivement (fichier compris).
+  Ces photos restent sinon dans leur secteur après la suppression d'une voie ou
+  un changement de photo.
+
 ## [1.3.5] - 2026-11-09
 
 ### Modifié
