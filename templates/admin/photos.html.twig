@@ -14,7 +14,9 @@
         <ul class="grille-voies">
             {% for photo in photos %}
                 <li class="carte-photo">
-                    <img src="{{ asset(photo.chemin) }}" alt="Photo du secteur {{ photo.secteur.nom }}" loading="lazy">
+                    <div class="cadre-photo">
+                        <img src="{{ asset(photo.chemin) }}" alt="Photo du secteur {{ photo.secteur.nom }}" loading="lazy">
+                    </div>
                     <div class="carte-infos">
                         <strong><a href="{{ path('secteur_show', {id: photo.secteur.id}) }}">{{ photo.secteur.nom }}</a></strong><br>
                         <small>Envoyée le {{ photo.creeLe|date('d/m/Y') }} par {{ photo.auteur.pseudo }}</small>

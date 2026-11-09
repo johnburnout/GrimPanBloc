@@ -149,7 +149,11 @@ ul:has(> li > .form-error), form ul { color: #b42318; padding-left: 1.2rem; marg
     background: var(--surface); border: 1px solid var(--bord); border-radius: var(--rayon); overflow: hidden;
     display: flex; flex-direction: column;
 }
-.carte-photo img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--bord); }
+/* Photo entière dans un cadre de hauteur commune, sans recadrage ni déformation.
+   Le cadre (et non l'image) est l'élément flexible : Safari étire les images
+   placées directement dans une colonne flexible. */
+.carte-photo .cadre-photo { position: relative; aspect-ratio: 4 / 3; background: #2a2d33; }
+.carte-photo .cadre-photo img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
 .carte-photo .carte-infos { display: block; flex: 1; }
 .carte-photo form { padding: 0 .8rem .8rem; }
 
