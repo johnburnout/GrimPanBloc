@@ -688,7 +688,7 @@ Pour donner le rôle à un compte existant : **Administration → Utilisateurs �
 | `src/Controller/AdminReglagesController.php` | Réglages (club, SMTP, mail de test, envoi groupé) et fiche à imprimer |
 | `src/Controller/AdminUtilisateursController.php` | Liste des utilisateurs : admin, désactivation, suppression |
 | `src/Mail/` | Réglages SMTP (mot de passe chiffré avec `APP_SECRET`) et envoi des mails |
-| `src/Site/IdentiteClub.php` | Nom et logo du club (`public/uploads/logo/`) |
+| `src/Site/IdentiteClub.php` | Nom et logo du club (`public/uploads/logo/`), gardés en cache |
 | `src/Site/ReglageHttps.php` | Réglage « Toujours utiliser HTTPS », gardé en cache (appliqué par `ForcerHttpsSubscriber`) |
 | `src/Security/UserChecker.php` | Refus de connexion des comptes désactivés |
 | `tests/` | Tests PHPUnit (`php bin/phpunit`) |

@@ -4,6 +4,7 @@ namespace App\Tests\Fonctionnel;
 
 use App\Mail\ReglagesSmtp;
 use App\Repository\ReglageRepository;
+use App\Site\IdentiteClub;
 use App\Site\ReglageHttps;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -82,6 +83,44 @@ final class AdminReglagesTest extends FonctionnelTestCase
         self::assertContains('Identité du club enregistrée.', $this->flashsApresRedirection('success'));
         self::assertSame('Les Grimpeurs du Causse', $this->reglage('club.nom'));
         self::assertSame('Les Grimpeurs du Causse', $this->section('Identité de la salle')->filter('input[type="text"]')->attr('value'));
+    }
+
+    /** Nom et logo modifiés : l'en-tête de la page suivante les montre aussitôt (cache effacé). */
+    public function testLEnTeteSuitLesChangementsDuNomEtDuLogo(): void
+    {
+        $png = tempnam(sys_get_temp_dir(), 'logo');
+        imagepng(imagecreatetruecolor(60, 40), $png);
+        $this->client->request('GET', '/secteurs');
+        self::assertSelectorNotExists('img.logo-club');
+
+        $this->soumettre('Identité de la salle', ['nom_club' => 'Club du Causse'], ['logo' => new UploadedFile($png, 'logo.png', 'image/png', null, true)]);
+        $logo = (string) $this->reglage('club.logo');
+        try {
+            self::assertFileExists(static::getContainer()->getParameter('kernel.project_dir').'/public/'.$logo);
+            $this->client->request('GET', '/secteurs');
+            self::assertSelectorExists('img.logo-club[alt="Club du Causse"][src$="'.basename($logo).'"]');
+
+            $this->soumettre('Identité de la salle', ['nom_club' => 'Club du Causse', 'supprimer_logo' => '1']);
+            $this->client->request('GET', '/secteurs');
+            self::assertSelectorNotExists('img.logo-club');
+        } finally {
+            @unlink(static::getContainer()->getParameter('kernel.project_dir').'/public/'.$logo);
+        }
+    }
+
+    /** Nom et logo viennent du cache : pas de requête SQL à chaque page. */
+    public function testLIdentiteDuClubEstLueDansLeCache(): void
+    {
+        $club = static::getContainer()->get(IdentiteClub::class);
+        self::assertSame('', $club->nom());
+
+        // Écriture directe en base, sans passer par IdentiteClub
+        static::getContainer()->get(ReglageRepository::class)->definir('club.nom', 'Autre nom');
+        $this->em->flush();
+
+        self::assertSame('', $club->nom(), 'Valeur en cache, base non relue.');
+        $club->definirNom('Club du Causse');
+        self::assertSame('Club du Causse', $club->nom());
     }
 
     public function testUnLogoQuiNEstPasUneImageEstRefuse(): void

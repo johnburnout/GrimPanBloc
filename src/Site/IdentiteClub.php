@@ -5,6 +5,7 @@ namespace App\Site;
 use App\Repository\ReglageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Contracts\Cache\CacheInterface;
 
 /**
  * Nom et logo de la salle ou du club, affichés dans l'en-tête et sur la fiche à imprimer.
@@ -12,28 +13,33 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
  * Le logo est réenregistré par GD (PNG, JPEG ou WebP, 600 px au plus), ce qui
  * élimine tout contenu indésirable du fichier envoyé. Le SVG est refusé : servi
  * depuis le site, il pourrait contenir du script.
+ *
+ * Affichés sur chaque page : le nom et le chemin du logo sont gardés dans le cache
+ * de l'application, effacé à chaque modification (et à chaque mise à jour du site).
  */
 final class IdentiteClub
 {
     public const COTE_MAX_LOGO = 600;
     private const TYPES = [IMAGETYPE_PNG => 'png', IMAGETYPE_JPEG => 'jpg', IMAGETYPE_WEBP => 'webp'];
+    private const CLE_CACHE = 'identite_club';
 
     public function __construct(
         private readonly ReglageRepository $reglages,
         private readonly EntityManagerInterface $em,
+        private readonly CacheInterface $cache,
         private readonly string $racine,
     ) {
     }
 
     public function nom(): string
     {
-        return (string) $this->reglages->valeur('club.nom', '');
+        return $this->lire()['nom'];
     }
 
     /** Chemin public du logo (« uploads/logo/club-….png »), ou null. */
     public function logo(): ?string
     {
-        $chemin = (string) $this->reglages->valeur('club.logo', '');
+        $chemin = $this->lire()['logo'];
 
         return '' !== $chemin && is_file($this->racine.'/public/'.$chemin) ? $chemin : null;
     }
@@ -41,7 +47,7 @@ final class IdentiteClub
     public function definirNom(string $nom): void
     {
         $this->reglages->definir('club.nom', mb_substr(trim($nom), 0, 100));
-        $this->em->flush();
+        $this->enregistrer();
     }
 
     public function definirLogo(UploadedFile $fichier): void
@@ -86,14 +92,29 @@ final class IdentiteClub
 
         $this->supprimerFichierLogo();
         $this->reglages->definir('club.logo', $relatif);
-        $this->em->flush();
+        $this->enregistrer();
     }
 
     public function supprimerLogo(): void
     {
         $this->supprimerFichierLogo();
         $this->reglages->definir('club.logo', '');
+        $this->enregistrer();
+    }
+
+    /** @return array{nom: string, logo: string} valeurs enregistrées (logo : chemin, ou '') */
+    private function lire(): array
+    {
+        return $this->cache->get(self::CLE_CACHE, fn (): array => [
+            'nom' => (string) $this->reglages->valeur('club.nom', ''),
+            'logo' => (string) $this->reglages->valeur('club.logo', ''),
+        ]);
+    }
+
+    private function enregistrer(): void
+    {
         $this->em->flush();
+        $this->cache->delete(self::CLE_CACHE);
     }
 
     private function supprimerFichierLogo(): void
