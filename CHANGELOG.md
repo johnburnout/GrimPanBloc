@@ -7,6 +7,15 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Ajouté
+- **Miniatures des photos** (800 px de côté au plus) : la liste des voies et la
+  page Administration → Photos chargent bien plus vite, surtout sur téléphone.
+  La page d'une voie affiche toujours la photo entière. Les miniatures des photos
+  déjà envoyées sont créées à la fin de la mise à jour ; en cas d'avertissement,
+  lancez `php bin/console app:photos:miniatures`.
+
 ## [1.3.10] - 2026-11-09
 
 ### Modifié
