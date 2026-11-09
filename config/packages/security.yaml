@@ -34,6 +34,8 @@ security:
                 interval: '5 minutes'
             logout:
                 path: app_logout
+                # Jeton « logout » attendu dans le champ _csrf_token du formulaire (base.html.twig)
+                enable_csrf: true
                 target: app_home
             remember_me:
                 secret: '%kernel.secret%'

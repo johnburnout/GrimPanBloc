@@ -59,6 +59,9 @@ a { color: var(--accent-fonce); }
 }
 .entete a { color: #fff; text-decoration: none; }
 .entete nav { display: flex; flex-wrap: wrap; gap: .25rem 1rem; align-items: center; }
+/* Déconnexion : formulaire POST présenté comme les liens du menu */
+.form-deconnexion { display: contents; }
+.entete .form-deconnexion button { background: none; padding: 0; border-radius: 0; color: #fff; font-weight: inherit; }
 .logo { display: flex; align-items: center; }
 .logo svg { display: block; height: 36px; width: auto; }
 .logo-symbole { display: none; }

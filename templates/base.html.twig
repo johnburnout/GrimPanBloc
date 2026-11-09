@@ -29,7 +29,11 @@
         {% endif %}
         {% if app.user %}
             <a href="{{ path('profil') }}" class="pseudo" title="Mon compte">{{ app.user.pseudo }}</a>
-            <a href="{{ path('app_logout') }}">Déconnexion</a>
+            {# POST + jeton CSRF : un site tiers ne peut pas déconnecter l'utilisateur à son insu #}
+            <form method="post" action="{{ path('app_logout') }}" class="form-deconnexion">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                <button type="submit" class="btn-lien">Déconnexion</button>
+            </form>
         {% else %}
             <a href="{{ path('app_login') }}">Connexion</a>
             <a href="{{ path('app_register') }}" class="btn btn-petit">Inscription</a>

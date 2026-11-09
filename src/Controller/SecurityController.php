@@ -22,7 +22,8 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route('/deconnexion', name: 'app_logout')]
+    // POST seulement : un GET sur /deconnexion n'atteint plus le pare-feu (405).
+    #[Route('/deconnexion', name: 'app_logout', methods: ['POST'])]
     public function logout(): never
     {
         throw new \LogicException('Intercepté par le pare-feu.');

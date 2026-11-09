@@ -71,6 +71,40 @@ final class ConnexionTest extends FonctionnelTestCase
         self::assertResponseRedirects('/');
     }
 
+    public function testLeBoutonDeDeconnexionDeconnecte(): void
+    {
+        $this->client->loginUser($this->creerUtilisateur('lea'));
+        $page = $this->client->request('GET', '/');
+
+        $this->client->submit($page->selectButton('Déconnexion')->form());
+
+        self::assertResponseRedirects('/');
+        $this->client->request('GET', '/profil');
+        self::assertResponseRedirects('/connexion');
+    }
+
+    public function testUnLienGetNeDeconnectePlus(): void
+    {
+        $this->client->loginUser($this->creerUtilisateur('lea'));
+
+        $this->client->request('GET', '/deconnexion');
+
+        self::assertResponseStatusCodeSame(405);
+        $this->client->request('GET', '/profil');
+        self::assertResponseIsSuccessful();
+    }
+
+    public function testUnPostSansJetonValideNeDeconnectePas(): void
+    {
+        $this->client->loginUser($this->creerUtilisateur('lea'));
+
+        $this->client->request('POST', '/deconnexion', ['_csrf_token' => 'faux']);
+
+        self::assertResponseStatusCodeSame(403);
+        $this->client->request('GET', '/profil');
+        self::assertResponseIsSuccessful();
+    }
+
     private function creerGrimpeurAvecMotDePasse(string $pseudo): User
     {
         $user = $this->creerUtilisateur($pseudo);
