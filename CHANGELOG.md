@@ -7,6 +7,16 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Sécurité
+- **Mises à jour en un clic** : la dernière étape (mise à jour de la base) est
+  déclenchée par un envoi de formulaire et non plus par un lien : le code
+  d'autorisation n'apparaît plus dans les journaux du serveur ni dans l'historique
+  du navigateur. Une page « Finalisation de la mise à jour… » s'affiche quelques
+  secondes. Les mises à jour depuis les versions précédentes fonctionnent comme
+  avant. Aucune action n'est nécessaire sur les sites installés.
+
 ## [1.3.2] - 2026-11-09
 
 ### Sécurité
