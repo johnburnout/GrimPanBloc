@@ -50,7 +50,8 @@
                     <li>Le code actuel est conservé dans <code>var/mise-a-jour/</code>.</li>
                     <li><strong>Sauvegardez la base de données avant</strong> (outil de votre hébergeur ou <code>mariadb-dump</code>).</li>
                 </ul>
-                <form method="post" action="{{ path('admin_mise_a_jour_installer') }}"
+                {# data-turbo="false" : la réponse est une page (envoi du jeton), pas une redirection #}
+                <form method="post" action="{{ path('admin_mise_a_jour_installer') }}" data-turbo="false"
                       onsubmit="this.querySelector('button').disabled = true; this.querySelector('button').textContent = 'Mise à jour en cours…'">
                     <input type="hidden" name="_token" value="{{ csrf_token('mise_a_jour') }}">
                     <button class="btn">Mettre à jour vers la version {{ release.version }}</button>

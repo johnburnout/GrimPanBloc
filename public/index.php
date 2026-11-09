@@ -3,7 +3,8 @@
 use App\Kernel;
 
 // Mise à jour en cours (voir src/MiseAJour/Maintenance.php) : tout le monde reçoit une
-// page 503, sauf la requête de finalisation qui porte le bon jeton. Le verrou expire
+// page 503, sauf la requête de finalisation qui porte le bon jeton (en POST, ou dans
+// l'URL quand l'ancienne version est antérieure à la 1.3.3). Le verrou expire
 // après 30 minutes pour qu'une mise à jour interrompue ne bloque pas le site.
 (static function (): void {
     $verrou = dirname(__DIR__).'/var/maintenance.lock';
@@ -16,7 +17,7 @@ use App\Kernel;
     }
     $chemin = (string) parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH);
     if (str_ends_with($chemin, '/admin/mise-a-jour/finaliser')
-        && hash_equals((string) ($d['jeton'] ?? ''), hash('sha256', (string) ($_GET['jeton'] ?? '')))) {
+        && hash_equals((string) ($d['jeton'] ?? ''), hash('sha256', (string) ($_POST['jeton'] ?? $_GET['jeton'] ?? '')))) {
         return;
     }
     http_response_code(503);
