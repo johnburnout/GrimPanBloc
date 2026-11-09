@@ -7,6 +7,12 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Technique
+- Retrait d'un composant de notifications (Notifier) qui n'a jamais servi. Aucune
+  action n'est nécessaire sur les sites installés.
+
 ## [1.3.9] - 2026-11-09
 
 ### Corrigé
