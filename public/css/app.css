@@ -164,6 +164,14 @@ ul:has(> li > .form-error), form ul { color: #b42318; padding-left: 1.2rem; marg
 .carte-photo .carte-infos { display: block; flex: 1; padding: .4rem .5rem; overflow-wrap: anywhere; }
 .carte-photo form { padding: 0 .5rem .5rem; }
 
+.pagination { display: flex; flex-wrap: wrap; gap: .35rem; align-items: center; justify-content: center; margin: 1.25rem 0; }
+.pagination a, .pagination [aria-current] {
+    min-width: 2.2rem; padding: .35rem .6rem; text-align: center; border-radius: var(--rayon);
+    border: 1px solid var(--bord); background: var(--surface); text-decoration: none; color: inherit;
+}
+.pagination [aria-current] { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.pagination-ellipse { color: var(--texte-doux); }
+
 .liste-secteurs { list-style: none; padding: 0; display: grid; gap: .5rem; }
 .liste-secteurs a {
     display: flex; justify-content: space-between; text-decoration: none; color: inherit;

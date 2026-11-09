@@ -11,6 +11,7 @@
     {% if photos is empty %}
         <p class="vide">Aucune photo inutilisée.</p>
     {% else %}
+        <p class="meta">{{ total }} photo{{ total > 1 ? 's' }} inutilisée{{ total > 1 ? 's' }}{% if pages > 1 %} · page {{ page }} sur {{ pages }}{% endif %}</p>
         <ul class="grille-photos">
             {% for photo in photos %}
                 <li class="carte-photo">
@@ -24,7 +25,7 @@
                         <strong><a href="{{ path('secteur_show', {id: photo.secteur.id}) }}">{{ photo.secteur.nom }}</a></strong><br>
                         <small>Envoyée le {{ photo.creeLe|date('d/m/Y') }} par {{ photo.auteur.pseudo }}</small>
                     </div>
-                    <form method="post" action="{{ path('admin_photo_supprimer', {id: photo.id}) }}"
+                    <form method="post" action="{{ path('admin_photo_supprimer', {id: photo.id} + (page > 1 ? {page: page} : {})) }}"
                           onsubmit="return confirm('Supprimer définitivement cette photo du secteur « {{ photo.secteur.nom|e('js') }} » ?')">
                         <input type="hidden" name="_token" value="{{ csrf_token('photo' ~ photo.id) }}">
                         <button class="btn btn-petit btn-danger">Supprimer</button>
@@ -32,5 +33,20 @@
                 </li>
             {% endfor %}
         </ul>
+        {% if pages > 1 %}
+            <nav class="pagination" aria-label="Pages">
+                {% if page > 1 %}<a href="{{ path('admin_photos', {page: page - 1}) }}" rel="prev">← Précédente</a>{% endif %}
+                {% for n in 1..pages %}
+                    {% if n == page %}
+                        <span aria-current="page">{{ n }}</span>
+                    {% elseif n == 1 or n == pages or (n - page)|abs <= 2 %}
+                        <a href="{{ path('admin_photos', {page: n}) }}">{{ n }}</a>
+                    {% elseif (n - page)|abs == 3 %}
+                        <span class="pagination-ellipse">…</span>
+                    {% endif %}
+                {% endfor %}
+                {% if page < pages %}<a href="{{ path('admin_photos', {page: page + 1}) }}" rel="next">Suivante →</a>{% endif %}
+            </nav>
+        {% endif %}
     {% endif %}
 {% endblock %}

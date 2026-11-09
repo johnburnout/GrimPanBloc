@@ -2,6 +2,7 @@
 
 namespace App\Tests\Fonctionnel;
 
+use App\Controller\AdminPhotosController;
 use App\Entity\Photo;
 use App\Entity\Prise;
 use App\Entity\Secteur;
@@ -89,6 +90,70 @@ final class AdminPhotosTest extends FonctionnelTestCase
         self::assertSame(['Cette photo est utilisée par une voie : supprimez ou modifiez d\'abord la voie.'], $this->flashsApresRedirection('error'));
         self::assertNotNull($this->em->find(Photo::class, $photo->getId()));
         self::assertFileExists($this->dossier.'/libre.jpg');
+    }
+
+    public function testPaginationAuDelaDe30Photos(): void
+    {
+        $n = AdminPhotosController::PAR_PAGE + 1;
+        for ($i = 1; $i <= $n; ++$i) {
+            $this->creerPhoto(\sprintf('Secteur %02d', $i), "p$i.jpg");
+        }
+        $this->client->loginUser($this->admin);
+
+        $page = $this->client->request('GET', '/admin/photos');
+        self::assertCount(AdminPhotosController::PAR_PAGE, $page->filter('.carte-photo'));
+        self::assertSelectorTextContains('.meta', "$n photos inutilisées · page 1 sur 2");
+        self::assertSelectorTextContains('.pagination [aria-current]', '1');
+        self::assertStringContainsString('Secteur 01', $page->filter('.carte-photo')->first()->text());
+
+        $page = $this->client->click($page->selectLink('Suivante →')->link());
+        self::assertCount(1, $page->filter('.carte-photo'));
+        self::assertStringContainsString("Secteur $n", $page->filter('.carte-photo')->text());
+        self::assertSelectorExists('.pagination a[rel="prev"]');
+        self::assertSelectorNotExists('.pagination a[rel="next"]');
+    }
+
+    public function testPasDePaginationAvecPeuDePhotos(): void
+    {
+        $this->creerPhoto('Dévers', 'libre.jpg');
+        $this->client->loginUser($this->admin);
+
+        $this->client->request('GET', '/admin/photos');
+
+        self::assertSelectorTextContains('.meta', '1 photo inutilisée');
+        self::assertSelectorNotExists('.pagination');
+    }
+
+    /** Supprimer la seule photo de la dernière page ramène à la page précédente, qui existe. */
+    public function testSuppressionSurLaDernierePageRevientALaPagePrecedente(): void
+    {
+        $n = AdminPhotosController::PAR_PAGE + 1;
+        for ($i = 1; $i <= $n; ++$i) {
+            $this->creerPhoto(\sprintf('Secteur %02d', $i), "p$i.jpg");
+        }
+        $this->client->loginUser($this->admin);
+        $page = $this->client->request('GET', '/admin/photos?page=2');
+
+        $this->client->submit($page->filter('.carte-photo form')->form());
+
+        self::assertResponseRedirects('/admin/photos?page=2');
+        $this->client->followRedirect();
+        self::assertCount(AdminPhotosController::PAR_PAGE, $this->client->getCrawler()->filter('.carte-photo'));
+        self::assertSelectorNotExists('.pagination');
+    }
+
+    public function testPageHorsLimites(): void
+    {
+        $this->creerPhoto('Dévers', 'libre.jpg');
+        $this->client->loginUser($this->admin);
+
+        foreach (['/admin/photos?page=99', '/admin/photos?page=0', '/admin/photos?page=-3'] as $url) {
+            $this->client->request('GET', $url);
+            self::assertResponseIsSuccessful();
+            self::assertCount(1, $this->client->getCrawler()->filter('.carte-photo'), $url);
+        }
+        $this->client->request('GET', '/admin/photos?page=abc');
+        self::assertResponseStatusCodeSame(404);
     }
 
     public function testJetonInvalideRefuse(): void
