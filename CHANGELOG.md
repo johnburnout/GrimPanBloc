@@ -7,7 +7,7 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
-## [Non publié]
+## [1.3.6] - 2026-11-09
 
 ### Ajouté
 - **Administration → Photos** : liste des photos qu'aucune voie n'utilise, avec
