@@ -19,7 +19,7 @@ class SecteurController extends AbstractController
     #[Route('', name: 'secteur_index')]
     public function index(SecteurRepository $repo): Response
     {
-        return $this->render('secteur/index.html.twig', ['secteurs' => $repo->findBy([], ['nom' => 'ASC'])]);
+        return $this->render('secteur/index.html.twig', ['secteurs' => $repo->listeAvecNombreDeVoies()]);
     }
 
     #[Route('/nouveau', name: 'secteur_new')]

@@ -14,11 +14,12 @@
         <p class="vide">Aucun secteur. Commencez par en créer un (pan, mur, dévers…).</p>
     {% else %}
         <ul class="liste-secteurs">
-            {% for s in secteurs %}
+            {% for ligne in secteurs %}
+                {% set s = ligne.secteur %}
                 <li>
                     <a href="{{ path('secteur_show', {id: s.id}) }}">
                         <strong>{{ s.nom }}</strong>
-                        <small>{{ s.photos|length }} photo(s)</small>
+                        <small>{{ ligne.voies }} voie{{ ligne.voies > 1 ? 's' }}</small>
                     </a>
                 </li>
             {% endfor %}
