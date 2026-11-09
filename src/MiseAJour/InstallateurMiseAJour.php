@@ -122,7 +122,8 @@ final class InstallateurMiseAJour
     }
 
     /**
-     * Dernière étape, avec le nouveau code : migrations, logos, fin de la maintenance.
+     * Dernière étape, avec le nouveau code : migrations, logos, fin de la maintenance,
+     * puis miniatures manquantes des photos (site déjà rouvert).
      *
      * @param callable(array<string, mixed>): array{code: int, sortie: string} $console lance une commande Symfony
      *
@@ -142,6 +143,13 @@ final class InstallateurMiseAJour
             }
         } finally {
             $this->maintenance->desactiver();
+        }
+
+        // Après la maintenance : peut prendre un moment s'il y a beaucoup de photos, et
+        // une photo sans miniature s'affiche simplement en entier.
+        $r = $console(['command' => 'app:photos:miniatures']);
+        if (0 !== $r['code']) {
+            $avertissements[] = 'Certaines miniatures de photos n\'ont pas pu être créées : lancez « php bin/console app:photos:miniatures ».';
         }
 
         return $avertissements;

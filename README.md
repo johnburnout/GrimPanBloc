@@ -45,7 +45,8 @@ JavaScript natif (aucune étape de build) · AssetMapper.
 - **Création de voie** :
   - envoi d'une photo (JPEG, PNG ou WebP) ou réutilisation d'une photo du secteur.
     La photo est redressée selon l'EXIF et réduite à **2000 × 2000 px maximum**,
-    proportions conservées, pour économiser la place disque ;
+    proportions conservées, pour économiser la place disque. Une **miniature**
+    (800 px de côté au plus) sert dans les listes de voies et l'administration ;
   - marquage des prises sur la photo : départ, main, pied, top ;
   - cotation française (3a → 9c) ou couleur (vert → blanc).
 - **Éditeur de prises** (tactile et souris) :
@@ -568,6 +569,10 @@ sudo systemctl reload php8.4-fpm
 - **Réduction des photos** : après la mise à jour qui l'introduit, lance une fois
   `php bin/console app:photos:reduire` pour réduire les photos déjà envoyées.
   Commence par `--simulation` pour voir ce qui sera fait.
+- **Miniatures des photos** (1.3.11) : la mise à jour crée celles des photos déjà
+  envoyées, une fois le site rouvert. Si elle le signale, termine en SSH avec
+  `php bin/console app:photos:miniatures`. En attendant, les listes affichent
+  les photos entières.
 
 ## Publier une nouvelle version
 
@@ -737,6 +742,7 @@ php bin/console doctrine:schema:validate       # vérifier mapping et schéma
 # Photos
 php bin/console app:photos:reduire --simulation  # liste les photos de plus de 2000 px
 php bin/console app:photos:reduire               # les réduit (fichiers et dimensions en base)
+php bin/console app:photos:miniatures            # crée les miniatures manquantes (--toutes : les recrée)
 
 # Vérifications
 php bin/console lint:twig templates
@@ -764,6 +770,8 @@ Pour donner le rôle à un compte existant : **Administration → Utilisateurs �
 | `src/Service/PhotoUploader.php` | Enregistrement des photos envoyées |
 | `src/Service/PhotoOptimiseur.php` | Redressement EXIF et réduction à 2000 × 2000 px |
 | `src/Command/ReduirePhotosCommand.php` | Commande `app:photos:reduire` (photos déjà enregistrées) |
+| `src/Service/MiniaturesPhotos.php` | Miniatures 800 px (`public/uploads/photos/miniatures/`), fonction Twig `miniature()` |
+| `src/Command/MiniaturesPhotosCommand.php` | Commande `app:photos:miniatures` (miniatures manquantes) |
 | `templates/voie/_form.html.twig` | Formulaire complet, commun à la création et à la modification |
 | `templates/voie/_photo.html.twig` | Rendu photo + prises (SVG) |
 | `public/js/editeur.js` | Éditeur de prises |
@@ -801,6 +809,10 @@ Pour donner le rôle à un compte existant : **Administration → Utilisateurs �
   conservés dans leur format). Une photo déjà assez petite n'est pas réenregistrée,
   donc pas recompressée. Les prises étant en pourcentage, une réduction ne les
   décale pas.
+- **Miniatures de 800 px** dans `uploads/photos/miniatures/`, sous le même nom que
+  la photo : les listes chargent quelques dizaines de Ko par voie au lieu de la
+  photo entière. Une photo sans miniature (plus petite que 800 px, ou miniature
+  pas encore créée) s'affiche en entier : rien ne casse si la création échoue.
 - **Prises en pourcentage** : x, y et rayon sont stockés en % de l'image, pour
   rester alignés quelle que soit la taille d'affichage.
 - **Cotation** stockée en texte (`6a`, `bleu`) avec un **rang** numérique pour

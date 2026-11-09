@@ -18,7 +18,7 @@
                     <div class="cadre-photo">
                         {# Clic : la photo en grand, dans un nouvel onglet #}
                         <a href="{{ asset(photo.chemin) }}" target="_blank" rel="noopener" title="Voir la photo en grand">
-                            <img src="{{ asset(photo.chemin) }}" alt="Photo du secteur {{ photo.secteur.nom }}" loading="lazy">
+                            <img src="{{ asset(miniature(photo)) }}" alt="Photo du secteur {{ photo.secteur.nom }}" loading="lazy">
                         </a>
                     </div>
                     <div class="carte-infos">

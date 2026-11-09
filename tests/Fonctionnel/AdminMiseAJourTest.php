@@ -98,7 +98,7 @@ final class AdminMiseAJourTest extends FonctionnelTestCase
         $this->client->submit($form->form());
 
         self::assertResponseRedirects('/admin/mise-a-jour');
-        self::assertSame(['doctrine:migrations:migrate', 'asset-map:compile'], array_column($this->lancees, 'command'));
+        self::assertSame(['doctrine:migrations:migrate', 'asset-map:compile', 'app:photos:miniatures'], array_column($this->lancees, 'command'));
         self::assertFileDoesNotExist($this->maintenance->fichier(), 'La maintenance est terminée.');
     }
 
@@ -109,7 +109,7 @@ final class AdminMiseAJourTest extends FonctionnelTestCase
         $this->client->request('POST', '/admin/mise-a-jour/finaliser', ['jeton' => $jeton]);
 
         self::assertResponseRedirects('/admin/mise-a-jour');
-        self::assertSame(['doctrine:migrations:migrate', 'asset-map:compile'], array_column($this->lancees, 'command'));
+        self::assertSame(['doctrine:migrations:migrate', 'asset-map:compile', 'app:photos:miniatures'], array_column($this->lancees, 'command'));
         self::assertTrue($this->lancees[0]['--allow-no-migration']);
         $version = static::getContainer()->get(VersionInstallee::class)->get();
         self::assertSame(["GrimPanBloc est passé de la version ? à la version $version."], $this->flashs('success'));
@@ -124,7 +124,7 @@ final class AdminMiseAJourTest extends FonctionnelTestCase
         $this->client->request('GET', '/admin/mise-a-jour/finaliser?jeton='.$jeton);
 
         self::assertResponseRedirects('/admin/mise-a-jour');
-        self::assertCount(2, $this->lancees);
+        self::assertCount(3, $this->lancees);
         self::assertFileDoesNotExist($this->maintenance->fichier());
     }
 
@@ -151,6 +151,18 @@ final class AdminMiseAJourTest extends FonctionnelTestCase
 
         self::assertStringContainsString('asset-map:compile', $this->flashs('error')[0] ?? '');
         self::assertCount(1, $this->flashs('success'));
+    }
+
+    public function testEchecDesMiniaturesNEstQuUnAvertissement(): void
+    {
+        $this->codes['app:photos:miniatures'] = 1;
+        $jeton = $this->maintenance->activer();
+
+        $this->client->request('POST', '/admin/mise-a-jour/finaliser', ['jeton' => $jeton]);
+
+        self::assertStringContainsString('app:photos:miniatures', $this->flashs('error')[0] ?? '');
+        self::assertCount(1, $this->flashs('success'));
+        self::assertFileDoesNotExist($this->maintenance->fichier());
     }
 
     public function testJetonInvalideOuAbsent(): void

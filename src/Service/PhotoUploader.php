@@ -8,14 +8,15 @@ use App\Entity\User;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
- * Enregistre une photo envoyée (redressée et réduite, voir PhotoOptimiseur)
- * et crée l'entité Photo correspondante.
+ * Enregistre une photo envoyée (redressée et réduite, voir PhotoOptimiseur), crée
+ * sa miniature (voir MiniaturesPhotos) et l'entité Photo correspondante.
  */
 class PhotoUploader
 {
     public function __construct(
         private readonly string $photosDir,
         private readonly PhotoOptimiseur $optimiseur,
+        private readonly MiniaturesPhotos $miniatures,
     ) {
     }
 
@@ -26,6 +27,11 @@ class PhotoUploader
         $fichier->move($this->photosDir, $nom);
 
         $resultat = $this->optimiseur->optimiser($this->photosDir.'/'.$nom);
+        try {
+            $this->miniatures->creer($nom);
+        } catch (\Throwable) {
+            // Sans miniature, la photo s'affiche en entier : l'envoi n'échoue pas pour autant
+        }
 
         return (new Photo())
             ->setFichier($nom)

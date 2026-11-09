@@ -87,6 +87,51 @@ class PhotoOptimiseur
         return ['largeur' => imagesx($image), 'hauteur' => imagesy($image), 'modifiee' => true];
     }
 
+    /**
+     * Écrit dans $destination une copie réduite à $cote × $cote au plus (proportions
+     * conservées, même format). Renvoie false si l'image est illisible, ou déjà assez
+     * petite : la photo elle-même sert alors de miniature.
+     */
+    public function miniature(string $source, string $destination, int $cote): bool
+    {
+        $infos = @getimagesize($source);
+        if (false === $infos || max($infos[0], $infos[1]) <= $cote) {
+            return false;
+        }
+        [$largeur, $hauteur, $type] = $infos;
+        $image = match ($type) {
+            IMAGETYPE_JPEG => @imagecreatefromjpeg($source),
+            IMAGETYPE_PNG => @imagecreatefrompng($source),
+            IMAGETYPE_WEBP => @imagecreatefromwebp($source),
+            default => false,
+        };
+        if (false === $image) {
+            return false;
+        }
+
+        $ratio = $cote / max($largeur, $hauteur);
+        $nl = max(1, (int) round($largeur * $ratio));
+        $nh = max(1, (int) round($hauteur * $ratio));
+        $reduite = imagecreatetruecolor($nl, $nh);
+        imagealphablending($reduite, false);
+        imagesavealpha($reduite, true);
+        imagecopyresampled($reduite, $image, 0, 0, 0, 0, $nl, $nh, $largeur, $hauteur);
+
+        $dossier = \dirname($destination);
+        if (!is_dir($dossier) && !@mkdir($dossier, 0775, true) && !is_dir($dossier)) {
+            throw new \RuntimeException(\sprintf('Impossible de créer le dossier « %s ».', $dossier));
+        }
+        if (IMAGETYPE_JPEG === $type) {
+            imageinterlace($reduite, true);
+        }
+
+        return match ($type) {
+            IMAGETYPE_JPEG => imagejpeg($reduite, $destination, self::QUALITE_JPEG),
+            IMAGETYPE_PNG => imagepng($reduite, $destination, 9),
+            IMAGETYPE_WEBP => imagewebp($reduite, $destination, self::QUALITE_WEBP),
+        };
+    }
+
     /** Angle de rotation à appliquer selon l'orientation EXIF (0 si aucune). */
     private function angleExif(string $chemin): int
     {

@@ -11,12 +11,13 @@ final class GestionPhotos
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
+        private readonly MiniaturesPhotos $miniatures,
         #[Autowire('%photos_dir%')] private readonly string $photosDir,
     ) {
     }
 
     /**
-     * Supprime la photo et son fichier.
+     * Supprime la photo, son fichier et sa miniature.
      *
      * @throws \LogicException si une voie l'utilise encore
      */
@@ -33,5 +34,6 @@ final class GestionPhotos
         if (is_file($fichier)) {
             @unlink($fichier);
         }
+        $this->miniatures->supprimer((string) $photo->getFichier());
     }
 }
