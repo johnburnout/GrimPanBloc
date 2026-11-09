@@ -86,6 +86,25 @@ final class VoieFormulaireTest extends FonctionnelTestCase
         self::assertSame($avant, $this->nombreDeVoies());
     }
 
+    public function testPhotoTropGrandeRefuseeSansEtreDecodee(): void
+    {
+        $auteur = $this->creerUtilisateur('auteur');
+        $secteurId = $this->creerVoie($auteur)->getPhoto()->getSecteur()->getId();
+        $avant = $this->nombreDeVoies();
+
+        $this->client->loginUser($auteur);
+        $form = $this->formulaire("/voies/nouvelle/$secteurId");
+        $form['voie[photo]'] = '';
+        $form['voie[nouvellePhoto]'] = $this->pngGeant(10_000, 10_000);
+        $form['voie[prises]'] = json_encode([['x' => 30, 'y' => 40]]);
+        $this->remplirInfos($form, 'Bombe');
+        $this->client->submit($form);
+
+        self::assertResponseStatusCodeSame(422);
+        self::assertAnySelectorTextContains('form', 'La photo dépasse 25 mégapixels');
+        self::assertSame($avant, $this->nombreDeVoies());
+    }
+
     public function testLesPrisesInvalidesSontIgnoreesEtLeNombreEstLimite(): void
     {
         $auteur = $this->creerUtilisateur('auteur');

@@ -13,6 +13,14 @@ namespace App\Service;
 class PhotoOptimiseur
 {
     public const COTE_MAX = 2000;
+    /**
+     * Taille maximale acceptée à l'envoi (contrainte Image des formulaires). GD décode
+     * l'image entière en mémoire, ~4 octets par pixel, et le double quand une photo
+     * est redressée : 25 Mpx ≈ 200 Mo au pire, dans les 256 Mo conseillés à
+     * l'installation. Couvre les photos de téléphone (12 Mpx) et la plupart des
+     * appareils photo (24 Mpx), sans laisser passer une « bombe de décompression ».
+     */
+    public const PIXELS_MAX = 25_000_000;
     private const QUALITE_JPEG = 85;
     private const QUALITE_WEBP = 85;
 

@@ -9,6 +9,7 @@ use App\Enum\CotationCouleur;
 use App\Enum\CotationFr;
 use App\Enum\SystemeCotation;
 use App\Form\DataTransformer\PrisesJsonTransformer;
+use App\Service\PhotoOptimiseur;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -59,7 +60,9 @@ class VoieType extends AbstractType
                 'attr' => ['accept' => 'image/jpeg,image/png,image/webp', 'capture' => 'environment'],
                 'constraints' => [
                     new Image(maxSize: '15M', mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
-                        mimeTypesMessage: 'Formats acceptés : JPEG, PNG, WebP.'),
+                        mimeTypesMessage: 'Formats acceptés : JPEG, PNG, WebP.',
+                        maxPixels: PhotoOptimiseur::PIXELS_MAX,
+                        maxPixelsMessage: 'La photo dépasse 25 mégapixels : réduisez-la avant de l\'envoyer.'),
                     new Callback(self::exigerUnePhoto(...)),
                 ],
             ])

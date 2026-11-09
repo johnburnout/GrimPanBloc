@@ -2,6 +2,7 @@
 
 namespace App\Form\Reglages;
 
+use App\Service\PhotoOptimiseur;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -29,6 +30,8 @@ final class ClubType extends AbstractType
                     mimeTypes: ['image/png', 'image/jpeg', 'image/webp'],
                     maxSizeMessage: 'Le logo ne doit pas dépasser 5 Mo.',
                     mimeTypesMessage: 'Le logo doit être une image PNG, JPEG ou WebP.',
+                    maxPixels: PhotoOptimiseur::PIXELS_MAX,
+                    maxPixelsMessage: 'Le logo dépasse 25 mégapixels : réduisez-le avant de l\'envoyer.',
                 )],
             ]);
     }

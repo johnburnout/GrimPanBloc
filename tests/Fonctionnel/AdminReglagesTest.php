@@ -62,6 +62,14 @@ final class AdminReglagesTest extends FonctionnelTestCase
         self::assertSame('', (string) $this->reglage('club.logo'));
     }
 
+    public function testUnLogoTropGrandEstRefuse(): void
+    {
+        $this->soumettre('Identité de la salle', ['nom_club' => 'Club'], ['logo' => $this->pngGeant(10_000, 10_000)]);
+
+        $this->assertErreurAffichee('Le logo dépasse 25 mégapixels');
+        self::assertSame('', (string) $this->reglage('club.logo'));
+    }
+
     // --- SMTP ---------------------------------------------------------------
 
     public function testEnregistrerLesReglagesSmtpPuisGarderEtEffacerLeMotDePasse(): void

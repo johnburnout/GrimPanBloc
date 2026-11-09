@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
  * Tests HTTP sur la base grimpepan_test (voir doctrine.yaml, when@test).
@@ -87,6 +88,23 @@ abstract class FonctionnelTestCase extends WebTestCase
         self::assertGreaterThan(0, $champ->count(), "Aucun formulaire vers $action sur la page.");
 
         return (string) $champ->first()->attr('value');
+    }
+
+    /**
+     * PNG de quelques octets qui annonce des dimensions énormes : son en-tête suffit
+     * aux contrôles (type, dimensions), mais GD tenterait d'allouer largeur × hauteur.
+     */
+    protected function pngGeant(int $largeur, int $hauteur): UploadedFile
+    {
+        $bloc = static fn (string $type, string $donnees): string => pack('N', \strlen($donnees)).$type.$donnees.pack('N', crc32($type.$donnees));
+        $png = "\x89PNG\r\n\x1a\n"
+            .$bloc('IHDR', pack('NNCCCCC', $largeur, $hauteur, 8, 2, 0, 0, 0))
+            .$bloc('IDAT', gzcompress(''))
+            .$bloc('IEND', '');
+        $chemin = tempnam(sys_get_temp_dir(), 'geant').'.png';
+        file_put_contents($chemin, $png);
+
+        return new UploadedFile($chemin, 'geant.png', 'image/png', null, true);
     }
 
     protected function voieExiste(int $id): bool
