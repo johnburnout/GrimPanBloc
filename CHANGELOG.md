@@ -7,6 +7,14 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Modifié
+- **Liste des secteurs** : chaque secteur affiche son nombre de voies au lieu de
+  son nombre de photos. Les photos restent dans le secteur pour être réutilisées,
+  même quand plus aucune voie ne s'en sert : un secteur sans voie pouvait ainsi
+  afficher « 3 photo(s) ».
+
 ## [1.3.4] - 2026-11-09
 
 ### Technique
