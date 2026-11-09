@@ -6,6 +6,9 @@ framework:
     form: true
     validation:
         enable_attributes: true
+    assets:
+        # css/app.css?v=<version> : le cache des navigateurs ne survit pas à une mise à jour
+        version_strategy: App\Asset\VersionApplication
 
 when@test:
     framework:
