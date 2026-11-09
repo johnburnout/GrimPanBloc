@@ -7,6 +7,14 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Corrigé
+- Après une mise à jour, les navigateurs pouvaient garder l'ancienne mise en page
+  (feuille de style en cache) : les miniatures de la page Photos s'affichaient par
+  exemple en taille réelle. La feuille de style et les scripts portent désormais
+  le numéro de version dans leur adresse, et sont rechargés à chaque mise à jour.
+
 ## [1.3.8] - 2026-11-09
 
 ### Modifié
