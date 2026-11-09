@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Photos · Administration · GrimPanBloc{% endblock %}
+
+{% block body %}
+    <h1>Administration</h1>
+    {{ include('admin/_onglets.html.twig', {actif: 'photos'}) }}
+
+    <p class="aide">Photos qu'aucune voie n'utilise. Elles restent dans leur secteur pour pouvoir servir à une nouvelle voie ; supprimez celles qui ne serviront plus. La suppression est définitive.</p>
+
+    {% if photos is empty %}
+        <p class="vide">Aucune photo inutilisée.</p>
+    {% else %}
+        <ul class="grille-voies">
+            {% for photo in photos %}
+                <li class="carte-photo">
+                    <img src="{{ asset(photo.chemin) }}" alt="Photo du secteur {{ photo.secteur.nom }}" loading="lazy">
+                    <div class="carte-infos">
+                        <strong><a href="{{ path('secteur_show', {id: photo.secteur.id}) }}">{{ photo.secteur.nom }}</a></strong><br>
+                        <small>Envoyée le {{ photo.creeLe|date('d/m/Y') }} par {{ photo.auteur.pseudo }}</small>
+                    </div>
+                    <form method="post" action="{{ path('admin_photo_supprimer', {id: photo.id}) }}"
+                          onsubmit="return confirm('Supprimer définitivement cette photo du secteur « {{ photo.secteur.nom|e('js') }} » ?')">
+                        <input type="hidden" name="_token" value="{{ csrf_token('photo' ~ photo.id) }}">
+                        <button class="btn btn-petit btn-danger">Supprimer</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

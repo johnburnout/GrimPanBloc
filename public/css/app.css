@@ -145,6 +145,14 @@ ul:has(> li > .form-error), form ul { color: #b42318; padding-left: 1.2rem; marg
 .carte-infos small { grid-column: 2; }
 .carte-infos .badge { grid-row: span 2; }
 
+.carte-photo {
+    background: var(--surface); border: 1px solid var(--bord); border-radius: var(--rayon); overflow: hidden;
+    display: flex; flex-direction: column;
+}
+.carte-photo img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--bord); }
+.carte-photo .carte-infos { display: block; flex: 1; }
+.carte-photo form { padding: 0 .8rem .8rem; }
+
 .liste-secteurs { list-style: none; padding: 0; display: grid; gap: .5rem; }
 .liste-secteurs a {
     display: flex; justify-content: space-between; text-decoration: none; color: inherit;

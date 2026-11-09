@@ -63,6 +63,7 @@ JavaScript natif (aucune étape de build) · AssetMapper.
 - **Administration** (réservée aux admins) :
   - **Réglages** : sécurité (« Toujours utiliser HTTPS »), nom et logo de la salle ou du club (affichés dans l'en-tête et sur la fiche), serveur SMTP, mail de test, envoi d'un message à tous les utilisateurs ou aux seuls admins ;
   - **Utilisateurs** : nommer ou retirer un admin, désactiver ou réactiver un compte, supprimer un compte ;
+  - **Photos** : photos qu'aucune voie n'utilise (restées dans leur secteur après la suppression d'une voie ou un changement de photo), avec leur secteur, et suppression définitive ;
   - **Fiche à imprimer** : affiche A4 avec le logo du club et un QR code vers le site ;
   - **Mises à jour** : alerte quand une nouvelle version est publiée, et mise à jour en un clic.
 
