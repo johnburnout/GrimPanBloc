@@ -7,6 +7,30 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Sécurité
+- **Connexion** : après 5 mots de passe erronés pour un même compte, la connexion
+  est bloquée 5 minutes depuis cette adresse (25 essais par adresse, tous comptes
+  confondus). Freine les essais de mots de passe en série.
+- **Déconnexion** : le lien « Déconnexion » devient un bouton protégé. Un autre site
+  ne peut plus déconnecter un utilisateur à son insu.
+- **Photos et logo** : refusés au-delà de 25 mégapixels (« réduisez-la avant de
+  l'envoyer »). Une image aux dimensions démesurées pouvait saturer la mémoire du
+  serveur pendant son redimensionnement. Les photos de téléphone et d'appareil
+  photo courants restent acceptées.
+- En-têtes de sécurité HTTP sur toutes les pages : le site ne peut plus être affiché
+  dans un cadre sur un autre site, et les liens sortants ne transmettent que
+  le nom du site.
+
+### Corrigé
+- Les messages d'erreur fournis par Symfony (connexion refusée, compte désactivé,
+  certaines erreurs de formulaire) s'affichent en français et non plus en anglais.
+
+### Technique
+- Analyse statique (PHPStan) et vérification du style de code (php-cs-fixer) à
+  chaque release. Aucune action n'est nécessaire sur les sites installés.
+
 ## [1.3.1] - 2026-11-07
 
 ### Modifié
