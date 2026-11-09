@@ -17,6 +17,12 @@ aux administrateurs sur la page « Mises à jour ».
 ### Technique
 - Retrait d'un composant de notifications (Notifier) qui n'a jamais servi. Aucune
   action n'est nécessaire sur les sites installés.
+- Analyse statique (PHPStan) sans plus aucune erreur tolérée : types précisés
+  dans le code, et cas impossibles signalés explicitement.
+
+### Documentation
+- README : précautions liées aux mises à jour depuis GitHub, configuration nginx
+  (à adapter, non testée), et données personnelles conservées (RGPD).
 
 ## [1.3.9] - 2026-11-09
 
