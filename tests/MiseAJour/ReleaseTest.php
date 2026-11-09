@@ -7,6 +7,11 @@ use PHPUnit\Framework\TestCase;
 
 final class ReleaseTest extends TestCase
 {
+    /**
+     * @param list<string> $noms
+     *
+     * @return array<string, mixed>
+     */
     private static function api(string $tag, array $noms): array
     {
         return [

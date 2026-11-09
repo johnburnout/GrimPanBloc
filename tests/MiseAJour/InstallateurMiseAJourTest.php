@@ -204,6 +204,7 @@ final class InstallateurMiseAJourTest extends TestCase
         $client = new MockHttpClient(fn (string $methode, string $url) => match ($url) {
             self::URL_ZIP => new MockResponse($zip),
             self::URL_SHA => new MockResponse("$empreinte  grimpanbloc-v1.1.0.zip\n"),
+            default => throw new \LogicException("Requête inattendue vers $url"),
         });
 
         $version = new VersionInstallee($this->racine);

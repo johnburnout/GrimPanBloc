@@ -26,6 +26,7 @@ use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+/** @extends AbstractType<Voie> */
 class VoieType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

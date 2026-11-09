@@ -124,7 +124,7 @@ final class InstallateurMiseAJour
     /**
      * Dernière étape, avec le nouveau code : migrations, logos, fin de la maintenance.
      *
-     * @param callable(array): array{code: int, sortie: string} $console lance une commande Symfony
+     * @param callable(array<string, mixed>): array{code: int, sortie: string} $console lance une commande Symfony
      *
      * @return list<string> avertissements
      */

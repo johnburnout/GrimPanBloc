@@ -13,7 +13,11 @@ use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/** Profil : email et mot de passe. Le pseudo n'est pas modifiable. */
+/**
+ * Profil : email et mot de passe. Le pseudo n'est pas modifiable.
+ *
+ * @extends AbstractType<User>
+ */
 class ProfilType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

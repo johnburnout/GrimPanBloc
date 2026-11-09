@@ -198,7 +198,11 @@ final class Installateur
         return ['version' => $version, 'base_creee' => $creee, 'tables' => $tables];
     }
 
-    /** Contenu du fichier .env.local de production. */
+    /**
+     * Contenu du fichier .env.local de production.
+     *
+     * @param array{hote: string, port: int|string, base: string, utilisateur: string, mot_de_passe: string} $p
+     */
     public function contenuEnv(array $p, string $versionServeur): string
     {
         // Les caractères spéciaux sont encodés pour l'URL (« @ » → « %40 »)…
@@ -237,6 +241,8 @@ final class Installateur
 
     /**
      * Lance une commande de la console Symfony dans ce processus PHP (pas besoin de exec()).
+     *
+     * @param array<string, mixed> $arguments
      *
      * @return array{code: int, sortie: string}
      */
@@ -280,6 +286,7 @@ final class Installateur
 
     // --- Utilitaires ---------------------------------------------------------------
 
+    /** @return array{libelle: string, ok: bool, detail: string, bloquant: bool} */
     private function verif(string $libelle, bool $ok, string $detail, bool $bloquant, string $infoOk = ''): array
     {
         return ['libelle' => $libelle, 'ok' => $ok, 'detail' => $ok ? $infoOk : $detail, 'bloquant' => $bloquant];

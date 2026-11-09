@@ -19,6 +19,8 @@ use Symfony\Component\Validator\Constraints\Regex;
 /**
  * Serveur d'envoi des mails. Données : celles de ReglagesSmtp::lire(), plus le
  * mot de passe (vide = inchangé) et la case « effacer le mot de passe ».
+ *
+ * @extends AbstractType<array<string, mixed>>
  */
 final class SmtpType extends AbstractType
 {

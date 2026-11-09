@@ -4,6 +4,7 @@ namespace App\Tests\Fonctionnel;
 
 use App\Entity\Voie;
 use App\Enum\TypePrise;
+use Symfony\Component\DomCrawler\Field\FileFormField;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -31,7 +32,7 @@ final class VoieFormulaireTest extends FonctionnelTestCase
         $form['voie[prises]'] = json_encode([
             ['x' => 10, 'y' => 20, 'r' => 4, 'type' => 'depart'],
             ['x' => 50, 'y' => 60],
-        ]);
+        ], \JSON_THROW_ON_ERROR);
         $this->remplirInfos($form, 'Le toit');
         $this->client->submit($form);
 
@@ -54,8 +55,8 @@ final class VoieFormulaireTest extends FonctionnelTestCase
         $this->client->loginUser($auteur);
         $form = $this->formulaire("/voies/nouvelle/$secteurId");
         $form['voie[photo]'] = '';
-        $form['voie[nouvellePhoto]'] = $this->imageJpeg();
-        $form['voie[prises]'] = json_encode([['x' => 30, 'y' => 40, 'type' => 'top']]);
+        $this->joindre($form, $this->imageJpeg());
+        $form['voie[prises]'] = json_encode([['x' => 30, 'y' => 40, 'type' => 'top']], \JSON_THROW_ON_ERROR);
         $this->remplirInfos($form, 'Nouvelle photo');
         $this->client->submit($form);
 
@@ -95,8 +96,8 @@ final class VoieFormulaireTest extends FonctionnelTestCase
         $this->client->loginUser($auteur);
         $form = $this->formulaire("/voies/nouvelle/$secteurId");
         $form['voie[photo]'] = '';
-        $form['voie[nouvellePhoto]'] = $this->pngGeant(10_000, 10_000);
-        $form['voie[prises]'] = json_encode([['x' => 30, 'y' => 40]]);
+        $this->joindre($form, $this->pngGeant(10_000, 10_000));
+        $form['voie[prises]'] = json_encode([['x' => 30, 'y' => 40]], \JSON_THROW_ON_ERROR);
         $this->remplirInfos($form, 'Bombe');
         $this->client->submit($form);
 
@@ -118,7 +119,7 @@ final class VoieFormulaireTest extends FonctionnelTestCase
         $this->client->loginUser($auteur);
         $form = $this->formulaire('/voies/nouvelle/'.$photo->getSecteur()->getId());
         $form['voie[photo]'] = (string) $photo->getId();
-        $form['voie[prises]'] = json_encode($prises);
+        $form['voie[prises]'] = json_encode($prises, \JSON_THROW_ON_ERROR);
         $this->remplirInfos($form, 'Beaucoup de prises');
         $this->client->submit($form);
 
@@ -141,7 +142,7 @@ final class VoieFormulaireTest extends FonctionnelTestCase
         $form = $this->formulaire("/voies/$id/modifier");
         self::assertSame([['x' => 10, 'y' => 20, 'r' => 3, 'type' => 'main']], json_decode($form['voie[prises]']->getValue(), true));
 
-        $form['voie[prises]'] = json_encode([['x' => 70, 'y' => 80, 'type' => 'pied'], ['x' => 1, 'y' => 1]]);
+        $form['voie[prises]'] = json_encode([['x' => 70, 'y' => 80, 'type' => 'pied'], ['x' => 1, 'y' => 1]], \JSON_THROW_ON_ERROR);
         $form['voie[nom]'] = 'Renommée';
         $this->client->submit($form);
 
@@ -221,6 +222,14 @@ final class VoieFormulaireTest extends FonctionnelTestCase
         $form['voie[nom]'] = $nom;
         $form['voie[systeme]'] = 'fr';
         $form['voie[cotationFr]'] = '6b';
+    }
+
+    /** Joint le fichier au champ « Nouvelle photo », comme le ferait le navigateur. */
+    private function joindre(Form $form, UploadedFile $fichier): void
+    {
+        $champ = $form['voie[nouvellePhoto]'];
+        self::assertInstanceOf(FileFormField::class, $champ);
+        $champ->upload($fichier->getPathname());
     }
 
     private function imageJpeg(): UploadedFile

@@ -782,7 +782,7 @@ Pour donner le rôle à un compte existant : **Administration → Utilisateurs �
 | `src/Site/ReglageHttps.php` | Réglage « Toujours utiliser HTTPS », gardé en cache (appliqué par `ForcerHttpsSubscriber`) |
 | `src/Security/UserChecker.php` | Refus de connexion des comptes désactivés |
 | `tests/` | Tests PHPUnit (`php bin/phpunit`) |
-| `phpstan.dist.neon`, `phpstan-baseline.neon` | Analyse statique (`vendor/bin/phpstan analyse`) ; la baseline liste les erreurs existantes tolérées |
+| `phpstan.dist.neon` | Analyse statique (`vendor/bin/phpstan analyse`), niveau 6, sans erreur tolérée |
 | `.php-cs-fixer.dist.php` | Style de code Symfony (`vendor/bin/php-cs-fixer fix`) |
 | `src/Controller/AdminMiseAJourController.php` | Page « Mises à jour » (`/admin/mise-a-jour`) |
 | `src/Command/MiseAJourCommand.php` | Commande `app:mise-a-jour` |

@@ -10,7 +10,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/** Message envoyé par mail à tous les utilisateurs actifs, ou aux seuls administrateurs. */
+/**
+ * Message envoyé par mail à tous les utilisateurs actifs, ou aux seuls administrateurs.
+ *
+ * @extends AbstractType<array<string, mixed>>
+ */
 final class EnvoiGroupeType extends AbstractType
 {
     public const LONGUEUR_MAX_OBJET = 200;

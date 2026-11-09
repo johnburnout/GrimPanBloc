@@ -25,7 +25,11 @@ final readonly class Release
     ) {
     }
 
-    /** Construit la release à partir de la réponse de l'API GitHub. */
+    /**
+     * Construit la release à partir de la réponse de l'API GitHub.
+     *
+     * @param array<string, mixed> $d
+     */
     public static function depuisApi(array $d): self
     {
         $tag = (string) ($d['tag_name'] ?? '');

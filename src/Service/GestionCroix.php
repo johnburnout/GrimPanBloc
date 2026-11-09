@@ -28,7 +28,7 @@ final class GestionCroix
     {
         $cotation = null;
         if ($voie->getAuteur() !== $grimpeur) {
-            $cotation = $voie->getSysteme()->cotation($cotationProposee)?->value
+            $cotation = $voie->getSysteme()->cotation($cotationProposee)->value
                 ?? throw new \InvalidArgumentException('Choisissez la cotation que vous proposez.');
         }
 

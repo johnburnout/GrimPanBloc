@@ -11,7 +11,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\Length;
 
-/** Nom et logo de la salle ou du club (voir IdentiteClub). */
+/**
+ * Nom et logo de la salle ou du club (voir IdentiteClub).
+ *
+ * @extends AbstractType<array<string, mixed>>
+ */
 final class ClubType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

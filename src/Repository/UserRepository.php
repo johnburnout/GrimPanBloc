@@ -87,7 +87,11 @@ class UserRepository extends ServiceEntityRepository
             ->addSelect(\sprintf('(SELECT COUNT(c.id) FROM %s c WHERE c.grimpeur = u) AS croix', Croix::class));
     }
 
-    /** @return array{utilisateur: User, voies: int, croix: int} */
+    /**
+     * @param array{utilisateur: User, voies: int|string, croix: int|string} $l ligne brute de la requête
+     *
+     * @return array{utilisateur: User, voies: int, croix: int}
+     */
     private function ligne(array $l): array
     {
         return ['utilisateur' => $l['utilisateur'], 'voies' => (int) $l['voies'], 'croix' => (int) $l['croix']];

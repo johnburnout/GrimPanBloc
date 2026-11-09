@@ -263,7 +263,7 @@ final class AdminReglagesTest extends FonctionnelTestCase
     {
         $crawler = $this->client->getCrawler();
         // Page affichée (réglages, ou réponse à un formulaire invalide) ; sinon on l'ouvre
-        if (null === $this->client->getRequest() || 0 === $crawler->filter('section h2')->count()) {
+        if ($this->client->getHistory()->isEmpty() || 0 === $crawler->filter('section h2')->count()) {
             $crawler = $this->client->request('GET', '/admin/reglages');
         }
         $section = $crawler->filter('section')->reduce(fn ($s) => str_contains($s->filter('h2')->text(''), $titre));

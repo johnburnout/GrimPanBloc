@@ -167,7 +167,11 @@ class AdminReglagesController extends AbstractController
 
     // ---------------------------------------------------------------------------
 
-    /** Formulaire d'une section, prérempli avec les valeurs enregistrées. */
+    /**
+     * Formulaire d'une section, prérempli avec les valeurs enregistrées.
+     *
+     * @return FormInterface<array<string, mixed>>
+     */
     private function formulaire(string $section, User $admin): FormInterface
     {
         [$type, $donnees] = match ($section) {
@@ -176,6 +180,7 @@ class AdminReglagesController extends AbstractController
             'smtp' => [SmtpType::class, $this->smtp->lire()],
             'mail_test' => [MailTestType::class, ['destinataire' => $admin->getEmail()]],
             'envoi_groupe' => [EnvoiGroupeType::class, ['cible' => 'tous', 'objet' => '', 'corps' => '']],
+            default => throw new \LogicException(\sprintf('Section de réglages inconnue : « %s ».', $section)),
         };
 
         return $this->createForm($type, $donnees, [
@@ -185,7 +190,11 @@ class AdminReglagesController extends AbstractController
         ]);
     }
 
-    /** La page complète ; $soumis remplace le formulaire de sa section. */
+    /**
+     * La page complète ; $soumis remplace le formulaire de sa section.
+     *
+     * @param FormInterface<array<string, mixed>>|null $soumis
+     */
     private function page(Request $request, User $admin, ?FormInterface $soumis = null): Response
     {
         $formulaires = [];

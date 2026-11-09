@@ -302,7 +302,11 @@ class Voie
         return $this;
     }
 
-    /** Remplace toutes les prises (les anciennes sont supprimées par orphanRemoval). */
+    /**
+     * Remplace toutes les prises (les anciennes sont supprimées par orphanRemoval).
+     *
+     * @param iterable<Prise> $prises
+     */
     public function remplacerPrises(iterable $prises): static
     {
         foreach ($this->prises->toArray() as $ancienne) {
@@ -323,7 +327,11 @@ class Voie
         return $this->croix;
     }
 
-    /** Croix posées par d'autres grimpeurs que l'auteur. */
+    /**
+     * Croix posées par d'autres grimpeurs que l'auteur.
+     *
+     * @return list<Croix>
+     */
     public function getCroixValidantes(): array
     {
         return array_values($this->croix->filter(fn (Croix $c) => $c->getGrimpeur() !== $this->auteur)->toArray());

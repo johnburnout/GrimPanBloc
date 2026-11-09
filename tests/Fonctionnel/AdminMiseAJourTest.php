@@ -13,6 +13,7 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
 
 /**
  * Finalisation d'une mise à jour (route exécutée par la NOUVELLE version).
@@ -56,7 +57,13 @@ final class AdminMiseAJourTest extends FonctionnelTestCase
         parent::tearDown();
     }
 
-    /** @internal appelé par le faux lanceur */
+    /**
+     * @internal appelé par le faux lanceur
+     *
+     * @param array<string, mixed> $arguments
+     *
+     * @return array{code: int, sortie: string}
+     */
     public function lancer(array $arguments): array
     {
         $this->lancees[] = $arguments;
@@ -213,6 +220,9 @@ final class AdminMiseAJourTest extends FonctionnelTestCase
     /** @return list<string> messages flash (lus et retirés de la session) */
     private function flashs(string $type): array
     {
-        return $this->client->getRequest()->getSession()->getFlashBag()->get($type);
+        $session = $this->client->getRequest()->getSession();
+        self::assertInstanceOf(FlashBagAwareSessionInterface::class, $session);
+
+        return $session->getFlashBag()->get($type);
     }
 }

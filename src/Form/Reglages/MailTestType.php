@@ -8,7 +8,11 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-/** Envoi d'un mail générique pour vérifier les réglages SMTP. */
+/**
+ * Envoi d'un mail générique pour vérifier les réglages SMTP.
+ *
+ * @extends AbstractType<array<string, mixed>>
+ */
 final class MailTestType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void

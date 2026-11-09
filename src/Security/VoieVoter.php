@@ -46,6 +46,7 @@ class VoieVoter extends Voter
             self::MODIFIER => $estAuteur,
             self::MODIFIER_TRACE => $estAuteur && !$subject->estValidee(),
             self::SUPPRIMER => $estAuteur || $this->decisions->decide($token, ['ROLE_ADMIN']),
+            default => throw new \LogicException(\sprintf('Droit inconnu : « %s ».', $attribute)),
         };
     }
 }
