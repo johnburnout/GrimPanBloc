@@ -100,6 +100,26 @@ Précisions :
 - Il reste toujours au moins **un administrateur actif** : le dernier ne peut être ni rétrogradé, ni désactivé, ni supprimé.
 - Quand le rôle d'un compte change, sa session est fermée : il doit se reconnecter (les droits sont lus à la connexion).
 
+### Données personnelles (RGPD)
+
+À reprendre dans la page de confidentialité du club, si elle existe :
+
+- **Données conservées** pour chaque compte : email, pseudo, mot de passe (haché,
+  jamais en clair), date d'inscription, statut (admin, actif). L'application ne
+  garde ni adresse IP ni historique de connexion ; le serveur web, lui, tient ses
+  propres journaux d'accès.
+- **Contenus publiés** : voies (photo, prises, nom, description), croix et
+  cotations proposées, affichés sous le pseudo.
+- **Cookies** : session de connexion, et cookie « Rester connecté » (30 jours)
+  seulement si la case est cochée. Aucun cookie de mesure d'audience ni de
+  service tiers.
+- **Suppression d'un compte** : faite par un administrateur, à la demande de la
+  personne (il n'y a pas de bouton de suppression dans « Mon compte »). L'email
+  et le mot de passe sont effacés. Le **pseudo reste affiché** sur les voies et
+  les croix, qui restent visibles et continuent de compter pour la cotation : ce
+  sont des contributions à un topo commun. Si la personne demande aussi leur
+  retrait, un administrateur supprime ses voies une par une.
+
 ## Installation avec l'assistant web
 
 C'est la façon la plus simple d'installer GrimPanBloc, et elle convient aussi aux
@@ -411,6 +431,55 @@ Les commandes de l'étape 5 se lancent alors en SSH, ou en local avant d'envoyer
 les fichiers. Les limites d'envoi de l'étape 3 se règlent dans l'interface de
 l'hébergeur ou dans un `.user.ini`.
 
+### Autre serveur web : nginx
+
+GrimPanBloc est testé avec **Apache** uniquement. Sous nginx, les fichiers
+`.htaccess` sont **ignorés** : leurs deux rôles sont à reproduire dans la
+configuration du site.
+
+1. **Envoyer les requêtes vers `public/index.php`**, comme pour toute application
+   Symfony (voir la [documentation Symfony sur nginx](https://symfony.com/doc/current/setup/web_server_configuration.html#nginx)).
+2. **Protéger `public/uploads/`** : n'y servir que les images, et ne jamais y
+   exécuter de PHP. Sans cette règle, la sécurité des photos repose sur la seule
+   application (nom de fichier aléatoire, extension tirée du vrai type de
+   l'image), ce qui tient, mais sans seconde barrière.
+
+Exemple à adapter, **non testé par le projet** :
+
+```nginx
+root /var/www/grimpanbloc/public;
+client_max_body_size 20M;
+
+location / {
+    try_files $uri /index.php$is_args$args;
+}
+
+# Photos et logo : images seulement, jamais de PHP
+location ^~ /uploads/ {
+    location ~* \.(jpe?g|png|webp)$ {
+        add_header X-Content-Type-Options nosniff always;
+    }
+    return 403;
+}
+
+location ~ ^/index\.php(/|$) {
+    fastcgi_pass unix:/run/php/php8.4-fpm.sock;
+    fastcgi_split_path_info ^(.+\.php)(/.*)$;
+    include fastcgi_params;
+    fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+    fastcgi_param DOCUMENT_ROOT $realpath_root;
+    internal;
+}
+
+# Aucun autre fichier PHP n'est exécuté (assistant d'installation compris)
+location ~ \.php$ {
+    return 404;
+}
+```
+
+L'assistant d'installation web (`public/setup/`) est prévu pour Apache : sous
+nginx, suis l'installation manuelle.
+
 ## Mise à jour du serveur
 
 GrimPanBloc vérifie **une fois par jour** si une nouvelle release a été publiée
@@ -437,6 +506,26 @@ Ne sont **jamais touchés** : `.env.local`, `var/` et les photos
 Cette méthode suppose que le serveur web (PHP) puisse écrire dans la racine du
 projet, dans `public/` et dans `var/` : c'est généralement le cas en
 hébergement mutualisé. Sinon, la page le signale et propose la commande SSH.
+
+### Confiance dans les releases GitHub
+
+Les mises à jour, en un clic comme en SSH, installent ce qui est publié dans les
+[releases du dépôt GitHub](https://github.com/johnburnout/GrimPanBloc/releases).
+L'empreinte SHA-256 est publiée **dans la même release** que l'archive : elle
+garantit que l'archive n'a pas été abîmée en route, **pas** qu'elle vient bien
+des mainteneurs. Autrement dit, quiconque peut publier une release sur ce dépôt
+peut faire installer son code sur tous les sites qui se mettent à jour.
+
+En pratique :
+
+- côté mainteneurs : compte GitHub protégé par la double authentification,
+  accès en écriture au dépôt réservé à quelques personnes de confiance ;
+- côté site : la mise à jour n'est **jamais automatique**, un administrateur doit
+  cliquer. En cas de doute sur une release (version inattendue, notes de version
+  étranges), ne pas l'installer et se renseigner.
+
+Une vérification plus forte (signature des archives, attestations GitHub)
+serait possible à l'avenir.
 
 ### En SSH
 
