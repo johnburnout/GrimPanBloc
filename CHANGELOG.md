@@ -7,6 +7,13 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Corrigé
+- **Administration → Photos** : chaque photo s'affiche entière, dans ses
+  proportions d'origine (sur fond sombre si elle est en portrait ou très allongée),
+  au lieu d'être recadrée ou déformée.
+
 ## [1.3.6] - 2026-11-09
 
 ### Ajouté
