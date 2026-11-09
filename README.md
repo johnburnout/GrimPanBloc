@@ -118,9 +118,24 @@ racine web sur le dossier **`public/`**.
 > **Fichiers cachés** : `.env`, `public/.htaccess` et `public/uploads/.htaccess`
 > commencent par un point, et beaucoup de clients FTP les ignorent par défaut
 > (FileZilla : *Serveur → Forcer l'affichage des fichiers cachés*). L'assistant
-> les recrée s'ils manquent ; vérifie quand même qu'ils sont bien sur le serveur. Les prérequis sont les mêmes que pour
+> les recrée s'ils manquent ; vérifie quand même qu'ils sont bien sur le serveur.
+
+Les prérequis sont les mêmes que pour
 l'installation manuelle : PHP 8.4.1 ou plus, MariaDB 11.8, Apache avec
 `mod_rewrite`, et l'extension PHP `zip` pour les mises à jour en un clic.
+
+> **Réglages PHP sur un hébergement mutualisé** : sans accès à `php.ini`, règle
+> ces limites dans le panneau de l'hébergeur (souvent *Configuration PHP*), sans
+> laisser « Défaut », dont la valeur est inconnue (souvent 128M pour la mémoire) :
+>
+> | Réglage | Valeur | Pourquoi |
+> |---|---|---|
+> | Allocation maximale de mémoire (`memory_limit`) | **256M** | GD décode les photos en entier pour les redresser et les réduire ; 256M couvrent la limite de 25 mégapixels |
+> | Taille maximale de téléchargement (`upload_max_filesize`) | 16M ou plus | photos jusqu'à 15 Mo |
+> | Taille HTTP POST maximale (`post_max_size`) | 20M ou plus | la photo plus le reste du formulaire |
+>
+> L'assistant signale une mémoire insuffisante, mais il est supprimé après
+> l'installation : à revérifier si l'hébergeur change ses réglages.
 
 Pour construire l'archive toi-même à partir du code : `bin/construire-release.sh`
 (voir [Publier une nouvelle version](#publier-une-nouvelle-version)).
@@ -216,7 +231,7 @@ Le formulaire accepte des photos jusqu'à 15 Mo, mais PHP les limite par défaut
 ```ini
 upload_max_filesize = 16M
 post_max_size = 20M
-memory_limit = 256M        ; redressement des grandes photos (GD)
+memory_limit = 256M        ; redressement des grandes photos (GD), jusqu'à 25 Mpx
 
 ; Performances en production
 opcache.enable = 1
