@@ -7,6 +7,29 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Ajouté
+- **Administration → Sauvegardes** : sauvegarde des secteurs, des voies (avec leurs
+  prises et leurs croix) et des photos, dans une archive téléchargeable. Une
+  sauvegarde se restaure en entier ou pour un seul secteur ; les liens vers les
+  voies restent valables. Une archive téléchargée peut être réimportée, ici ou sur
+  un autre site GrimPanBloc. Restaurer une sauvegarde manuelle demande s'il faut
+  la garder ou la supprimer ensuite.
+- **Sauvegardes automatiques** avant chaque restauration, nettoyage de secteur et
+  mise à jour, et au moins une fois par semaine (à la visite d'un administrateur).
+  Le nombre de sauvegardes automatiques conservées se règle de 3 à 10 (5 par
+  défaut) ; les sauvegardes manuelles ne sont jamais supprimées d'office.
+  En SSH ou par cron : `php bin/console app:sauvegarde [--automatique]`.
+- **Nettoyer un secteur** (bouton sur la page du secteur, administrateurs) :
+  toutes ses voies et toutes ses photos, même inutilisées, sont supprimées après
+  une sauvegarde automatique ; il faut taper SUPPRIMER pour confirmer.
+
+### Technique
+- Composant Symfony Lock : une seule sauvegarde ou restauration à la fois.
+- Les comptes utilisateurs et les réglages ne font pas partie de ces sauvegardes :
+  pour eux, sauvegardez la base de données chez l'hébergeur.
+
 ## [1.3.11] - 2026-11-09
 
 ### Ajouté
