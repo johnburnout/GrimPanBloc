@@ -256,6 +256,14 @@ ul:has(> li > .form-error), form ul { color: #b42318; padding-left: 1.2rem; marg
 .zone-danger form { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
 .zone-danger label { flex-basis: 100%; }
 .zone-danger input[type=text] { flex: 1 1 12rem; }
+.zone-danger fieldset { flex-basis: 100%; }
+.zone-danger fieldset legend { font-weight: 600; margin-bottom: .25rem; }
+.zone-danger label.case { display: flex; gap: .5rem; align-items: flex-start; margin: .35rem 0; }
+.zone-danger label.case input { flex: none; margin-top: .3rem; }
+
+/* Sauvegardes */
+.tableau-sauvegardes .erreur { color: #b42318; }
+.form-en-ligne input[type=number] { flex: 0 0 5rem; }
 
 /* Mises à jour */
 .bandeau-maj { background: var(--accent); color: #fff; text-align: center; padding: .5rem 1rem; }

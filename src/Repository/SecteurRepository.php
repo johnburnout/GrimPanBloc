@@ -36,4 +36,20 @@ class SecteurRepository extends ServiceEntityRepository
 
         return array_map(fn (array $l): array => ['secteur' => $l['secteur'], 'voies' => (int) $l['voies']], $lignes);
     }
+
+    /**
+     * Nombre de voies, de photos (utilisées ou non) et de croix du secteur.
+     *
+     * @return array{voies: int, photos: int, croix: int}
+     */
+    public function contenu(Secteur $secteur): array
+    {
+        $c = $this->getEntityManager()->getConnection();
+
+        return [
+            'voies' => (int) $c->fetchOne('SELECT COUNT(*) FROM voie v JOIN photo p ON p.id = v.photo_id WHERE p.secteur_id = ?', [$secteur->getId()]),
+            'photos' => (int) $c->fetchOne('SELECT COUNT(*) FROM photo WHERE secteur_id = ?', [$secteur->getId()]),
+            'croix' => (int) $c->fetchOne('SELECT COUNT(*) FROM croix c JOIN voie v ON v.id = c.voie_id JOIN photo p ON p.id = v.photo_id WHERE p.secteur_id = ?', [$secteur->getId()]),
+        ];
+    }
 }

@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Restaurer une sauvegarde · Administration · GrimPanBloc{% endblock %}
+
+{% block body %}
+    <p class="fil"><a href="{{ path('admin_sauvegardes') }}">← Sauvegardes</a></p>
+    <h1>Restaurer la sauvegarde du {{ resume.creeLe|date('d/m/Y à H:i') }}</h1>
+    <p class="meta">{{ sauvegarde.type.libelle }}{% if resume.motif %} · {{ resume.motif }}{% endif %} · version {{ resume.version }}</p>
+
+    <section class="zone-danger">
+        <ul>
+            <li>L'état actuel est d'abord sauvegardé automatiquement : la restauration peut être annulée en restaurant cette sauvegarde-là.</li>
+            <li>Les voies, photos et croix sont retrouvées telles qu'au moment de la sauvegarde ; les liens vers les voies restent valables.</li>
+            <li>Les auteurs sont retrouvés par leur pseudo. Une voie dont l'auteur n'existe plus sur ce site vous est attribuée ; une croix dont le grimpeur n'existe plus est ignorée.</li>
+        </ul>
+
+        <form method="post">
+            <input type="hidden" name="_token" value="{{ csrf_token('restaurer' ~ sauvegarde.nom) }}">
+
+            <fieldset class="choix">
+                <legend>Que faut-il restaurer ?</legend>
+                <label class="case">
+                    <input type="radio" name="portee" value="tout" required>
+                    <span><strong>Tous les secteurs</strong> ({{ resume.secteurs|length }} secteur{{ resume.secteurs|length > 1 ? 's' }}, {{ resume.nombreVoies }} voie{{ resume.nombreVoies > 1 ? 's' }}, {{ resume.nombrePhotos }} photo{{ resume.nombrePhotos > 1 ? 's' }}) :
+                        toutes les voies et photos actuelles sont remplacées, et les secteurs créés depuis sont supprimés.</span>
+                </label>
+                {% for s in resume.secteurs %}
+                    <label class="case">
+                        <input type="radio" name="portee" value="{{ s.id }}" required>
+                        <span>Seulement le secteur <strong>{{ s.nom }}</strong> ({{ s.voies }} voie{{ s.voies > 1 ? 's' }}, {{ s.photos }} photo{{ s.photos > 1 ? 's' }}) :
+                            {% if existants[s.id] is defined %}
+                                remplace tout le contenu actuel du secteur « {{ existants[s.id] }} ».
+                            {% else %}
+                                le secteur, supprimé depuis, est recréé.
+                            {% endif %}</span>
+                    </label>
+                {% endfor %}
+            </fieldset>
+
+            {% if sauvegarde.type.value == 'manuelle' %}
+                <fieldset class="choix">
+                    <legend>Après la restauration, cette sauvegarde manuelle doit-elle être…</legend>
+                    <label class="case"><input type="radio" name="apres" value="garder" required> gardée</label>
+                    <label class="case"><input type="radio" name="apres" value="supprimer" required> supprimée</label>
+                </fieldset>
+            {% endif %}
+
+            <label for="confirmation">Tapez <strong>{{ mot }}</strong> pour confirmer</label>
+            <input type="text" id="confirmation" name="confirmation" required autocomplete="off" autocapitalize="characters" spellcheck="false"
+                   pattern="\s*{{ mot }}\s*" title="Tapez {{ mot }} en majuscules">
+            <button class="btn btn-danger">Restaurer</button>
+        </form>
+    </section>
+{% endblock %}

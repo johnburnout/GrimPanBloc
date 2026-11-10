@@ -7,6 +7,7 @@ use App\MiseAJour\LanceurCommandes;
 use App\MiseAJour\Maintenance;
 use App\MiseAJour\VerificateurMiseAJour;
 use App\MiseAJour\VersionInstallee;
+use App\Sauvegarde\GestionSauvegardes;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -53,7 +54,7 @@ class AdminMiseAJourController extends AbstractController
     #[Route('/installer', name: 'admin_mise_a_jour_installer', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN')]
     #[IsCsrfTokenValid('mise_a_jour')]
-    public function installer(Request $request): Response
+    public function installer(Request $request, GestionSauvegardes $sauvegardes): Response
     {
         $release = $this->verificateur->miseAJourDisponible(true);
         if (!$release) {
@@ -68,6 +69,16 @@ class AdminMiseAJourController extends AbstractController
         $session = $request->getSession();
         $urlFinaliser = $this->generateUrl('admin_mise_a_jour_finaliser');
         $reponse = new Response(headers: ['Cache-Control' => 'no-store']);
+
+        // Secteurs, voies et photos sauvegardés avant de toucher au code (et aux migrations)
+        try {
+            $sauvegarde = $sauvegardes->creerAutomatique("avant la mise à jour vers la version {$release->version}");
+            $journal[] = 'Secteurs, voies et photos sauvegardés (Administration → Sauvegardes, '.$sauvegarde->creeLe->format('d/m/Y H:i:s').').';
+        } catch (\Throwable $e) {
+            $this->addFlash('error', 'Mise à jour annulée : la sauvegarde préalable a échoué. '.$e->getMessage());
+
+            return $this->redirectToRoute('admin_mise_a_jour');
+        }
 
         try {
             $jeton = $this->installateur->installer($release, function (string $ligne) use (&$journal) { $journal[] = $ligne; });

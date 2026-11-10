@@ -1,5 +1,9 @@
 parameters:
     photos_dir: '%kernel.project_dir%/public/uploads/photos'
+    # Sauvegardes des secteurs, voies et photos (var/ est conservé par les mises à jour)
+    sauvegardes_dir: '%kernel.project_dir%/var/sauvegardes'
+    # Sauvegarde automatique si la dernière date de plus de N jours (0 : jamais)
+    sauvegardes_intervalle_jours: 7
     # Mises à jour : dépôt GitHub dont on suit les releases (API surchargée dans les tests)
     env(MISE_A_JOUR_API): 'https://api.github.com/repos/johnburnout/GrimPanBloc'
 
@@ -24,3 +28,6 @@ when@test:
     parameters:
         # Les tests n'écrivent jamais dans les vraies photos (public/uploads/)
         photos_dir: '%kernel.project_dir%/var/test/photos'
+        sauvegardes_dir: '%kernel.project_dir%/var/test/sauvegardes'
+        # Pas de sauvegarde déclenchée par les requêtes des tests (testée à part)
+        sauvegardes_intervalle_jours: 0

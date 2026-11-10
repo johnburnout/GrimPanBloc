@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sauvegardes · Administration · GrimPanBloc{% endblock %}
+
+{% block body %}
+    <h1>Administration</h1>
+    {{ include('admin/_onglets.html.twig', {actif: 'sauvegardes'}) }}
+
+    <p class="aide">Une sauvegarde contient les secteurs, les voies (avec leurs prises et leurs croix) et les photos. Les comptes utilisateurs et les réglages n'en font pas partie.
+        Une sauvegarde automatique est faite avant chaque restauration, nettoyage de secteur et mise à jour, et au moins une fois par semaine.</p>
+
+    <section class="carte-form-large">
+        <h2>Nouvelle sauvegarde</h2>
+        <form method="post" action="{{ path('admin_sauvegarde_creer') }}" class="form-en-ligne">
+            <input type="hidden" name="_token" value="{{ csrf_token('sauvegarde_creer') }}">
+            <label for="motif">Note (facultative)</label>
+            <input type="text" id="motif" name="motif" maxlength="200" placeholder="Avant le changement des voies de juin">
+            <button class="btn">Sauvegarder maintenant</button>
+        </form>
+    </section>
+
+    <section class="carte-form-large">
+        <h2>Sauvegardes enregistrées</h2>
+        {% if lignes is empty %}
+            <p class="vide">Aucune sauvegarde pour l'instant.</p>
+        {% else %}
+            <p class="meta">{{ lignes|length }} sauvegarde{{ lignes|length > 1 ? 's' }} · {{ (tailleTotale / 1048576)|number_format(1, ',', ' ') }} Mo au total</p>
+            <div class="tableau-defilant">
+                <table class="tableau tableau-sauvegardes">
+                    <thead>
+                        <tr><th>Date</th><th>Type</th><th>Contenu</th><th>Taille</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for l in lignes %}
+                            {% set s = l.sauvegarde %}
+                            {% set r = l.resume %}
+                            <tr>
+                                <td>{{ s.creeLe|date('d/m/Y H:i') }}</td>
+                                <td>{{ s.type.libelle }}{% if r and r.motif %}<br><small>{{ r.motif }}</small>{% endif %}</td>
+                                <td>
+                                    {% if r %}
+                                        {{ r.secteurs|length }} secteur{{ r.secteurs|length > 1 ? 's' }}, {{ r.nombreVoies }} voie{{ r.nombreVoies > 1 ? 's' }}, {{ r.nombrePhotos }} photo{{ r.nombrePhotos > 1 ? 's' }}
+                                        <br><small>version {{ r.version }}</small>
+                                    {% else %}
+                                        <span class="erreur">Illisible : {{ l.erreur }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ (s.taille / 1048576)|number_format(1, ',', ' ') }} Mo</td>
+                                <td class="actions-ligne">
+                                    <a class="btn btn-petit btn-secondaire" href="{{ path('admin_sauvegarde_telecharger', {nom: s.nom}) }}" download>Télécharger</a>
+                                    {% if r %}<a class="btn btn-petit" href="{{ path('admin_sauvegarde_restaurer', {nom: s.nom}) }}">Restaurer…</a>{% endif %}
+                                    <form method="post" action="{{ path('admin_sauvegarde_supprimer', {nom: s.nom}) }}"
+                                          onsubmit="return confirm('Supprimer définitivement la sauvegarde du {{ s.creeLe|date('d/m/Y H:i') }} ?')">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('supprimer' ~ s.nom) }}">
+                                        <button class="btn btn-petit btn-danger">Supprimer</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+        <p class="aide">Les sauvegardes sont rangées sur le serveur, dans <code>var/sauvegardes/</code>. Téléchargez-en une de temps en temps : si le serveur est perdu, elles le sont aussi.</p>
+    </section>
+
+    <section class="carte-form-large">
+        <h2>Sauvegardes automatiques conservées</h2>
+        <p class="aide">Au-delà, les plus anciennes sauvegardes automatiques sont supprimées. Les sauvegardes manuelles et importées ne sont jamais supprimées d'office.</p>
+        {{ form_start(conservation, {attr: {class: 'form-en-ligne'}}) }}
+            {{ form_errors(conservation) }}
+            {{ form_label(conservation.automatiques, 'Nombre (' ~ constant('App\\Sauvegarde\\ReglageSauvegardes::MIN') ~ ' à ' ~ constant('App\\Sauvegarde\\ReglageSauvegardes::MAX') ~ ')') }}
+            {{ form_widget(conservation.automatiques) }}
+            <button class="btn">Enregistrer</button>
+            {{ form_errors(conservation.automatiques) }}
+        {{ form_end(conservation) }}
+    </section>
+
+    <section class="carte-form-large">
+        <h2>Importer une sauvegarde</h2>
+        <p class="aide">Une archive téléchargée depuis cette page, ici ou sur un autre site GrimPanBloc. Taille maximale acceptée par le serveur : {{ tailleEnvoiMax }}.
+            L'archive rejoint la liste ci-dessus ; rien n'est restauré sans votre confirmation.</p>
+        {{ form_start(import) }}
+            {{ form_errors(import) }}
+            {{ form_label(import.archive, 'Archive (.zip)') }}
+            {{ form_errors(import.archive) }}
+            {{ form_widget(import.archive, {attr: {accept: '.zip,application/zip'}}) }}
+            <button class="btn">Importer</button>
+        {{ form_end(import) }}
+    </section>
+{% endblock %}

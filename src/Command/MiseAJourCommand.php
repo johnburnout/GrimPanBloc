@@ -5,6 +5,7 @@ namespace App\Command;
 use App\MiseAJour\InstallateurMiseAJour;
 use App\MiseAJour\VerificateurMiseAJour;
 use App\MiseAJour\VersionInstallee;
+use App\Sauvegarde\GestionSauvegardes;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
@@ -24,6 +25,7 @@ class MiseAJourCommand
         private readonly VerificateurMiseAJour $verificateur,
         private readonly InstallateurMiseAJour $installateur,
         private readonly VersionInstallee $version,
+        private readonly GestionSauvegardes $sauvegardes,
         private readonly string $racine,
     ) {
     }
@@ -52,8 +54,17 @@ class MiseAJourCommand
         if ($verifier) {
             return Command::SUCCESS;
         }
-        if (!$io->confirm("Installer la version {$release->version} ? Pensez à sauvegarder la base de données avant.", true)) {
+        if (!$io->confirm("Installer la version {$release->version} ? Secteurs, voies et photos seront sauvegardés avant ; pour les comptes et réglages, sauvegardez la base de données.", true)) {
             return Command::SUCCESS;
+        }
+
+        try {
+            $s = $this->sauvegardes->creerAutomatique("avant la mise à jour vers la version {$release->version}");
+            $io->text('✔ Secteurs, voies et photos sauvegardés : '.$s->chemin);
+        } catch (\Throwable $e) {
+            $io->error('Mise à jour annulée : la sauvegarde préalable a échoué. '.$e->getMessage());
+
+            return Command::FAILURE;
         }
 
         try {

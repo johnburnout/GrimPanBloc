@@ -1,0 +1,7 @@
+parameters:
+    # Valeur par défaut : les installations dont l'environnement est compilé
+    # (.env.local.php d'une version antérieure) ne connaissent pas LOCK_DSN.
+    env(LOCK_DSN): 'flock'
+
+framework:
+    lock: '%env(LOCK_DSN)%'

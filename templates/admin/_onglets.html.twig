@@ -1,9 +1,10 @@
-{# Onglets de l'administration. Variable : actif ('reglages' | 'utilisateurs' | 'photos' | 'fiche' | 'mise_a_jour') #}
+{# Onglets de l'administration. Variable : actif ('reglages' | 'utilisateurs' | 'photos' | 'sauvegardes' | 'fiche' | 'mise_a_jour') #}
 <nav class="onglets" aria-label="Administration">
     {% for cle, onglet in {
         reglages: {route: 'admin_reglages', libelle: 'Réglages'},
         utilisateurs: {route: 'admin_utilisateurs', libelle: 'Utilisateurs'},
         photos: {route: 'admin_photos', libelle: 'Photos'},
+        sauvegardes: {route: 'admin_sauvegardes', libelle: 'Sauvegardes'},
         fiche: {route: 'admin_fiche', libelle: 'Fiche à imprimer'},
         mise_a_jour: {route: 'admin_mise_a_jour', libelle: 'Mises à jour'},
     } %}

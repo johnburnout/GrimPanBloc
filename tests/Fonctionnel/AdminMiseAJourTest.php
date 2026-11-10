@@ -2,12 +2,14 @@
 
 namespace App\Tests\Fonctionnel;
 
+use App\Enum\TypeSauvegarde;
 use App\MiseAJour\ArchiveRelease;
 use App\MiseAJour\InstallateurMiseAJour;
 use App\MiseAJour\LanceurCommandes;
 use App\MiseAJour\Maintenance;
 use App\MiseAJour\VerificateurMiseAJour;
 use App\MiseAJour\VersionInstallee;
+use App\Sauvegarde\DepotSauvegardes;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Filesystem\Filesystem;
@@ -87,6 +89,9 @@ final class AdminMiseAJourTest extends FonctionnelTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSame('9.9.9', trim((string) file_get_contents($this->dossier.'/VERSION')), 'Code remplacé.');
+        $sauvegardes = static::getContainer()->get(DepotSauvegardes::class)->lister();
+        self::assertCount(1, $sauvegardes, 'Secteurs, voies et photos sauvegardés avant la mise à jour.');
+        self::assertSame(TypeSauvegarde::Automatique, $sauvegardes[0]->type);
         // La page porte le jeton : jamais mise en cache (la session ajoute ses propres directives)
         self::assertStringContainsString('no-store', (string) $this->client->getResponse()->headers->get('Cache-Control'));
         $form = $this->client->getCrawler()->filter('form#finaliser');

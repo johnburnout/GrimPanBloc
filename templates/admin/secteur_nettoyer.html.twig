@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nettoyer {{ secteur.nom }} · Administration · GrimPanBloc{% endblock %}
+
+{% block body %}
+    <p class="fil"><a href="{{ path('secteur_show', {id: secteur.id}) }}">← {{ secteur.nom }}</a></p>
+    <h1>Nettoyer le secteur « {{ secteur.nom }} »</h1>
+
+    <section class="zone-danger">
+        {% if contenu.voies == 0 and contenu.photos == 0 %}
+            <p>Ce secteur est déjà vide : aucune voie, aucune photo.</p>
+        {% else %}
+            <ul>
+                <li>Les <strong>{{ contenu.voies }} voie(s)</strong> du secteur sont supprimées, avec leurs prises et leurs <strong>{{ contenu.croix }} croix</strong>.</li>
+                <li>Les <strong>{{ contenu.photos }} photo(s)</strong> du secteur sont supprimées, y compris celles qu'aucune voie n'utilise.</li>
+                <li>Le secteur lui-même (nom, description) est conservé, prêt pour de nouvelles voies.</li>
+                <li>Une sauvegarde automatique est faite juste avant : le secteur pourra être restauré depuis Administration → <a href="{{ path('admin_sauvegardes') }}">Sauvegardes</a>.</li>
+            </ul>
+            {% set mot = constant('App\\Security\\ConfirmationSuppression::MOT') %}
+            <form method="post">
+                <input type="hidden" name="_token" value="{{ csrf_token('nettoyer' ~ secteur.id) }}">
+                <label for="confirmation">Tapez <strong>{{ mot }}</strong> pour confirmer</label>
+                <input type="text" id="confirmation" name="confirmation" required autocomplete="off" autocapitalize="characters" spellcheck="false"
+                       pattern="\s*{{ mot }}\s*" title="Tapez {{ mot }} en majuscules">
+                <button class="btn btn-danger">Nettoyer le secteur</button>
+            </form>
+        {% endif %}
+    </section>
+{% endblock %}

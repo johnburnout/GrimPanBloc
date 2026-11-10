@@ -10,6 +10,9 @@
         {% else %}
             <a href="{{ path('app_login') }}" class="btn btn-secondaire">Connectez-vous pour créer une voie</a>
         {% endif %}
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('admin_secteur_nettoyer', {id: secteur.id}) }}" class="btn btn-secondaire">Nettoyer le secteur…</a>
+        {% endif %}
     </div>
 
     {% if secteur.description %}<p>{{ secteur.description|nl2br }}</p>{% endif %}

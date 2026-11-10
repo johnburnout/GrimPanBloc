@@ -13,6 +13,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -41,6 +42,8 @@ abstract class FonctionnelTestCase extends WebTestCase
         while ($connexion->isTransactionActive()) {
             $connexion->rollBack();
         }
+        // Sauvegardes faites pendant le test (avant une mise à jour, un nettoyage…)
+        (new Filesystem())->remove((string) static::getContainer()->getParameter('sauvegardes_dir'));
         parent::tearDown();
     }
 
