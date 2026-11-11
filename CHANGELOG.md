@@ -7,6 +7,12 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Corrigé
+- **Nouvelle photo sur téléphone** : on peut de nouveau choisir une photo de la
+  photothèque, et pas seulement en prendre une avec l'appareil photo.
+
 ## [1.5.0] - 2026-11-11
 
 ### Modifié
