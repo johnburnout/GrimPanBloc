@@ -28,5 +28,9 @@
 {% endblock %}
 
 {% block javascripts %}
-    {% if trace %}<script src="{{ asset('js/editeur.js') }}" defer></script>{% endif %}
+    {% if trace %}
+        <script src="{{ asset('js/editeur.js') }}" defer></script>
+    {% else %}
+        <script src="{{ asset('js/visionneuse.js') }}" defer></script>
+    {% endif %}
 {% endblock %}

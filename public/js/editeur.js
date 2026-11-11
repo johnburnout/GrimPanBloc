@@ -155,7 +155,7 @@
 
     const basculerClasse = (actif) => {
         editeur.classList.toggle('plein-ecran', actif);
-        document.body.classList.toggle('editeur-plein-ecran', actif);
+        document.body.classList.toggle('plein-ecran-actif', actif);
         boutonPleinEcran.setAttribute('aria-pressed', actif ? 'true' : 'false');
         boutonPleinEcran.title = actif ? 'Quitter le plein écran' : 'Plein écran';
         dimensionner();

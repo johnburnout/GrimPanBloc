@@ -192,8 +192,8 @@ ul:has(> li > .form-error), form ul { color: #b42318; padding-left: 1.2rem; marg
 /* --- Photo + prises ----------------------------------------------------- */
 
 .photo-voie { position: relative; margin: 0; line-height: 0; background: #222; }
-.photo-voie img { width: 100%; height: auto; display: block; }
-.photo-voie svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.photo-voie > img { width: 100%; height: auto; display: block; }
+.photo-voie > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 /* Pas d'object-fit/crop : le SVG doit couvrir exactement l'image pour rester aligné. */
 .photo-voie.grande { border-radius: var(--rayon); overflow: hidden; }
 
@@ -222,7 +222,7 @@ ul:has(> li > .form-error), form ul { color: #b42318; padding-left: 1.2rem; marg
 }
 
 /* Vue zoomable : la scène (image + SVG) garde la taille réelle de l'image,
-   le script la place avec transform. touch-action: none → les gestes sont pour l'éditeur. */
+   le script la place avec transform. touch-action: none → les gestes sont pour le script. */
 .vue {
     position: relative; overflow: hidden; background: #1b1b1b;
     touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
@@ -275,13 +275,18 @@ ul:has(> li > .form-error), form ul { color: #b42318; padding-left: 1.2rem; marg
     writing-mode: vertical-lr; direction: rtl; /* curseur vertical, zoom vers le haut */
 }
 
-/* Plein écran : API Fullscreen, ou repli CSS (iPhone) */
-.editeur.plein-ecran {
-    position: fixed; inset: 0; z-index: 1000; border-radius: 0; background: #111;
-    width: 100%; height: 100%; height: 100dvh;
+/* Plein écran (éditeur et visionneuse) : API Fullscreen, ou repli CSS (iPhone) */
+.plein-ecran {
+    position: fixed; inset: 0; z-index: 1000; border-radius: 0 !important; background: #111;
+    width: 100%; height: 100%; height: 100dvh; margin: 0;
 }
-.editeur.plein-ecran .vue { height: 100% !important; }
-body.editeur-plein-ecran { overflow: hidden; }
+.plein-ecran .vue { height: 100% !important; }
+body.plein-ecran-actif { overflow: hidden; }
+
+/* Visionneuse de la page d'une voie : zoom au double toucher ou à deux doigts ;
+   à 1×, un doigt fait défiler la page comme d'habitude. */
+.visionneuse .vue { cursor: zoom-in; }
+.visionneuse .vue.zoomee { cursor: grab; }
 
 @media (max-width: 600px) {
     .outil { font-size: .8rem; padding: .35rem .5rem; }

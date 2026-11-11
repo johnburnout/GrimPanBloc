@@ -7,6 +7,39 @@ use App\Entity\Secteur;
 
 final class VoieControllerTest extends FonctionnelTestCase
 {
+    // --- Consultation -------------------------------------------------------
+
+    public function testLaPhotoDUneVoieSOuvreDansLaVisionneuse(): void
+    {
+        $voie = $this->creerVoie($this->creerUtilisateur('auteur'));
+
+        $this->client->loginUser($this->creerUtilisateur('grimpeur'));
+        $page = $this->client->request('GET', '/voies/'.$voie->getId());
+
+        self::assertResponseIsSuccessful();
+        // La figure reste lisible sans JavaScript ; la visionneuse la rend zoomable
+        $figure = $page->filter('figure.photo-voie.grande');
+        self::assertCount(1, $figure);
+        self::assertSame('0 0 800 600', $figure->filter('svg')->attr('viewBox'));
+        self::assertCount(1, $page->filter('script[src*="js/visionneuse.js"]'));
+        self::assertCount(0, $page->filter('script[src*="js/editeur.js"]'));
+    }
+
+    public function testUneVoieVerrouilleeGardeLaVisionneuseSurLaPageDeModification(): void
+    {
+        $auteur = $this->creerUtilisateur('auteur');
+        $voie = $this->creerVoie($auteur);
+        $this->valider($voie, $this->creerUtilisateur('grimpeur'));
+
+        $this->client->loginUser($auteur);
+        $page = $this->client->request('GET', '/voies/'.$voie->getId().'/modifier');
+
+        self::assertResponseIsSuccessful();
+        self::assertCount(1, $page->filter('figure.photo-voie.grande'));
+        self::assertCount(1, $page->filter('script[src*="js/visionneuse.js"]'));
+        self::assertCount(0, $page->filter('script[src*="js/editeur.js"]'));
+    }
+
     // --- Suppression --------------------------------------------------------
 
     public function testLAuteurSupprimeUneVoieNonValidee(): void
