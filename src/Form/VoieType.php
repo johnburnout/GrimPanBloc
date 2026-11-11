@@ -58,7 +58,9 @@ class VoieType extends AbstractType
                 'label' => 'Nouvelle photo',
                 'mapped' => false,
                 'required' => false,
-                'attr' => ['accept' => 'image/jpeg,image/png,image/webp', 'capture' => 'environment'],
+                // Pas d'attribut « capture » : il imposerait l'appareil photo sur téléphone,
+                // alors qu'on doit pouvoir aussi choisir une photo de la photothèque.
+                'attr' => ['accept' => 'image/jpeg,image/png,image/webp'],
                 'constraints' => [
                     new Image(maxSize: '15M', mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
                         mimeTypesMessage: 'Formats acceptés : JPEG, PNG, WebP.',

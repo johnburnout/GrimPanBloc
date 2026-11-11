@@ -237,6 +237,21 @@ final class VoieFormulaireTest extends FonctionnelTestCase
         self::assertCount(1, $page->filter('script[src*="js/editeur.js"]'));
     }
 
+    public function testLaNouvellePhotoPeutVenirDeLaPhotothequeOuDeLAppareil(): void
+    {
+        $auteur = $this->creerUtilisateur('auteur');
+        $secteurId = $this->creerVoie($auteur)->getPhoto()->getSecteur()->getId();
+
+        $this->client->loginUser($auteur);
+        $page = $this->client->request('GET', "/voies/nouvelle/$secteurId");
+
+        $champ = $page->filter('input[type="file"][name="voie[nouvellePhoto]"]');
+        self::assertCount(1, $champ);
+        self::assertStringStartsWith('image/', $champ->attr('accept'));
+        // « capture » forcerait l'appareil photo et cacherait la photothèque sur téléphone
+        self::assertNull($champ->attr('capture'));
+    }
+
     // ------------------------------------------------------------------------
 
     private function formulaire(string $url): Form
