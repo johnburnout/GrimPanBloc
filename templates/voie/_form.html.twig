@@ -13,23 +13,43 @@
 
 <section class="etape">
     <h2>2. Les prises</h2>
-    <p class="aide">Choisissez un type puis touchez la photo pour placer une prise.
-        Touchez une prise existante pour changer son type, faites-la glisser pour la déplacer.
-        Le curseur « Taille » règle les prochaines prises et la dernière posée ou déplacée.</p>
-
-    <div class="barre-outils" role="toolbar">
-        {% for t in typesPrise %}
-            <button type="button" class="outil" data-outil="{{ t.value }}" aria-pressed="{{ loop.index == 2 ? 'true' : 'false' }}">
-                <span class="pastille prise-{{ t.value }}"></span> {{ t.libelle }}
-            </button>
-        {% endfor %}
-        <button type="button" class="outil" data-outil="gomme">✕ Effacer</button>
-        <label class="taille">Taille <input type="range" id="taille-prise" min="1" max="10" step="0.5" value="3"></label>
-        <button type="button" class="btn-lien" id="annuler">↶ Annuler</button>
-    </div>
+    <p class="aide">Choisissez un type dans la barre d'outils, puis <strong>touchez deux fois</strong> la photo
+        (double-clic à la souris) pour placer une prise. Faites glisser une prise d'un doigt pour la déplacer ;
+        touchez-la une fois pour lui donner le type choisi et régler sa taille.
+        Zoomez avec deux doigts ou le curseur sur le côté ; déplacez l'image avec deux doigts
+        (ou un doigt posé à côté des prises). Le bouton en bas du curseur passe en plein écran,
+        et la barre d'outils se déplace par sa poignée <span aria-hidden="true">⠿</span>.</p>
 
     <div id="editeur" class="editeur">
-        <p class="editeur-vide">Choisissez ou envoyez une photo pour commencer.</p>
+        <p class="editeur-vide" id="editeur-vide">Choisissez ou envoyez une photo pour commencer.</p>
+        <div class="vue" id="vue" hidden>
+            <div class="scene" id="scene"></div>
+
+            <div class="barre-outils" id="barre-outils" role="toolbar" aria-label="Outils de marquage">
+                <button type="button" class="poignee" id="poignee" title="Déplacer la barre d'outils" aria-label="Déplacer la barre d'outils">⠿</button>
+                {% for t in typesPrise %}
+                    <button type="button" class="outil" data-outil="{{ t.value }}" aria-pressed="{{ t.value == 'main' ? 'true' : 'false' }}">
+                        <span class="pastille prise-{{ t.value }}"></span> {{ t.libelle }}
+                    </button>
+                {% endfor %}
+                <button type="button" class="outil" data-outil="gomme">✕ Effacer</button>
+                <label class="taille">Taille <input type="range" id="taille-prise" min="1" max="10" step="0.5" value="3"></label>
+                <button type="button" class="outil" id="annuler" title="Annuler la dernière action">↶</button>
+                <button type="button" class="outil replier" id="replier" aria-expanded="true" title="Replier la barre d'outils" aria-label="Replier la barre d'outils">▴</button>
+            </div>
+
+            <div class="zoom" id="zoom" role="group" aria-label="Zoom">
+                <button type="button" data-zoom="plus" aria-label="Zoomer">+</button>
+                <input type="range" id="zoom-curseur" min="0" max="3" step="0.01" value="0" aria-label="Niveau de zoom">
+                <button type="button" data-zoom="moins" aria-label="Dézoomer">−</button>
+                <button type="button" data-zoom="ajuster" title="Voir toute la photo" aria-label="Voir toute la photo">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="1.5"/></svg>
+                </button>
+                <button type="button" id="plein-ecran" title="Plein écran" aria-label="Plein écran" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>
+                </button>
+            </div>
+        </div>
     </div>
     <p class="compteur"><span id="nb-prises">0</span> prise(s)</p>
     {{ form_errors(form.prises) }}

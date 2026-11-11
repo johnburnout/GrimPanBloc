@@ -215,25 +215,80 @@ ul:has(> li > .form-error), form ul { color: #b42318; padding-left: 1.2rem; marg
 
 /* --- Éditeur ------------------------------------------------------------ */
 
-.barre-outils {
-    display: flex; flex-wrap: wrap; gap: .4rem; align-items: center;
-    position: sticky; top: 0; z-index: 2;
-    background: var(--surface); padding: .5rem 0;
-}
-.outil {
-    font: inherit; cursor: pointer; padding: .45rem .75rem;
-    border: 1px solid var(--bord); border-radius: 999px; background: #fff;
-}
-.outil[aria-pressed=true] { background: var(--texte); color: #fff; border-color: var(--texte); }
-.taille { display: flex; align-items: center; gap: .4rem; margin: 0 0 0 .5rem; font-weight: normal; }
-.taille input { width: 6rem; }
-
 .editeur { border-radius: var(--rayon); overflow: hidden; }
 .editeur-vide {
     margin: 0; padding: 3rem 1rem; text-align: center; color: var(--texte-doux);
     border: 2px dashed var(--bord); border-radius: var(--rayon);
 }
-.photo-voie.edition svg { cursor: crosshair; touch-action: none; }
+
+/* Vue zoomable : la scène (image + SVG) garde la taille réelle de l'image,
+   le script la place avec transform. touch-action: none → les gestes sont pour l'éditeur. */
+.vue {
+    position: relative; overflow: hidden; background: #1b1b1b;
+    touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+    cursor: grab;
+}
+.scene { position: absolute; top: 0; left: 0; transform-origin: 0 0; line-height: 0; }
+.scene img, .scene svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.scene img { pointer-events: none; }
+.prise.selection { filter: drop-shadow(0 0 3px rgba(0,0,0,.9)); }
+
+/* Barre d'outils flottante, déplaçable par sa poignée */
+.barre-outils {
+    position: absolute; z-index: 3; top: 8px; left: 8px;
+    display: flex; flex-wrap: wrap; gap: .3rem; align-items: center;
+    max-width: calc(100% - 4.5rem); padding: .3rem;
+    background: rgba(255,255,255,.92); border-radius: var(--rayon);
+    box-shadow: 0 2px 10px rgba(0,0,0,.35); line-height: 1.2; cursor: default;
+}
+.poignee {
+    font: inherit; font-size: 1.1rem; border: 0; background: none; padding: .3rem .35rem;
+    cursor: move; touch-action: none; color: var(--texte-doux);
+}
+.outil {
+    font: inherit; font-size: .9rem; cursor: pointer; padding: .4rem .65rem;
+    border: 1px solid var(--bord); border-radius: 999px; background: #fff; color: var(--texte);
+}
+.outil[aria-pressed=true] { background: var(--texte); color: #fff; border-color: var(--texte); }
+#annuler, .replier { font-size: 1.1rem; line-height: 1; padding: .3rem .65rem; }
+.taille { display: flex; align-items: center; gap: .3rem; margin: 0 .2rem; font-weight: normal; font-size: .9rem; }
+.taille input { width: 5.5rem; }
+.barre-outils.repliee .outil:not([aria-pressed=true]):not(.replier),
+.barre-outils.repliee .taille { display: none; }
+
+/* Zoom : colonne sur le bord droit */
+.zoom {
+    position: absolute; z-index: 3; top: 8px; right: 8px; bottom: 8px;
+    display: flex; flex-direction: column; align-items: center; gap: .3rem;
+    padding: .3rem; background: rgba(255,255,255,.92); border-radius: var(--rayon);
+    box-shadow: 0 2px 10px rgba(0,0,0,.35); line-height: 1; cursor: default;
+}
+.zoom button {
+    width: 2.4rem; height: 2.4rem; flex: none; padding: 0; cursor: pointer;
+    font: inherit; font-size: 1.3rem; font-weight: 700;
+    border: 1px solid var(--bord); border-radius: 50%; background: #fff; color: var(--texte);
+}
+.zoom button svg { width: 1.2rem; height: 1.2rem; vertical-align: middle; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.zoom button[aria-pressed=true] { background: var(--texte); color: #fff; border-color: var(--texte); }
+.zoom input[type=range] {
+    flex: 1 1 auto; min-height: 3rem; width: 2rem; margin: 0;
+    writing-mode: vertical-lr; direction: rtl; /* curseur vertical, zoom vers le haut */
+}
+
+/* Plein écran : API Fullscreen, ou repli CSS (iPhone) */
+.editeur.plein-ecran {
+    position: fixed; inset: 0; z-index: 1000; border-radius: 0; background: #111;
+    width: 100%; height: 100%; height: 100dvh;
+}
+.editeur.plein-ecran .vue { height: 100% !important; }
+body.editeur-plein-ecran { overflow: hidden; }
+
+@media (max-width: 600px) {
+    .outil { font-size: .8rem; padding: .35rem .5rem; }
+    .taille { font-size: .8rem; }
+    .taille input { width: 4.5rem; }
+    .zoom button { width: 2.1rem; height: 2.1rem; }
+}
 .compteur { margin: .5rem 0 0; color: var(--texte-doux); }
 
 [hidden] { display: none !important; }

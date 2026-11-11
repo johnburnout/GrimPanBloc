@@ -207,6 +207,36 @@ final class VoieFormulaireTest extends FonctionnelTestCase
         self::assertResponseStatusCodeSame(403);
     }
 
+    // --- Éditeur -------------------------------------------------------------
+
+    public function testLEditeurProposeBarreFlottanteZoomEtPleinEcran(): void
+    {
+        $auteur = $this->creerUtilisateur('auteur');
+        $id = $this->creerVoie($auteur)->getId();
+
+        $this->client->loginUser($auteur);
+        $page = $this->client->request('GET', "/voies/$id/modifier");
+        self::assertResponseIsSuccessful();
+
+        // Barre d'outils posée sur la photo, avec poignée et un bouton par type de prise
+        $barre = $page->filter('#vue #barre-outils[role="toolbar"]');
+        self::assertCount(1, $barre);
+        self::assertCount(1, $barre->filter('#poignee'));
+        foreach (TypePrise::cases() as $type) {
+            self::assertCount(1, $barre->filter(\sprintf('[data-outil="%s"]', $type->value)));
+        }
+        self::assertCount(1, $barre->filter('[data-outil="gomme"]'));
+        self::assertCount(1, $barre->filter('#taille-prise'));
+        self::assertCount(1, $barre->filter('#annuler'));
+
+        // Curseur de zoom sur le côté et plein écran
+        self::assertCount(1, $page->filter('#vue .zoom #zoom-curseur[type="range"]'));
+        self::assertCount(3, $page->filter('#vue .zoom [data-zoom]'));
+        self::assertCount(1, $page->filter('#vue #plein-ecran'));
+
+        self::assertCount(1, $page->filter('script[src*="js/editeur.js"]'));
+    }
+
     // ------------------------------------------------------------------------
 
     private function formulaire(string $url): Form
