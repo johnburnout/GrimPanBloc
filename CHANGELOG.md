@@ -7,6 +7,15 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Ajouté
+- **Photo d'une voie zoomable** sur la page de consultation : zoom avec deux doigts
+  ou le curseur sur le côté, **double toucher** pour zoomer sur un endroit (et de
+  nouveau pour revenir à la photo entière), déplacement de l'image une fois
+  zoomée, et bouton **plein écran**. Sans zoom, un doigt fait défiler la page
+  comme d'habitude.
+
 ## [1.5.1] - 2026-11-11
 
 ### Corrigé
