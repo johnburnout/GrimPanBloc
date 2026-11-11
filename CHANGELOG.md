@@ -7,6 +7,20 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Modifié
+- **Éditeur des prises refait, pensé pour le téléphone** :
+  - la photo se **zoome** (jusqu'à 8×) avec deux doigts ou le curseur vertical sur
+    le bord droit (boutons +, − et « voir toute la photo ») ; on la **déplace avec
+    deux doigts**, ou d'un doigt posé à côté des prises ;
+  - **double toucher** (double-clic à la souris) pour poser une prise ; une prise se
+    **déplace d'un doigt** ; un simple toucher lui donne le type choisi et permet de
+    régler sa taille ;
+  - la **barre d'outils flotte sur la photo** : elle se déplace par sa poignée ⠿ et
+    se replie pour ne laisser que l'outil actif ;
+  - bouton **plein écran** (sur iPhone, l'éditeur occupe toute la fenêtre).
+
 ## [1.4.0] - 2026-11-10
 
 ### Ajouté
