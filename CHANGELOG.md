@@ -7,6 +7,19 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Ajouté
+- **Suppression d'un secteur** (administrateurs) : bouton « Supprimer le
+  secteur… » sur la page du secteur. Ses voies (avec leurs croix) et ses photos
+  sont supprimées avec lui, après confirmation par le mot SUPPRIMER. Une
+  sauvegarde automatique est faite juste avant : le secteur peut être restauré
+  depuis Administration → Sauvegardes.
+
+### Modifié
+- **Création des secteurs réservée aux administrateurs.** Les grimpeurs
+  continuent de créer des voies dans les secteurs existants.
+
 ## [1.6.1] - 2026-11-14
 
 ### Corrigé
