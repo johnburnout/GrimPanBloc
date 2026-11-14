@@ -12,6 +12,7 @@
         {% endif %}
         {% if is_granted('ROLE_ADMIN') %}
             <a href="{{ path('admin_secteur_nettoyer', {id: secteur.id}) }}" class="btn btn-secondaire">Nettoyer le secteur…</a>
+            <a href="{{ path('admin_secteur_supprimer', {id: secteur.id}) }}" class="btn btn-secondaire">Supprimer le secteur…</a>
         {% endif %}
     </div>
 

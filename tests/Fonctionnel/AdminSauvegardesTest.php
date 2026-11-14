@@ -307,6 +307,70 @@ final class AdminSauvegardesTest extends FonctionnelTestCase
         self::assertFileExists($this->photos.'/libre.jpg');
     }
 
+    public function testSupprimerUnSecteur(): void
+    {
+        $voie = $this->voieAvecPhoto('Dévers', 'Le toit', 'toit.jpg');
+        $this->valider($voie, $this->creerUtilisateur('grimpeur'));
+        $secteur = $voie->getPhoto()->getSecteur();
+        $libre = $this->photo($secteur, 'libre.jpg');
+        $autre = $this->voieAvecPhoto('Dalle', 'Voisine', 'voisine.jpg');
+        $idSecteur = $secteur->getId();
+        $idVoie = $voie->getId();
+        $url = "/admin/secteurs/$idSecteur/supprimer";
+
+        $this->client->loginUser($this->admin);
+        $page = $this->client->request('GET', "/secteurs/$idSecteur");
+        $page = $this->client->click($page->selectLink('Supprimer le secteur…')->link());
+        self::assertStringContainsString('1 voie(s)', $page->filter('.zone-danger')->text());
+        self::assertStringContainsString('2 photo(s)', $page->filter('.zone-danger')->text());
+
+        // Garde-fous : jeton et mot de confirmation
+        $this->client->request('POST', $url, ['_token' => 'faux', 'confirmation' => 'SUPPRIMER']);
+        self::assertResponseRedirects($url);
+        $page = $this->client->request('GET', $url);
+        $this->client->submit($page->selectButton('Supprimer le secteur')->form(['confirmation' => 'oui']));
+        self::assertResponseRedirects($url);
+        self::assertNotNull($this->em->find(Secteur::class, $idSecteur));
+
+        $page = $this->client->request('GET', $url);
+        $this->client->submit($page->selectButton('Supprimer le secteur')->form(['confirmation' => 'SUPPRIMER']));
+
+        self::assertResponseRedirects('/secteurs');
+        self::assertSame(['Secteur « Dévers » supprimé, avec 1 voie(s) et 2 photo(s).'], $this->flashsApresRedirection('success'));
+        $this->em->clear();
+        self::assertNull($this->em->find(Secteur::class, $idSecteur));
+        self::assertFalse($this->voieExiste($idVoie));
+        self::assertNull($this->em->find(Photo::class, $libre->getId()));
+        self::assertFileDoesNotExist($this->photos.'/toit.jpg');
+        self::assertTrue($this->voieExiste($autre->getId()), 'Les autres secteurs ne bougent pas.');
+        self::assertFileExists($this->photos.'/voisine.jpg');
+
+        // Restauration depuis la sauvegarde automatique : le secteur revient avec tout son contenu
+        $avant = $this->depot->lister();
+        self::assertCount(1, $avant);
+        self::assertSame(TypeSauvegarde::Automatique, $avant[0]->type);
+        $this->restaurer($avant[0], (string) $idSecteur);
+        $this->em->clear();
+        self::assertSame('Dévers', $this->em->find(Secteur::class, $idSecteur)?->getNom());
+        self::assertTrue($this->voieExiste($idVoie));
+        self::assertFileExists($this->photos.'/toit.jpg');
+    }
+
+    public function testUnGrimpeurNePeutNiSupprimerNiNettoyerUnSecteur(): void
+    {
+        $secteur = $this->voieAvecPhoto('Dévers', 'Le toit', 'toit.jpg')->getPhoto()->getSecteur();
+        $this->client->loginUser($this->creerUtilisateur('grimpeur'));
+
+        $page = $this->client->request('GET', '/secteurs/'.$secteur->getId());
+        self::assertCount(0, $page->selectLink('Supprimer le secteur…'));
+        self::assertCount(0, $page->selectLink('Nettoyer le secteur…'));
+        foreach (['supprimer', 'nettoyer'] as $action) {
+            $this->client->request('POST', '/admin/secteurs/'.$secteur->getId().'/'.$action, ['confirmation' => 'SUPPRIMER']);
+            self::assertResponseStatusCodeSame(403, $action);
+        }
+        self::assertNotNull($this->em->find(Secteur::class, $secteur->getId()));
+    }
+
     public function testConservationDesSauvegardesAutomatiques(): void
     {
         $this->client->loginUser($this->admin);

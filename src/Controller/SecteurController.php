@@ -23,7 +23,7 @@ class SecteurController extends AbstractController
     }
 
     #[Route('/nouveau', name: 'secteur_new')]
-    #[IsGranted('ROLE_USER')] // en plus d'access_control, qui dépend de l'URL
+    #[IsGranted('ROLE_ADMIN')] // en plus d'access_control, qui dépend de l'URL
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $secteur = new Secteur();

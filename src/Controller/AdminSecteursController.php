@@ -17,6 +17,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 /**
  * Nettoyage d'un secteur : toutes ses voies et toutes ses photos (même inutilisées)
  * sont supprimées, après une sauvegarde automatique. Le secteur lui-même reste.
+ *
+ * Suppression d'un secteur : la même chose, puis le secteur lui-même.
  */
 #[Route('/admin/secteurs')]
 #[IsGranted('ROLE_ADMIN')]
@@ -48,6 +50,37 @@ class AdminSecteursController extends AbstractController
         }
 
         return $this->render('admin/secteur_nettoyer.html.twig', [
+            'secteur' => $secteur,
+            'contenu' => $secteurs->contenu($secteur),
+        ]);
+    }
+
+    #[Route('/{id}/supprimer', name: 'admin_secteur_supprimer', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function supprimer(Secteur $secteur, Request $request, SecteurRepository $secteurs, GestionSauvegardes $sauvegardes, #[CurrentUser] User $admin): Response
+    {
+        if ($request->isMethod('POST')) {
+            $payload = $request->getPayload();
+            if (!$this->isCsrfTokenValid('supprimer-secteur'.$secteur->getId(), $payload->getString('_token'))) {
+                $this->addFlash('error', 'Le formulaire a expiré : rechargez la page et recommencez.');
+            } elseif (!ConfirmationSuppression::estConfirmee($payload->getString('confirmation'))) {
+                $this->addFlash('error', 'Suppression annulée : tapez '.ConfirmationSuppression::MOT.' pour confirmer.');
+            } else {
+                $nom = $secteur->getNom();
+                try {
+                    ['avant' => $avant, 'bilan' => $bilan] = $sauvegardes->supprimerSecteur($secteur, $admin);
+                    $this->addFlash('success', \sprintf('Secteur « %s » supprimé, avec %d voie(s) et %d photo(s).', $nom, $bilan->voiesSupprimees, $bilan->photosSupprimees));
+                    $this->addFlash('info', \sprintf('Sauvegarde faite juste avant (%s) : en cas d\'erreur, restaurez ce secteur depuis Administration → Sauvegardes.', $avant->creeLe->format('d/m/Y H:i:s')));
+
+                    return $this->redirectToRoute('secteur_index');
+                } catch (\Throwable $e) {
+                    $this->addFlash('error', 'La suppression a échoué : '.$e->getMessage());
+                }
+            }
+
+            return $this->redirectToRoute('admin_secteur_supprimer', ['id' => $secteur->getId()]);
+        }
+
+        return $this->render('admin/secteur_supprimer.html.twig', [
             'secteur' => $secteur,
             'contenu' => $secteurs->contenu($secteur),
         ]);

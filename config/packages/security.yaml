@@ -44,7 +44,7 @@ security:
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/profil, roles: ROLE_USER }
-        - { path: ^/secteurs/nouveau, roles: ROLE_USER }
+        - { path: ^/secteurs/nouveau, roles: ROLE_ADMIN }
         - { path: ^/voies/nouvelle, roles: ROLE_USER }
 
 when@test:

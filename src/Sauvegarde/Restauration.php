@@ -243,6 +243,13 @@ final class Restauration
             : $this->connexion->fetchFirstColumn('SELECT fichier FROM photo WHERE secteur_id IN (?)', [$cibles], [ArrayParameterType::INTEGER]);
     }
 
+    /** Supprime le secteur lui-même, une fois vidé de ses voies et photos par remplacer(). */
+    public function supprimerSecteurVide(int $secteur): void
+    {
+        $this->connexion->delete('secteur', ['id' => $secteur]);
+        $this->em->clear();
+    }
+
     /**
      * Supprime voies et photos des secteurs ciblés (prises et croix suivent, ON DELETE CASCADE).
      *

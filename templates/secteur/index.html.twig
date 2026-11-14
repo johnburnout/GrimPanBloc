@@ -5,13 +5,13 @@
 {% block body %}
     <div class="titre-actions">
         <h1>Secteurs</h1>
-        {% if is_granted('ROLE_USER') %}
+        {% if is_granted('ROLE_ADMIN') %}
             <a href="{{ path('secteur_new') }}" class="btn">+ Nouveau secteur</a>
         {% endif %}
     </div>
 
     {% if secteurs is empty %}
-        <p class="vide">Aucun secteur. Commencez par en créer un (pan, mur, dévers…).</p>
+        <p class="vide">Aucun secteur.{% if is_granted('ROLE_ADMIN') %} Commencez par en créer un (pan, mur, dévers…).{% else %} Un administrateur doit d'abord en créer un (pan, mur, dévers…).{% endif %}</p>
     {% else %}
         <ul class="liste-secteurs">
             {% for ligne in secteurs %}

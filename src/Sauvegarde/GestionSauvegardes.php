@@ -16,7 +16,7 @@ use Symfony\Component\Lock\LockFactory;
  * Une seule opération à la fois (verrou) : deux restaurations simultanées, ou une
  * sauvegarde pendant une restauration, donneraient un résultat incohérent.
  *
- * Sauvegardes automatiques : avant chaque restauration, nettoyage de secteur et mise
+ * Sauvegardes automatiques : avant chaque restauration, nettoyage ou suppression de secteur et mise
  * à jour, et quand la dernière date de plus de « sauvegardes_intervalle_jours » jours
  * (voir SauvegardeReguliereListener). Seules les N dernières automatiques sont gardées
  * (ReglageSauvegardes) ; les manuelles et importées ne sont jamais supprimées d'office.
@@ -110,6 +110,24 @@ final class GestionSauvegardes
         return $this->sousVerrou(function () use ($secteur, $admin): array {
             $avant = $this->creer(TypeSauvegarde::Automatique, "avant le nettoyage du secteur « {$secteur->getNom()} »");
             $bilan = $this->restauration->remplacer(['secteurs' => [], 'photos' => [], 'voies' => []], [(int) $secteur->getId()], null, (int) $admin->getId());
+
+            return ['avant' => $avant, 'bilan' => $bilan];
+        });
+    }
+
+    /**
+     * Supprime le secteur avec toutes ses voies et toutes ses photos, après une
+     * sauvegarde automatique (d'où il peut être restauré).
+     *
+     * @return array{avant: Sauvegarde, bilan: BilanRestauration}
+     */
+    public function supprimerSecteur(Secteur $secteur, User $admin): array
+    {
+        return $this->sousVerrou(function () use ($secteur, $admin): array {
+            $id = (int) $secteur->getId();
+            $avant = $this->creer(TypeSauvegarde::Automatique, "avant la suppression du secteur « {$secteur->getNom()} »");
+            $bilan = $this->restauration->remplacer(['secteurs' => [], 'photos' => [], 'voies' => []], [$id], null, (int) $admin->getId());
+            $this->restauration->supprimerSecteurVide($id);
 
             return ['avant' => $avant, 'bilan' => $bilan];
         });

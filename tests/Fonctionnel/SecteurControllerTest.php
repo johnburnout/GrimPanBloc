@@ -40,6 +40,29 @@ final class SecteurControllerTest extends FonctionnelTestCase
         );
     }
 
+    public function testSeulUnAdminCreeUnSecteur(): void
+    {
+        $avant = $this->em->getRepository(Secteur::class)->count();
+
+        $this->client->loginUser($this->creerUtilisateur('grimpeur'));
+        $page = $this->client->request('GET', '/secteurs');
+        self::assertCount(0, $page->selectLink('+ Nouveau secteur'));
+        $this->client->request('GET', '/secteurs/nouveau');
+        self::assertResponseStatusCodeSame(403);
+        $this->client->request('POST', '/secteurs/nouveau', ['secteur' => ['nom' => 'Intrus']]);
+        self::assertResponseStatusCodeSame(403);
+        self::assertSame($avant, $this->em->getRepository(Secteur::class)->count());
+
+        $this->client->loginUser($this->creerUtilisateur('admin', admin: true));
+        $page = $this->client->request('GET', '/secteurs');
+        $page = $this->client->click($page->selectLink('+ Nouveau secteur')->link());
+        $this->client->submit($page->filter('form[name="secteur"]')->form(['secteur[nom]' => 'Grand toit']));
+
+        self::assertResponseRedirects();
+        self::assertSame($avant + 1, $this->em->getRepository(Secteur::class)->count());
+        self::assertNotNull($this->em->getRepository(Secteur::class)->findOneBy(['nom' => 'Grand toit']));
+    }
+
     private function creerVoieSurPhoto(Photo $photo, string $nom): void
     {
         $voie = (new Voie())->setNom($nom)->setAuteur($photo->getAuteur())->setPhoto($photo);
