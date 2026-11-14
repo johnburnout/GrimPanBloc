@@ -7,6 +7,14 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Corrigé
+- **Envoi de photos depuis un téléphone Android** : les photos de 48 ou 50
+  mégapixels (souvent plus de 15 Mo) étaient refusées. Le navigateur les réduit
+  désormais avant l'envoi, à la taille que le site garde de toute façon
+  (2000 px), ce qui rend aussi l'envoi bien plus rapide.
+
 ## [1.6.0] - 2026-11-11
 
 ### Ajouté
