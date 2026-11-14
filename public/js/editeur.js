@@ -254,16 +254,101 @@
             const option = selectPhoto.selectedOptions[0];
             const src = option ? option.dataset.src : null;
             blocUpload.hidden = !!src;
-            if (src) inputFichier.value = '';
+            if (src) {
+                selection++; // une réduction encore en cours ne remettra pas le fichier
+                inputFichier.value = '';
+            }
             chargerPhoto(src);
         });
     }
 
-    inputFichier.addEventListener('change', () => {
+    /*
+     * Les photos de téléphone (50 Mpx, plus de 15 Mo sur bien des Android) dépassent
+     * les limites du serveur : on les réduit ici avant l'envoi, à la taille que le
+     * serveur garde de toute façon (PhotoOptimiseur::COTE_MAX). Le navigateur applique
+     * l'orientation EXIF en dessinant l'image : la copie est déjà redressée.
+     * En cas d'échec, le fichier d'origine part tel quel et le serveur le contrôle.
+     */
+    const COTE_MAX = 2000;
+    const TAILLE_SURE = 2 * 1024 * 1024; // en dessous, et assez petite, la photo part telle quelle
+    const formulaire = inputFichier.form;
+    const boutonsEnvoi = formulaire ? formulaire.querySelectorAll('button[type="submit"]') : [];
+    let reductionEnCours = 0;
+
+    const chargerImage = (src) => new Promise((ok, echec) => {
+        const img = new Image();
+        img.onload = () => ok(img);
+        img.onerror = echec;
+        img.src = src;
+    });
+
+    const reduire = async (fichier) => {
+        const url = URL.createObjectURL(fichier);
+        try {
+            const img = await chargerImage(url);
+            const l = img.naturalWidth, h = img.naturalHeight;
+            const ratio = Math.min(1, COTE_MAX / Math.max(l, h));
+            const formatAccepte = ['image/jpeg', 'image/png', 'image/webp'].includes(fichier.type);
+            if (ratio >= 1 && formatAccepte && fichier.size <= TAILLE_SURE) return fichier;
+
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(l * ratio));
+            canvas.height = Math.max(1, Math.round(h * ratio));
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            // PNG et WebP gardent leur format (transparence) ; tout le reste devient JPEG
+            const type = ['image/png', 'image/webp'].includes(fichier.type) ? fichier.type : 'image/jpeg';
+            const blob = await new Promise(ok => canvas.toBlob(ok, type, 0.85));
+            if (!blob) return fichier;
+            const extension = { 'image/png': 'png', 'image/webp': 'webp' }[type] ?? 'jpg';
+            const nom = fichier.name.replace(/\.[^.]*$/, '') + '.' + extension;
+
+            return new File([blob], nom, { type, lastModified: Date.now() });
+        } finally {
+            URL.revokeObjectURL(url);
+        }
+    };
+
+    const remplacerFichier = (fichier) => {
+        const dt = new DataTransfer();
+        dt.items.add(fichier);
+        inputFichier.files = dt.files;
+    };
+
+    const majBoutonsEnvoi = () => {
+        boutonsEnvoi.forEach(b => { b.disabled = reductionEnCours > 0; });
+    };
+
+    let selection = 0; // numéro du dernier choix de fichier : un choix plus récent l'emporte
+
+    inputFichier.addEventListener('change', async () => {
         const fichier = inputFichier.files[0];
+        const numero = ++selection;
         if (!fichier) return;
         if (selectPhoto) selectPhoto.value = '';
-        chargerPhoto(URL.createObjectURL(fichier));
+
+        reductionEnCours++;
+        majBoutonsEnvoi();
+        let envoye = fichier;
+        try {
+            envoye = await reduire(fichier);
+        } catch (e) {
+            envoye = fichier; // image illisible ici : le serveur dira pourquoi
+        } finally {
+            reductionEnCours--;
+            majBoutonsEnvoi();
+        }
+        if (numero !== selection) return;
+        if (envoye !== fichier) {
+            try {
+                remplacerFichier(envoye);
+            } catch (e) {
+                envoye = fichier; // navigateur sans DataTransfer : envoi de l'original
+            }
+        }
+        chargerPhoto(URL.createObjectURL(envoye));
     });
 
     // --- Dessin ------------------------------------------------------------
