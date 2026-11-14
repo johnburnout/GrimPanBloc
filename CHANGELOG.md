@@ -7,7 +7,7 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
-## [Non publié]
+## [1.6.1] - 2026-11-14
 
 ### Corrigé
 - **Envoi de photos depuis un téléphone Android** : les photos de 48 ou 50
