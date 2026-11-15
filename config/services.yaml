@@ -2,6 +2,8 @@ parameters:
     photos_dir: '%kernel.project_dir%/public/uploads/photos'
     # Sauvegardes des secteurs, voies et photos (var/ est conservé par les mises à jour)
     sauvegardes_dir: '%kernel.project_dir%/var/sauvegardes'
+    # Documents envoyés depuis l'administration (règlement intérieur), servis par l'application
+    documents_dir: '%kernel.project_dir%/var/documents'
     # Sauvegarde automatique si la dernière date de plus de N jours (0 : jamais)
     sauvegardes_intervalle_jours: 7
     # Mises à jour : dépôt GitHub dont on suit les releases (API surchargée dans les tests)
@@ -29,5 +31,6 @@ when@test:
         # Les tests n'écrivent jamais dans les vraies photos (public/uploads/)
         photos_dir: '%kernel.project_dir%/var/test/photos'
         sauvegardes_dir: '%kernel.project_dir%/var/test/sauvegardes'
+        documents_dir: '%kernel.project_dir%/var/test/documents'
         # Pas de sauvegarde déclenchée par les requêtes des tests (testée à part)
         sauvegardes_intervalle_jours: 0

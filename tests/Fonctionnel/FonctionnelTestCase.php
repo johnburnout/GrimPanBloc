@@ -44,6 +44,8 @@ abstract class FonctionnelTestCase extends WebTestCase
         }
         // Sauvegardes faites pendant le test (avant une mise à jour, un nettoyage…)
         (new Filesystem())->remove((string) static::getContainer()->getParameter('sauvegardes_dir'));
+        // Règlement intérieur envoyé pendant le test
+        (new Filesystem())->remove((string) static::getContainer()->getParameter('documents_dir'));
         parent::tearDown();
     }
 

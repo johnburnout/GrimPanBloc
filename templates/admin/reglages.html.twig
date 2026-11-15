@@ -83,6 +83,28 @@
                 {{ form_errors(salle.horaires_remarque) }}
                 {{ form_widget(salle.horaires_remarque, {attr: {maxlength: constant('App\\Site\\InformationsSalle::LONGUEUR_MAX_REMARQUE'), placeholder: 'Fermé pendant les vacances scolaires'}}) }}
             </fieldset>
+
+            {{ form_label(salle.autres, 'Autres informations') }}
+            <p class="aide">Texte libre affiché en bas de la page Informations (tarifs, accès, consignes…). Mise en forme
+                <a href="https://www.markdownguide.org/basic-syntax/" target="_blank" rel="noopener">Markdown</a> :
+                <code>**gras**</code>, <code>*italique*</code>, <code>## Titre</code>, <code>- liste</code>, <code>[lien](https://…)</code>, ligne vide entre deux paragraphes.</p>
+            {{ form_errors(salle.autres) }}
+            {{ form_widget(salle.autres, {attr: {rows: 10, class: 'saisie-markdown', maxlength: constant('App\\Site\\InformationsSalle::LONGUEUR_MAX_AUTRES')}}) }}
+
+            <fieldset class="choix">
+                <legend>Règlement intérieur</legend>
+                <p class="aide">Fichier PDF de 10 Mo au plus, proposé en lien sur la page Informations.</p>
+                {% if reglement %}
+                    <p><a href="{{ path('informations_reglement', {v: reglement.timestamp}) }}" target="_blank" rel="noopener">Règlement intérieur actuel (PDF)</a>
+                        <small>— envoyé le {{ reglement|date('d/m/Y') }}</small></p>
+                    <label class="case">{{ form_widget(salle.supprimer_reglement) }} Supprimer le règlement intérieur</label>
+                {% else %}
+                    {% do salle.supprimer_reglement.setRendered %}
+                {% endif %}
+                {{ form_label(salle.reglement, reglement ? 'Remplacer le règlement intérieur' : 'Règlement intérieur (PDF)') }}
+                {{ form_errors(salle.reglement) }}
+                {{ form_widget(salle.reglement, {attr: {accept: 'application/pdf,.pdf'}}) }}
+            </fieldset>
             <button class="btn">Enregistrer</button>
         {{ form_end(salle) }}
     </section>

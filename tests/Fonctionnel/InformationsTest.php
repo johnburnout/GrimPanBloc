@@ -80,12 +80,42 @@ final class InformationsTest extends FonctionnelTestCase
         self::assertSelectorNotExists('.caracteristiques');
     }
 
+    public function testAutresInformationsEnMarkdown(): void
+    {
+        $this->enregistrer(['autres' => "## Tarifs\n\n- **Adulte** : 40 €\n- *Enfant* : 25 €\n\n| Créneau | Public |\n|---|---|\n| Mardi | Adultes |\n\n[Inscription](https://exemple.org/inscription)"]);
+
+        $page = $this->client->request('GET', '/informations');
+
+        self::assertResponseIsSuccessful();
+        $texte = $page->filter('.texte-libre');
+        self::assertSame('Autres informations', $texte->filter('h2')->first()->text());
+        self::assertSame('Tarifs', $texte->filter('h2')->eq(1)->text());
+        self::assertSame(['Adulte : 40 €', 'Enfant : 25 €'], $texte->filter('li')->each(fn ($n) => $n->text()));
+        self::assertSame('Adulte', $texte->filter('li strong')->text());
+        self::assertSame('Enfant', $texte->filter('li em')->text());
+        self::assertSame('Adultes', $texte->filter('table td')->eq(1)->text());
+        self::assertSame('https://exemple.org/inscription', $texte->filter('a')->attr('href'));
+    }
+
+    /** Le HTML écrit dans le texte s'affiche tel quel ; les liens javascript: sont neutralisés. */
+    public function testLeMarkdownNeLaissePasPasserDeScript(): void
+    {
+        $this->enregistrer(['autres' => "<script>alert(1)</script>\n\n<img src=x onerror=alert(2)>\n\n[clic](javascript:alert(3))"]);
+
+        $page = $this->client->request('GET', '/informations');
+
+        $texte = $page->filter('.texte-libre');
+        self::assertCount(0, $texte->filter('script, img'));
+        self::assertStringContainsString('<script>alert(1)</script>', $texte->text());
+        self::assertStringNotContainsString('javascript:', (string) $texte->filter('a')->attr('href'));
+    }
+
     /** @param array<string, mixed> $infos */
     private function enregistrer(array $infos): void
     {
         static::getContainer()->get(InformationsSalle::class)->enregistrer($infos + [
             'adresse' => '', 'coordonnees' => '', 'site_web' => '', 'horaires_affiches' => false,
-            'horaires' => [], 'horaires_remarque' => '', 'hauteur' => null, 'surface' => null,
+            'horaires' => [], 'horaires_remarque' => '', 'hauteur' => null, 'surface' => null, 'autres' => '',
         ]);
     }
 }

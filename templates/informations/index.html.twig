@@ -5,7 +5,7 @@
 {% block body %}
     <h1>Informations{% if club_nom() %} — {{ club_nom() }}{% endif %}</h1>
 
-    {% if not renseigne %}
+    {% if not renseigne and not reglement %}
         <p class="vide">Les informations sur la salle n'ont pas encore été renseignées.</p>
         {% if is_granted('ROLE_ADMIN') %}
             <p><a class="btn" href="{{ path('admin_reglages') }}">Les renseigner dans les réglages</a></p>
@@ -40,7 +40,7 @@
             {% endif %}
 
             {% set horairesVisibles = infos.horaires_affiches and (infos.horaires|filter(h => h)|length > 0 or infos.horaires_remarque) %}
-            {% if infos.site_web or infos.hauteur is not null or infos.surface is not null or horairesVisibles %}
+            {% if infos.site_web or infos.hauteur is not null or infos.surface is not null or horairesVisibles or reglement %}
             <section class="carte-form-large">
                 {% if infos.site_web %}
                     <h2>Site internet</h2>
@@ -73,9 +73,20 @@
                     </table>
                     {% if infos.horaires_remarque %}<p class="aide">{{ infos.horaires_remarque }}</p>{% endif %}
                 {% endif %}
+
+                {% if reglement %}
+                    <h2>Règlement intérieur</h2>
+                    <p><a class="lien-document" href="{{ path('informations_reglement', {v: reglement.timestamp}) }}" target="_blank" rel="noopener">Lire le règlement intérieur (PDF)</a></p>
+                {% endif %}
             </section>
             {% endif %}
         </div>
+        {% if infos.autres %}
+            <section class="carte-form-large texte-libre">
+                <h2>Autres informations</h2>
+                {{ infos.autres|markdown }}
+            </section>
+        {% endif %}
         {% if is_granted('ROLE_ADMIN') %}
             <p><a href="{{ path('admin_reglages') }}">Modifier ces informations</a></p>
         {% endif %}

@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * Informations pratiques sur la salle (adresse, localisation, site internet,
- * horaires, hauteur et surface grimpable), saisies dans Administration → Réglages
+ * horaires, hauteur, surface grimpable et « Autres informations » en Markdown), saisies dans Administration → Réglages
  * et affichées sur la page « Informations ».
  *
  * Stockées dans la table « reglage » (clés « salle.* »). Lues seulement par ces
@@ -21,6 +21,7 @@ final class InformationsSalle
     public const LONGUEUR_MAX_ADRESSE = 300;
     public const LONGUEUR_MAX_HORAIRE = 100;
     public const LONGUEUR_MAX_REMARQUE = 300;
+    public const LONGUEUR_MAX_AUTRES = 20000;
 
     public function __construct(
         private readonly ReglageRepository $reglages,
@@ -32,7 +33,7 @@ final class InformationsSalle
      * Valeurs enregistrées, au format du formulaire SalleType.
      *
      * @return array{adresse: string, coordonnees: string, site_web: string, horaires_affiches: bool,
-     *     horaires: array<string, string>, horaires_remarque: string, hauteur: ?float, surface: ?int}
+     *     horaires: array<string, string>, horaires_remarque: string, hauteur: ?float, surface: ?int, autres: string}
      */
     public function lire(): array
     {
@@ -52,6 +53,7 @@ final class InformationsSalle
             'horaires_remarque' => (string) $this->reglages->valeur('salle.horaires_remarque', ''),
             'hauteur' => is_numeric($hauteur) ? (float) $hauteur : null,
             'surface' => is_numeric($surface) ? (int) $surface : null,
+            'autres' => (string) $this->reglages->valeur('salle.autres', ''),
         ];
     }
 
@@ -67,13 +69,13 @@ final class InformationsSalle
         $infos = $this->lire();
 
         return '' !== $infos['adresse'] || '' !== $infos['coordonnees'] || '' !== $infos['site_web']
-            || null !== $infos['hauteur'] || null !== $infos['surface']
+            || null !== $infos['hauteur'] || null !== $infos['surface'] || '' !== $infos['autres']
             || ($infos['horaires_affiches'] && [] !== array_filter($infos['horaires']));
     }
 
     /**
      * @param array{adresse: ?string, coordonnees: ?string, site_web: ?string, horaires_affiches: bool,
-     *     horaires: array<string, ?string>, horaires_remarque: ?string, hauteur: int|float|null, surface: ?int} $infos
+     *     horaires: array<string, ?string>, horaires_remarque: ?string, hauteur: int|float|null, surface: ?int, autres?: ?string} $infos
      */
     public function enregistrer(array $infos): void
     {
@@ -91,6 +93,8 @@ final class InformationsSalle
         $this->reglages->definir('salle.horaires_remarque', trim((string) $infos['horaires_remarque']));
         $this->reglages->definir('salle.hauteur', null === $infos['hauteur'] ? '' : (string) round((float) $infos['hauteur'], 1));
         $this->reglages->definir('salle.surface', null === $infos['surface'] ? '' : (string) (int) $infos['surface']);
+        // Espaces de fin de ligne conservés : deux espaces = retour à la ligne en Markdown
+        $this->reglages->definir('salle.autres', trim(str_replace("\r\n", "\n", (string) ($infos['autres'] ?? '')), "\n"));
         $this->em->flush();
     }
 

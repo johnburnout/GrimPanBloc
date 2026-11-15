@@ -15,6 +15,7 @@ use App\Repository\UserRepository;
 use App\Site\IdentiteClub;
 use App\Site\InformationsSalle;
 use App\Site\ReglageHttps;
+use App\Site\ReglementInterieur;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
@@ -41,6 +42,7 @@ class AdminReglagesController extends AbstractController
         private readonly IdentiteClub $club,
         private readonly ReglageHttps $https,
         private readonly InformationsSalle $salle,
+        private readonly ReglementInterieur $reglement,
     ) {
     }
 
@@ -103,9 +105,18 @@ class AdminReglagesController extends AbstractController
     {
         $form = $this->formulaire('salle', $admin)->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->salle->enregistrer($form->getData());
+            try {
+                if ($form->get('supprimer_reglement')->getData()) {
+                    $this->reglement->supprimer();
+                } elseif (null !== $fichier = $form->get('reglement')->getData()) {
+                    $this->reglement->definir($fichier);
+                }
+                $this->salle->enregistrer($form->getData());
 
-            return $this->enregistre('Informations sur la salle enregistrées.');
+                return $this->enregistre('Informations sur la salle enregistrées.');
+            } catch (\InvalidArgumentException $e) {
+                $form->get('reglement')->addError(new FormError($e->getMessage()));
+            }
         }
 
         return $this->page($request, $admin, $form);
@@ -223,6 +234,7 @@ class AdminReglagesController extends AbstractController
             'forcerHttps' => $this->https->actif(),
             'enHttps' => $request->isSecure(),
             'clubLogo' => $this->club->logo(),
+            'reglement' => $this->reglement->modifieLe(),
             'smtpDefini' => $this->smtp->lire()['mot_de_passe_defini'],
             'smtpConfigure' => $this->smtp->estConfigure(),
             'nbTous' => $this->utilisateurs->nombreActifs(),

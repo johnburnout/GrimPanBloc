@@ -451,3 +451,14 @@ fieldset.choix { border: 0; padding: 0; margin: .5rem 0; }
 .grille-horaires { display: grid; grid-template-columns: auto 1fr; gap: .35rem .75rem; align-items: center; max-width: 30rem; }
 .grille-horaires label { margin: 0; font-weight: normal; }
 .grille-horaires > div { margin: 0; }
+.lien-document { font-weight: 600; }
+
+/* « Autres informations » : texte Markdown */
+.saisie-markdown { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .92rem; }
+.texte-libre h1, .texte-libre h2:not(:first-child), .texte-libre h3, .texte-libre h4 { font-size: 1.05rem; margin: 1.25rem 0 .5rem; }
+.texte-libre > :last-child { margin-bottom: 0; }
+.texte-libre img { max-width: 100%; height: auto; }
+.texte-libre table { border-collapse: collapse; display: block; overflow-x: auto; }
+.texte-libre th, .texte-libre td { border: 1px solid var(--bord); padding: .35rem .6rem; text-align: left; }
+.texte-libre blockquote { margin: .75rem 0; padding-left: 1rem; border-left: 3px solid var(--bord); color: var(--texte-doux); }
+.texte-libre code { background: var(--fond); padding: .1rem .3rem; border-radius: 4px; }

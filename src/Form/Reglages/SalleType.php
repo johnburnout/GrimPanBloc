@@ -3,8 +3,10 @@
 namespace App\Form\Reglages;
 
 use App\Site\InformationsSalle;
+use App\Site\ReglementInterieur;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
@@ -13,6 +15,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\UrlType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Callback;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Range;
 use Symfony\Component\Validator\Constraints\Url;
@@ -20,7 +23,8 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Informations pratiques sur la salle (voir InformationsSalle), affichées sur la
- * page « Informations ». Tous les champs sont facultatifs.
+ * page « Informations », et règlement intérieur en PDF (voir ReglementInterieur).
+ * Tous les champs sont facultatifs.
  *
  * @extends AbstractType<array<string, mixed>>
  */
@@ -72,6 +76,21 @@ final class SalleType extends AbstractType
                 'required' => false,
                 'invalid_message' => 'Surface invalide.',
                 'constraints' => [new Range(min: 1, max: 100000, notInRangeMessage: 'La surface doit être comprise entre {{ min }} et {{ max }} m².')],
+            ])
+            ->add('autres', TextareaType::class, $texte + [
+                'trim' => false,
+                'constraints' => [new Length(max: InformationsSalle::LONGUEUR_MAX_AUTRES, maxMessage: 'Texte trop long ({{ limit }} caractères au plus).')],
+            ])
+            ->add('supprimer_reglement', CheckboxType::class, ['required' => false, 'mapped' => false])
+            ->add('reglement', FileType::class, [
+                'required' => false,
+                'mapped' => false,
+                'constraints' => [new File(
+                    maxSize: ReglementInterieur::TAILLE_MAX,
+                    mimeTypes: ['application/pdf'],
+                    maxSizeMessage: 'Le règlement intérieur ne doit pas dépasser 10 Mo.',
+                    mimeTypesMessage: 'Le règlement intérieur doit être un fichier PDF.',
+                )],
             ]);
     }
 

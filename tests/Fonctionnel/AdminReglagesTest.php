@@ -157,6 +157,7 @@ final class AdminReglagesTest extends FonctionnelTestCase
             'mardi' => '18 h – 22 h',
             'samedi' => ' 14 h – 18 h',
             'horaires_remarque' => 'Fermé en août',
+            'autres' => "\r\n## Accès  \r\nParking   gratuit\r\n",
         ]);
 
         self::assertResponseRedirects('/admin/reglages');
@@ -171,11 +172,12 @@ final class AdminReglagesTest extends FonctionnelTestCase
         self::assertSame(['lundi' => '', 'mardi' => '18 h – 22 h', 'mercredi' => '', 'jeudi' => '', 'vendredi' => '',
             'samedi' => '14 h – 18 h', 'dimanche' => ''], $infos['horaires']);
         self::assertSame('Fermé en août', $infos['horaires_remarque']);
+        self::assertSame("## Accès  \nParking   gratuit", $infos['autres'], 'Espaces internes gardés (Markdown), lignes vides du début et de la fin retirées.');
 
         // Le formulaire est prérempli ; tout vider efface les informations
         self::assertSame('44.83121, 1.32543', $this->section('Informations sur la salle')->filter('input[name$="[coordonnees]"]')->attr('value'));
         $this->soumettre('Informations sur la salle', ['adresse' => '', 'coordonnees' => '', 'site_web' => '', 'hauteur' => '',
-            'surface' => '', 'horaires_affiches' => false, 'mardi' => '', 'samedi' => '', 'horaires_remarque' => '']);
+            'surface' => '', 'horaires_affiches' => false, 'mardi' => '', 'samedi' => '', 'horaires_remarque' => '', 'autres' => '']);
         self::assertResponseRedirects();
         self::assertFalse(static::getContainer()->get(InformationsSalle::class)->estRenseigne());
     }
@@ -190,6 +192,7 @@ final class AdminReglagesTest extends FonctionnelTestCase
         yield 'hauteur nulle' => [['hauteur' => '0'], 'La hauteur doit être comprise'];
         yield 'hauteur non numérique' => [['hauteur' => 'haut'], 'Hauteur invalide.'];
         yield 'surface' => [['surface' => '-3'], 'La surface doit être comprise'];
+        yield 'autres informations' => [['autres' => str_repeat('a', 20001)], 'Texte trop long'];
     }
 
     /** @param array<string, string> $saisie */
@@ -200,6 +203,53 @@ final class AdminReglagesTest extends FonctionnelTestCase
 
         $this->assertErreurAffichee($message);
         self::assertNull($this->reglage('salle.adresse'));
+    }
+
+    /** Envoi, remplacement puis suppression du règlement intérieur, vus depuis la page Informations. */
+    public function testReglementInterieurEnvoyeRemplacePuisSupprime(): void
+    {
+        $this->client->request('GET', '/informations');
+        self::assertSelectorNotExists('a.lien-document');
+
+        $this->soumettre('Informations sur la salle', [], ['reglement' => $this->pdf('Version 1')]);
+        self::assertResponseRedirects('/admin/reglages');
+        self::assertContains('Informations sur la salle enregistrées.', $this->flashsApresRedirection('success'));
+        self::assertSelectorTextContains('main', 'Règlement intérieur actuel (PDF)');
+
+        $page = $this->client->request('GET', '/informations');
+        $lien = $page->filter('a.lien-document');
+        self::assertCount(1, $lien, 'Le lien apparaît, même sans autre information renseignée.');
+        $this->client->request('GET', (string) $lien->attr('href'));
+        self::assertResponseIsSuccessful();
+        self::assertResponseHeaderSame('Content-Type', 'application/pdf');
+        self::assertStringStartsWith('inline; filename=reglement-interieur.pdf', (string) $this->client->getResponse()->headers->get('Content-Disposition'));
+        self::assertStringContainsString('Version 1', $this->pdfRecu());
+
+        $this->soumettre('Informations sur la salle', [], ['reglement' => $this->pdf('Version 2')]);
+        self::assertResponseRedirects();
+        $this->client->request('GET', '/informations/reglement-interieur.pdf');
+        self::assertStringContainsString('Version 2', $this->pdfRecu());
+
+        $this->soumettre('Informations sur la salle', ['supprimer_reglement' => '1']);
+        self::assertResponseRedirects();
+        $this->client->request('GET', '/informations/reglement-interieur.pdf');
+        self::assertResponseStatusCodeSame(404);
+        $this->client->request('GET', '/informations');
+        self::assertSelectorNotExists('a.lien-document');
+    }
+
+    public function testUnReglementQuiNEstPasUnPdfEstRefuse(): void
+    {
+        $faux = tempnam(sys_get_temp_dir(), 'reglement');
+        file_put_contents($faux, '<html><script>alert(1)</script></html>');
+
+        $this->soumettre('Informations sur la salle', ['adresse' => '1 rue du Rocher'],
+            ['reglement' => new UploadedFile($faux, 'reglement.pdf', 'application/pdf', null, true)]);
+
+        $this->assertErreurAffichee('Le règlement intérieur doit être un fichier PDF.');
+        self::assertNull($this->reglage('salle.adresse'), 'Rien n\'est enregistré.');
+        $this->client->request('GET', '/informations/reglement-interieur.pdf');
+        self::assertResponseStatusCodeSame(404);
     }
 
     // --- SMTP ---------------------------------------------------------------
@@ -377,6 +427,25 @@ final class AdminReglagesTest extends FonctionnelTestCase
         }
 
         $this->client->request($form->getMethod(), $form->getUri(), $donnees, $envois);
+    }
+
+    private function pdfRecu(): string
+    {
+        $reponse = $this->client->getResponse();
+        self::assertInstanceOf(\Symfony\Component\HttpFoundation\BinaryFileResponse::class, $reponse);
+
+        return (string) file_get_contents($reponse->getFile()->getPathname());
+    }
+
+    /** Petit PDF valide contenant $texte. */
+    private function pdf(string $texte): UploadedFile
+    {
+        $contenu = "%PDF-1.4\n1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n"
+            ."2 0 obj << /Type /Pages /Kids [] /Count 0 >> endobj\n% $texte\ntrailer << /Root 1 0 R >>\n%%EOF\n";
+        $chemin = tempnam(sys_get_temp_dir(), 'reglement');
+        file_put_contents($chemin, $contenu);
+
+        return new UploadedFile($chemin, 'reglement.pdf', 'application/pdf', null, true);
     }
 
     private function assertErreurAffichee(string $message): void
