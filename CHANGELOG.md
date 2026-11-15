@@ -7,6 +7,19 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Ajouté
+- **Page « Informations »**, accessible à tous depuis le lien « Infos » du menu :
+  adresse de la salle avec une carte OpenStreetMap et des liens vers
+  OpenStreetMap, Google Maps et l'itinéraire, site internet, hauteur, surface
+  grimpable et horaires d'ouverture. Seul ce qui est renseigné s'affiche.
+- **Informations sur la salle** dans Administration → Réglages : adresse
+  postale, localisation (latitude et longitude copiées depuis une carte en
+  ligne), site internet, hauteur, surface grimpable et horaires jour par jour,
+  avec une remarque. Les horaires ne s'affichent que si la case « Afficher les
+  horaires d'ouverture » est cochée.
+
 ## [1.10.0] - 2026-11-15
 
 ### Ajouté
