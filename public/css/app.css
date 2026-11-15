@@ -122,7 +122,7 @@ h2, h3 { font-weight: 650; }
 
 form label { display: block; font-weight: 600; margin: .75rem 0 .25rem; }
 form label.case, .filtres label { font-weight: normal; }
-input[type=text], input[type=email], input[type=password], input[type=file], select, textarea {
+input[type=text], input[type=email], input[type=password], input[type=file], input[type=url], input[type=number], select, textarea {
     width: 100%; font: inherit; padding: .55rem .7rem;
     border: 1px solid var(--bord); border-radius: 8px; background: #fff;
 }
@@ -432,3 +432,22 @@ fieldset.choix { border: 0; padding: 0; margin: .5rem 0; }
     .table-voies th, .table-voies td { padding: .45rem .5rem; }
     .table-voies .col-miniature .photo-voie { width: 72px; }
 }
+
+/* Page « Informations » et son formulaire dans les réglages */
+.infos-salle { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: 0 1rem; align-items: start; }
+.infos-salle h2 + * { margin-top: 0; }
+.infos-salle section > h2:not(:first-child) { margin-top: 1.25rem; }
+.infos-salle address { font-style: normal; margin-bottom: .75rem; }
+.carte-salle { display: block; width: 100%; height: 300px; border: 1px solid var(--bord); border-radius: var(--rayon); }
+.liens-carte { display: flex; flex-wrap: wrap; gap: .25rem 1rem; margin: .75rem 0 0; }
+.site-salle { word-break: break-all; font-weight: 600; }
+.caracteristiques { display: grid; grid-template-columns: auto 1fr; gap: .25rem 1rem; margin: 0; }
+.caracteristiques dt { color: var(--texte-doux); }
+.caracteristiques dd { margin: 0; font-weight: 600; }
+.horaires { border-collapse: collapse; }
+.horaires th, .horaires td { text-align: left; padding: .25rem 1rem .25rem 0; }
+.horaires th { font-weight: 600; }
+.horaires tr.ferme td { color: var(--texte-doux); }
+.grille-horaires { display: grid; grid-template-columns: auto 1fr; gap: .35rem .75rem; align-items: center; max-width: 30rem; }
+.grille-horaires label { margin: 0; font-weight: normal; }
+.grille-horaires > div { margin: 0; }

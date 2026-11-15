@@ -24,6 +24,7 @@
     <nav>
         <a href="{{ path('app_home') }}">Voies</a>
         <a href="{{ path('secteur_index') }}">Secteurs</a>
+        <a href="{{ path('informations') }}">Infos</a>
         {% if is_granted('ROLE_ADMIN') %}
             <a href="{{ path('admin') }}">Administration</a>
         {% endif %}

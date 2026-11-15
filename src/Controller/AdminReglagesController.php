@@ -7,11 +7,13 @@ use App\Form\Reglages\ClubType;
 use App\Form\Reglages\EnvoiGroupeType;
 use App\Form\Reglages\HttpsType;
 use App\Form\Reglages\MailTestType;
+use App\Form\Reglages\SalleType;
 use App\Form\Reglages\SmtpType;
 use App\Mail\MailerSite;
 use App\Mail\ReglagesSmtp;
 use App\Repository\UserRepository;
 use App\Site\IdentiteClub;
+use App\Site\InformationsSalle;
 use App\Site\ReglageHttps;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormError;
@@ -24,7 +26,7 @@ use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Réglages du site. Une seule page (GET), cinq formulaires postant chacun vers
+ * Réglages du site. Une seule page (GET), six formulaires postant chacun vers
  * sa route ; un formulaire invalide est réaffiché avec ses erreurs, les autres
  * avec les valeurs enregistrées.
  */
@@ -38,6 +40,7 @@ class AdminReglagesController extends AbstractController
         private readonly UserRepository $utilisateurs,
         private readonly IdentiteClub $club,
         private readonly ReglageHttps $https,
+        private readonly InformationsSalle $salle,
     ) {
     }
 
@@ -90,6 +93,19 @@ class AdminReglagesController extends AbstractController
             } catch (\InvalidArgumentException $e) {
                 $form->get('logo')->addError(new FormError($e->getMessage()));
             }
+        }
+
+        return $this->page($request, $admin, $form);
+    }
+
+    #[Route('/reglages/salle', name: 'admin_reglages_salle', methods: ['POST'])]
+    public function salle(Request $request, #[CurrentUser] User $admin): Response
+    {
+        $form = $this->formulaire('salle', $admin)->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->salle->enregistrer($form->getData());
+
+            return $this->enregistre('Informations sur la salle enregistrées.');
         }
 
         return $this->page($request, $admin, $form);
@@ -177,6 +193,7 @@ class AdminReglagesController extends AbstractController
         [$type, $donnees] = match ($section) {
             'https' => [HttpsType::class, ['forcer_https' => $this->https->actif()]],
             'club' => [ClubType::class, ['nom_club' => $this->club->nom(), 'supprimer_logo' => false, 'logo' => null]],
+            'salle' => [SalleType::class, $this->salle->lire()],
             'smtp' => [SmtpType::class, $this->smtp->lire()],
             'mail_test' => [MailTestType::class, ['destinataire' => $admin->getEmail()]],
             'envoi_groupe' => [EnvoiGroupeType::class, ['cible' => 'tous', 'objet' => '', 'corps' => '']],
@@ -198,7 +215,7 @@ class AdminReglagesController extends AbstractController
     private function page(Request $request, User $admin, ?FormInterface $soumis = null): Response
     {
         $formulaires = [];
-        foreach (['https', 'club', 'smtp', 'mail_test', 'envoi_groupe'] as $section) {
+        foreach (['https', 'club', 'salle', 'smtp', 'mail_test', 'envoi_groupe'] as $section) {
             $formulaires[$section] = $soumis && $soumis->getName() === $section ? $soumis : $this->formulaire($section, $admin);
         }
 

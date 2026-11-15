@@ -1,0 +1,83 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Informations · {{ club_nom() ?: 'GrimPanBloc' }}{% endblock %}
+
+{% block body %}
+    <h1>Informations{% if club_nom() %} — {{ club_nom() }}{% endif %}</h1>
+
+    {% if not renseigne %}
+        <p class="vide">Les informations sur la salle n'ont pas encore été renseignées.</p>
+        {% if is_granted('ROLE_ADMIN') %}
+            <p><a class="btn" href="{{ path('admin_reglages') }}">Les renseigner dans les réglages</a></p>
+        {% endif %}
+    {% else %}
+        <div class="infos-salle">
+            {% if infos.adresse or position %}
+                <section class="carte-form-large infos-lieu">
+                    <h2>Adresse</h2>
+                    {% if infos.adresse %}
+                        <address>{{ infos.adresse|nl2br }}</address>
+                    {% endif %}
+                    {% if position %}
+                        {% set lat = position[0] %}{% set lon = position[1] %}
+                        <iframe class="carte-salle" title="Carte : emplacement de la salle"
+                                src="https://www.openstreetmap.org/export/embed.html?bbox={{ [lon - 0.006, lat - 0.004, lon + 0.006, lat + 0.004]|join(',') }}&amp;layer=mapnik&amp;marker={{ lat }},{{ lon }}"
+                                loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                        {% set requete = lat ~ ',' ~ lon %}
+                    {% else %}
+                        {% set requete = infos.adresse|split("\n")|map(l => l|trim)|filter(l => l)|join(', ') %}
+                    {% endif %}
+                    <p class="liens-carte">
+                        {% if position %}
+                            <a href="https://www.openstreetmap.org/?mlat={{ position[0] }}&amp;mlon={{ position[1] }}#map=17/{{ position[0] }}/{{ position[1] }}" target="_blank" rel="noopener">Voir sur OpenStreetMap</a>
+                        {% else %}
+                            <a href="https://www.openstreetmap.org/search?query={{ requete|url_encode }}" target="_blank" rel="noopener">Voir sur OpenStreetMap</a>
+                        {% endif %}
+                        <a href="https://www.google.com/maps/search/?api=1&amp;query={{ requete|url_encode }}" target="_blank" rel="noopener">Google Maps</a>
+                        <a href="https://www.google.com/maps/dir/?api=1&amp;destination={{ requete|url_encode }}" target="_blank" rel="noopener">Itinéraire</a>
+                    </p>
+                </section>
+            {% endif %}
+
+            {% set horairesVisibles = infos.horaires_affiches and (infos.horaires|filter(h => h)|length > 0 or infos.horaires_remarque) %}
+            {% if infos.site_web or infos.hauteur is not null or infos.surface is not null or horairesVisibles %}
+            <section class="carte-form-large">
+                {% if infos.site_web %}
+                    <h2>Site internet</h2>
+                    <p><a href="{{ infos.site_web }}" target="_blank" rel="noopener" class="site-salle">{{ infos.site_web|replace({'https://': '', 'http://': ''})|trim('/', 'right') }}</a></p>
+                {% endif %}
+
+                {% if infos.hauteur is not null or infos.surface is not null %}
+                    <h2>La salle</h2>
+                    <dl class="caracteristiques">
+                        {% if infos.hauteur is not null %}
+                            <dt>Hauteur</dt>
+                            <dd>{{ infos.hauteur|number_format(infos.hauteur == infos.hauteur|round ? 0 : 1, ',', ' ') }} m</dd>
+                        {% endif %}
+                        {% if infos.surface is not null %}
+                            <dt>Surface grimpable</dt>
+                            <dd>{{ infos.surface|number_format(0, ',', ' ') }} m²</dd>
+                        {% endif %}
+                    </dl>
+                {% endif %}
+
+                {% if horairesVisibles %}
+                    <h2>Horaires d'ouverture</h2>
+                    <table class="horaires">
+                        {% for jour, libelle in constant('App\\Site\\InformationsSalle::JOURS') %}
+                            <tr{% if not infos.horaires[jour] %} class="ferme"{% endif %}>
+                                <th scope="row">{{ libelle }}</th>
+                                <td>{{ infos.horaires[jour] ?: 'Fermé' }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    {% if infos.horaires_remarque %}<p class="aide">{{ infos.horaires_remarque }}</p>{% endif %}
+                {% endif %}
+            </section>
+            {% endif %}
+        </div>
+        {% if is_granted('ROLE_ADMIN') %}
+            <p><a href="{{ path('admin_reglages') }}">Modifier ces informations</a></p>
+        {% endif %}
+    {% endif %}
+{% endblock %}

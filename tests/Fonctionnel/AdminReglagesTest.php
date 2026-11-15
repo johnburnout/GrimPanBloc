@@ -5,6 +5,7 @@ namespace App\Tests\Fonctionnel;
 use App\Mail\ReglagesSmtp;
 use App\Repository\ReglageRepository;
 use App\Site\IdentiteClub;
+use App\Site\InformationsSalle;
 use App\Site\ReglageHttps;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -140,6 +141,65 @@ final class AdminReglagesTest extends FonctionnelTestCase
 
         $this->assertErreurAffichee('Le logo dépasse 25 mégapixels');
         self::assertSame('', (string) $this->reglage('club.logo'));
+    }
+
+    // --- Informations sur la salle ------------------------------------------
+
+    public function testEnregistrerLesInformationsSurLaSalle(): void
+    {
+        $this->soumettre('Informations sur la salle', [
+            'adresse' => " Gymnase\n12 route du Causse ",
+            'coordonnees' => '44,83121 1,32543',
+            'site_web' => 'grimpeurs-du-causse.fr',
+            'hauteur' => '4.5',
+            'surface' => '250',
+            'horaires_affiches' => '1',
+            'mardi' => '18 h – 22 h',
+            'samedi' => ' 14 h – 18 h',
+            'horaires_remarque' => 'Fermé en août',
+        ]);
+
+        self::assertResponseRedirects('/admin/reglages');
+        self::assertContains('Informations sur la salle enregistrées.', $this->flashsApresRedirection('success'));
+        $infos = static::getContainer()->get(InformationsSalle::class)->lire();
+        self::assertSame('Gymnase'."\n".'12 route du Causse', $infos['adresse']);
+        self::assertSame('44.83121, 1.32543', $infos['coordonnees']);
+        self::assertSame('https://grimpeurs-du-causse.fr', $infos['site_web'], 'Le protocole est ajouté.');
+        self::assertSame(4.5, $infos['hauteur']);
+        self::assertSame(250, $infos['surface']);
+        self::assertTrue($infos['horaires_affiches']);
+        self::assertSame(['lundi' => '', 'mardi' => '18 h – 22 h', 'mercredi' => '', 'jeudi' => '', 'vendredi' => '',
+            'samedi' => '14 h – 18 h', 'dimanche' => ''], $infos['horaires']);
+        self::assertSame('Fermé en août', $infos['horaires_remarque']);
+
+        // Le formulaire est prérempli ; tout vider efface les informations
+        self::assertSame('44.83121, 1.32543', $this->section('Informations sur la salle')->filter('input[name$="[coordonnees]"]')->attr('value'));
+        $this->soumettre('Informations sur la salle', ['adresse' => '', 'coordonnees' => '', 'site_web' => '', 'hauteur' => '',
+            'surface' => '', 'horaires_affiches' => false, 'mardi' => '', 'samedi' => '', 'horaires_remarque' => '']);
+        self::assertResponseRedirects();
+        self::assertFalse(static::getContainer()->get(InformationsSalle::class)->estRenseigne());
+    }
+
+    /** @return iterable<string, array{array<string, string>, string}> */
+    public static function saisiesSalleInvalides(): iterable
+    {
+        yield 'coordonnées illisibles' => [['coordonnees' => 'Veyrignac'], 'Coordonnées invalides'];
+        yield 'latitude hors limites' => [['coordonnees' => '144.8, 1.3'], 'Coordonnées invalides'];
+        yield 'site internet' => [['site_web' => 'pas un site'], 'Adresse du site internet invalide.'];
+        yield 'site en javascript:' => [['site_web' => 'javascript:alert(1)'], 'Adresse du site internet invalide.'];
+        yield 'hauteur nulle' => [['hauteur' => '0'], 'La hauteur doit être comprise'];
+        yield 'hauteur non numérique' => [['hauteur' => 'haut'], 'Hauteur invalide.'];
+        yield 'surface' => [['surface' => '-3'], 'La surface doit être comprise'];
+    }
+
+    /** @param array<string, string> $saisie */
+    #[\PHPUnit\Framework\Attributes\DataProvider('saisiesSalleInvalides')]
+    public function testSaisieSalleInvalide(array $saisie, string $message): void
+    {
+        $this->soumettre('Informations sur la salle', $saisie + ['adresse' => '1 rue du Rocher']);
+
+        $this->assertErreurAffichee($message);
+        self::assertNull($this->reglage('salle.adresse'));
     }
 
     // --- SMTP ---------------------------------------------------------------

@@ -46,6 +46,48 @@
     </section>
 
     <section class="carte-form-large">
+        <h2>Informations sur la salle</h2>
+        <p class="aide">Affichées sur la page <a href="{{ path('informations') }}">Informations</a>, accessible à tous depuis le menu. Tous les champs sont facultatifs : ce qui est vide n'est pas affiché.</p>
+        {{ form_start(salle) }}
+            {{ form_errors(salle) }}
+            {{ form_label(salle.adresse, 'Adresse postale') }}
+            {{ form_errors(salle.adresse) }}
+            {{ form_widget(salle.adresse, {attr: {rows: 3, maxlength: constant('App\\Site\\InformationsSalle::LONGUEUR_MAX_ADRESSE'), placeholder: "Salle des sports\n12 route du Causse\n24370 Veyrignac"}}) }}
+
+            {{ form_label(salle.coordonnees, 'Localisation sur la carte (latitude, longitude)') }}
+            {{ form_errors(salle.coordonnees) }}
+            {{ form_widget(salle.coordonnees, {attr: {placeholder: '44.8312, 1.3254', inputmode: 'decimal'}}) }}
+            <p class="aide">Dans OpenStreetMap ou Google Maps, un clic droit sur l'emplacement de la salle affiche ses coordonnées : copiez-les ici. Une carte s'affichera sur la page Informations.</p>
+
+            {{ form_label(salle.site_web, 'Site internet') }}
+            {{ form_errors(salle.site_web) }}
+            {{ form_widget(salle.site_web, {attr: {placeholder: 'https://www.exemple.org'}}) }}
+
+            <div class="ligne-form">
+                <div>{{ form_label(salle.hauteur, 'Hauteur (m)') }}{{ form_errors(salle.hauteur) }}{{ form_widget(salle.hauteur, {attr: {min: 0.5, max: 100, step: 0.1, placeholder: '4,5'}}) }}</div>
+                <div>{{ form_label(salle.surface, 'Surface grimpable (m²)') }}{{ form_errors(salle.surface) }}{{ form_widget(salle.surface, {type: 'number', attr: {min: 1, max: 100000, placeholder: '250'}}) }}</div>
+            </div>
+
+            <fieldset class="choix">
+                <legend>Horaires d'ouverture</legend>
+                <label class="case">{{ form_widget(salle.horaires_affiches) }} Afficher les horaires d'ouverture sur la page Informations</label>
+                <p class="aide">Une ligne par jour, par exemple « 18 h – 22 h ». Laissez vide les jours de fermeture.</p>
+                {{ form_errors(salle.horaires) }}
+                <div class="grille-horaires">
+                    {% for jour, libelle in constant('App\\Site\\InformationsSalle::JOURS') %}
+                        {{ form_label(salle.horaires[jour], libelle) }}
+                        <div>{{ form_errors(salle.horaires[jour]) }}{{ form_widget(salle.horaires[jour], {attr: {maxlength: constant('App\\Site\\InformationsSalle::LONGUEUR_MAX_HORAIRE'), placeholder: 'Fermé'}}) }}</div>
+                    {% endfor %}
+                </div>
+                {{ form_label(salle.horaires_remarque, 'Remarque sur les horaires') }}
+                {{ form_errors(salle.horaires_remarque) }}
+                {{ form_widget(salle.horaires_remarque, {attr: {maxlength: constant('App\\Site\\InformationsSalle::LONGUEUR_MAX_REMARQUE'), placeholder: 'Fermé pendant les vacances scolaires'}}) }}
+            </fieldset>
+            <button class="btn">Enregistrer</button>
+        {{ form_end(salle) }}
+    </section>
+
+    <section class="carte-form-large">
         <h2>Serveur d'envoi des mails (SMTP)</h2>
         <p class="aide">Les informations sont fournies par votre hébergeur ou votre messagerie. Le mot de passe est enregistré chiffré.</p>
         {{ form_start(smtp, {attr: {autocomplete: 'off', class: 'grille-form'}}) }}
