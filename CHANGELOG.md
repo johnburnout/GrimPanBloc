@@ -7,6 +7,13 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [2.0.1] - 2026-11-15
+
+### Modifié
+- **Choix de la langue** : un petit menu déroulant dans le pied de page
+  remplace la liste des langues. La page se recharge dans la langue choisie
+  dès la sélection.
+
 ## [2.0.0] - 2026-11-15
 
 ### Ajouté
