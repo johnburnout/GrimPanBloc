@@ -7,6 +7,25 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Ajouté
+- **Deux modes d'affichage des voies**, sur l'accueil comme sur la page d'un
+  secteur : **icônes** ou **liste**.
+  - En icônes : un curseur règle la **taille des icônes** ; le **tri** (cotation,
+    nom, secteur, ouvreur ; croissant ou décroissant) se choisit avec les
+    filtres, puis « Valider ».
+  - En liste : colonnes nom, cotation, secteur et ouvreur ; un clic sur un
+    **en-tête de colonne** trie par celle-ci, un second clic inverse l'ordre.
+    Une case à cocher affiche ou non une **miniature** de chaque voie.
+  - La taille des icônes et l'affichage des miniatures sont retenus par le
+    navigateur.
+
+### Modifié
+- **Mêmes filtres partout** : la page d'un secteur propose maintenant les filtres
+  par échelle et difficulté de l'accueil (le filtre par secteur reste sur
+  l'accueil). Le bouton « Filtrer » devient « Valider » et applique filtres et tri.
+
 ## [1.7.0] - 2026-11-15
 
 ### Ajouté
