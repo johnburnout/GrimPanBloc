@@ -18,5 +18,9 @@
 
     {% if secteur.description %}<p>{{ secteur.description|nl2br }}</p>{% endif %}
 
-    {{ include('voie/_liste.html.twig') }}
+    {{ include('voie/_explorateur.html.twig') }}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/voies.js') }}" defer></script>
 {% endblock %}

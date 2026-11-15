@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Dto\CriteresVoies;
 use App\Entity\Secteur;
 use App\Form\SecteurType;
 use App\Repository\SecteurRepository;
@@ -10,6 +11,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -42,11 +44,12 @@ class SecteurController extends AbstractController
     }
 
     #[Route('/{id}', name: 'secteur_show', requirements: ['id' => '\d+'])]
-    public function show(Secteur $secteur, VoieRepository $voies): Response
+    public function show(Secteur $secteur, VoieRepository $voies, #[MapQueryString] CriteresVoies $criteres = new CriteresVoies()): Response
     {
         return $this->render('secteur/show.html.twig', [
             'secteur' => $secteur,
-            'voies' => $voies->rechercher($secteur),
+            'voies' => $voies->rechercher($criteres, $secteur),
+            'criteres' => $criteres,
         ]);
     }
 }

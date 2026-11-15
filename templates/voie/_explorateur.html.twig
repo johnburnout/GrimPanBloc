@@ -1,0 +1,143 @@
+{#
+    Liste de voies avec filtres, tri et mode d'affichage (icônes ou liste).
+    Variables : voies, criteres (App\Dto\CriteresVoies),
+                secteurs (optionnelle : sans elle, page d'un secteur, pas de filtre ni de colonne secteur)
+#}
+{% set global = secteurs is defined %}
+{% set route = app.current_route %}
+{% set routeParams = app.current_route_parameters %}
+{% set tris = global
+    ? {cotation: 'Cotation', nom: 'Nom', secteur: 'Secteur', ouvreur: 'Ouvreur'}
+    : {cotation: 'Cotation', nom: 'Nom', ouvreur: 'Ouvreur'} %}
+
+<form method="get" action="{{ path(route, routeParams) }}" class="filtres" id="filtres-voies">
+    <input type="hidden" name="vue" value="{{ criteres.vue }}">
+
+    {% if global %}
+        <label>Secteur
+            <select name="secteur">
+                <option value="">Tous</option>
+                {% for s in secteurs %}
+                    <option value="{{ s.id }}" {{ criteres.secteurId == s.id ? 'selected' }}>{{ s.nom }}</option>
+                {% endfor %}
+            </select>
+        </label>
+    {% endif %}
+
+    <label>Échelle
+        <select name="systeme" data-filtre-systeme>
+            <option value="">Toutes</option>
+            {% for s in enum_cases('App\\Enum\\SystemeCotation') %}
+                <option value="{{ s.value }}" {{ criteres.systemeCotation == s ? 'selected' }}>{{ s.value == 'fr' ? 'Française' : 'Couleurs' }}</option>
+            {% endfor %}
+        </select>
+    </label>
+
+    {% for s in enum_cases('App\\Enum\\SystemeCotation') %}
+        <fieldset class="plage" data-systeme="{{ s.value }}">
+            {% for borne, libelle in {min: 'De', max: 'à'} %}
+                {% set choisie = criteres.systemeCotation == s ? (borne == 'min' ? criteres.cotationMin : criteres.cotationMax) : null %}
+                <label>{{ libelle }}
+                    <select name="{{ borne }}">
+                        <option value="">—</option>
+                        {% for c in s.cotations %}
+                            <option value="{{ c.value }}" {{ choisie == c ? 'selected' }}>{{ c.libelle }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+            {% endfor %}
+        </fieldset>
+    {% endfor %}
+
+    {% if criteres.estListe %}
+        {# En liste, le tri se choisit par les en-têtes de colonne : on le garde tel quel #}
+        <input type="hidden" name="tri" value="{{ criteres.tri }}">
+        <input type="hidden" name="ordre" value="{{ criteres.ordre }}">
+    {% else %}
+        <label>Trier par
+            <select name="tri">
+                {% for valeur, libelle in tris %}
+                    <option value="{{ valeur }}" {{ criteres.tri == valeur ? 'selected' }}>{{ libelle }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>Ordre
+            <select name="ordre">
+                <option value="asc" {{ criteres.ordre == 'asc' ? 'selected' }}>Croissant</option>
+                <option value="desc" {{ criteres.ordre == 'desc' ? 'selected' }}>Décroissant</option>
+            </select>
+        </label>
+    {% endif %}
+
+    <button type="submit" class="btn">Valider</button>
+</form>
+
+<div class="barre-affichage">
+    <p class="nombre-voies">{{ voies|length }} voie{{ voies|length > 1 ? 's' }}</p>
+
+    {% if criteres.estListe %}
+        <label class="case"><input type="checkbox" id="afficher-miniatures"> Miniatures</label>
+    {% elseif voies is not empty %}
+        <label class="taille-icones">Taille
+            <input type="range" id="taille-icones" min="120" max="420" step="10" value="220" aria-label="Taille des icônes">
+        </label>
+    {% endif %}
+
+    <nav class="choix-vue" aria-label="Mode d'affichage">
+        {% for vue, libelle in {icones: 'Icônes', liste: 'Liste'} %}
+            <a href="{{ path(route, routeParams|merge(criteres.parametres({vue: vue}))) }}"
+               {% if criteres.vue == vue %}aria-current="true"{% endif %}>{{ libelle }}</a>
+        {% endfor %}
+    </nav>
+</div>
+
+{% if voies is empty %}
+    <p class="vide">Aucune voie{{ criteres.systemeCotation or (global and criteres.secteurId) ? ' ne correspond à ces filtres' : ' pour le moment' }}.</p>
+{% elseif criteres.estListe %}
+    <table class="table-voies" id="table-voies">
+        <thead>
+            <tr>
+                <th class="col-miniature"><span class="visuellement-cache">Miniature</span></th>
+                {% for valeur in global ? ['nom', 'cotation', 'secteur', 'ouvreur'] : ['nom', 'cotation', 'ouvreur'] %}
+                    {% set actif = criteres.tri == valeur %}
+                    <th{% if actif %} aria-sort="{{ criteres.ordre == 'asc' ? 'ascending' : 'descending' }}"{% endif %}>
+                        <a href="{{ path(route, routeParams|merge(criteres.parametresTri(valeur))) }}">
+                            {{ tris[valeur] }}
+                            {% if actif %}<span aria-hidden="true">{{ criteres.ordre == 'asc' ? '▲' : '▼' }}</span>{% endif %}
+                        </a>
+                    </th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for voie in voies %}
+                <tr>
+                    <td class="col-miniature">
+                        <a href="{{ path('voie_show', {id: voie.id}) }}" tabindex="-1" aria-hidden="true">
+                            {{ include('voie/_photo.html.twig', {voie: voie, classe: 'miniature'}) }}
+                        </a>
+                    </td>
+                    <td><a href="{{ path('voie_show', {id: voie.id}) }}">{{ voie.nom }}</a></td>
+                    <td>{{ include('voie/_badge.html.twig', {voie: voie}) }}</td>
+                    {% if global %}<td>{{ voie.photo.secteur.nom }}</td>{% endif %}
+                    <td>{{ voie.auteur.pseudo }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <ul class="grille-voies" id="grille-voies">
+        {% for voie in voies %}
+            <li class="carte-voie">
+                <a href="{{ path('voie_show', {id: voie.id}) }}">
+                    {{ include('voie/_photo.html.twig', {voie: voie, classe: 'miniature'}) }}
+                    <div class="carte-infos">
+                        {{ include('voie/_badge.html.twig', {voie: voie}) }}
+                        <strong>{{ voie.nom }}</strong>
+                        <small>{{ global ? voie.photo.secteur.nom ~ ' · ' }}{{ voie.auteur.pseudo }}</small>
+                    </div>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}

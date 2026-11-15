@@ -134,7 +134,9 @@ ul:has(> li > .form-error), form ul { color: #b42318; padding-left: 1.2rem; marg
 
 .grille-voies {
     list-style: none; padding: 0; margin: 0;
-    display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    display: grid; gap: 1rem;
+    /* --taille-icone : réglée au curseur « Taille » (js/voies.js) ; jamais plus large que l'écran */
+    grid-template-columns: repeat(auto-fill, minmax(min(var(--taille-icone, 220px), 100%), 1fr));
 }
 .carte-voie a {
     display: block; text-decoration: none; color: inherit;
@@ -171,6 +173,34 @@ ul:has(> li > .form-error), form ul { color: #b42318; padding-left: 1.2rem; marg
 }
 .pagination [aria-current] { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
 .pagination-ellipse { color: var(--texte-doux); }
+
+/* Barre au-dessus de la liste : nombre, réglage (taille ou miniatures), mode d'affichage */
+.barre-affichage { display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; align-items: center; margin-bottom: 1rem; }
+.barre-affichage .nombre-voies { margin: 0; color: var(--texte-doux); }
+.barre-affichage label { margin: 0; font-weight: normal; display: flex; align-items: center; gap: .4rem; }
+.taille-icones input { width: 9rem; accent-color: var(--accent); }
+.choix-vue { margin-left: auto; display: inline-flex; border: 1px solid var(--bord); border-radius: var(--rayon); overflow: hidden; }
+.choix-vue a { padding: .35rem .8rem; text-decoration: none; color: inherit; background: var(--surface); }
+.choix-vue a + a { border-left: 1px solid var(--bord); }
+.choix-vue a[aria-current] { background: var(--accent); color: #fff; font-weight: 600; }
+
+/* Mode liste : tableau trié par les en-têtes ; miniatures sur demande */
+.table-voies { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--bord); border-radius: var(--rayon); overflow: hidden; }
+.table-voies th, .table-voies td { padding: .5rem .75rem; text-align: left; border-bottom: 1px solid var(--bord); vertical-align: middle; }
+.table-voies tbody tr:last-child td { border-bottom: 0; }
+.table-voies th { background: var(--fond); white-space: nowrap; }
+.table-voies th a { color: inherit; text-decoration: none; display: inline-flex; gap: .3rem; align-items: center; }
+.table-voies th a:hover { color: var(--accent-fonce); }
+.table-voies th[aria-sort] a { color: var(--accent-fonce); }
+.table-voies td a { font-weight: 600; }
+.table-voies .col-miniature { display: none; width: 1%; padding-right: 0; }
+.table-voies.avec-miniatures .col-miniature { display: table-cell; }
+.table-voies .col-miniature .photo-voie { width: 96px; margin: 0; border-radius: 6px; overflow: hidden; }
+
+.visuellement-cache {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
 
 .liste-secteurs { list-style: none; padding: 0; display: grid; gap: .5rem; }
 .liste-secteurs a {
@@ -369,3 +399,8 @@ fieldset.choix { border: 0; padding: 0; margin: .5rem 0; }
 .logo-club { height: 40px; width: auto; max-width: 140px; object-fit: contain; background: #fff; border-radius: 6px; padding: 2px; }
 .entete .logo { margin-right: auto; }
 .apercu-logo img { max-height: 90px; max-width: 260px; object-fit: contain; border: 1px solid var(--bord); border-radius: var(--rayon); padding: 6px; background: #fff; }
+@media (max-width: 600px) {
+    .table-voies { font-size: .92rem; }
+    .table-voies th, .table-voies td { padding: .45rem .5rem; }
+    .table-voies .col-miniature .photo-voie { width: 72px; }
+}
