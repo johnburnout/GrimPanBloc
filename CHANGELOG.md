@@ -7,6 +7,20 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Ajouté
+- **Pieds libres ou pieds imposés** : nouveau choix dans le formulaire d'une voie
+  (pieds imposés par défaut). En pieds libres, les prises de pied ne sont plus
+  dessinées sur la photo ni dans les listes ; elles restent enregistrées et
+  apparaissent en transparence dans l'éditeur. Comme les prises et la cotation,
+  ce choix est verrouillé une fois la voie validée par un autre grimpeur.
+- **Dupliquer une voie** : lien « Dupliquer » dans la liste des voies d'un secteur
+  (icônes et liste) et sur la page d'une voie. Il ouvre le formulaire de
+  nouvelle voie pré-rempli (même photo, mêmes prises, cotation proposée, pieds,
+  consignes), à ajuster avant d'enregistrer. La copie appartient à celui qui
+  l'enregistre ; les croix ne sont pas reprises.
+
 ## [1.9.0] - 2026-11-15
 
 ### Ajouté
