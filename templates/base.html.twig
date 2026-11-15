@@ -64,17 +64,19 @@
 
 <footer class="pied">
     <span>GrimPanBloc {{ grimpanbloc_version() }}</span>
-    {# Menu des langues : le choix s'applique dès la sélection (bouton « OK » sans JavaScript) #}
-    <form class="langues" method="get" action="{{ path('langue') }}">
-        <input type="hidden" name="retour" value="{{ app.request.requestUri }}">
-        <label for="choix-langue" class="visuellement-cache">{{ 'pied.langue'|trans }}</label>
-        <select id="choix-langue" name="langue" onchange="this.form.submit()">
+    {# Menu des langues (fait maison pour afficher les drapeaux partout) : <details> s'ouvre sans JavaScript #}
+    {% set langueActuelle = app.request.locale %}
+    <details class="langues">
+        <summary aria-label="{{ 'pied.langue'|trans }} : {{ langues()[langueActuelle] }}">
+            {{ langues()[langueActuelle] }} <img class="drapeau" src="{{ asset('drapeaux/' ~ langueActuelle ~ '.svg') }}" alt="" width="21" height="14">
+        </summary>
+        <ul>
             {% for code, nom in langues() %}
-                <option value="{{ code }}" lang="{{ code }}" {{ code == app.request.locale ? 'selected' }}>{{ nom }}</option>
+                <li><a href="{{ path('langue', {langue: code, retour: app.request.requestUri}) }}" lang="{{ code }}" hreflang="{{ code }}"
+                       {% if code == langueActuelle %}aria-current="true"{% endif %}>{{ nom }} <img class="drapeau" src="{{ asset('drapeaux/' ~ code ~ '.svg') }}" alt="" width="21" height="14"></a></li>
             {% endfor %}
-        </select>
-        <noscript><button type="submit" class="btn btn-petit">OK</button></noscript>
-    </form>
+        </ul>
+    </details>
 </footer>
 
 {# Textes des scripts (public/js/), dans la langue de la page #}
@@ -90,6 +92,7 @@
     replier_barre: 'js.replier_barre'|trans,
     photo_zone: 'js.photo_zone'|trans,
 }|json_encode(constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_HEX_TAG'))|raw }}</script>
+<script src="{{ asset('js/langues.js') }}" defer></script>
 {% block javascripts %}{% endblock %}
 </body>
 </html>

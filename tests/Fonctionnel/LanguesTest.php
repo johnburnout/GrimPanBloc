@@ -19,7 +19,11 @@ final class LanguesTest extends FonctionnelTestCase
 
         self::assertSelectorExists('html[lang="es"]');
         self::assertSelectorTextContains('h1', 'Sectores');
-        self::assertSame('es', $this->client->getCrawler()->filter('.langues select option[selected]')->attr('value'));
+        $crawler = $this->client->getCrawler();
+        self::assertSame('es', $crawler->filter('.langues a[aria-current]')->attr('lang'));
+        self::assertStringEndsWith('/drapeaux/es.svg', (string) $crawler->filter('.langues summary img.drapeau')->attr('src'));
+        self::assertSame(['Français', 'English', 'Español', 'Italiano', 'Русский'], $crawler->filter('.langues li a')->each(fn ($a) => trim($a->text())));
+        self::assertCount(5, $crawler->filter('.langues li a img.drapeau'));
     }
 
     public function testUneLangueNonProposeeRetombeSurLeFrancais(): void
@@ -34,7 +38,7 @@ final class LanguesTest extends FonctionnelTestCase
     public function testLeSelecteurMemoriseLaLangue(): void
     {
         $page = $this->client->request('GET', '/secteurs?vue=liste');
-        $this->client->submit($page->filter('form.langues')->form(['langue' => 'ru']));
+        $this->client->click($page->filter('.langues a[lang="ru"]')->link());
 
         self::assertResponseRedirects('/secteurs?vue=liste');
         $cookie = $this->client->getCookieJar()->get(Langues::COOKIE);
