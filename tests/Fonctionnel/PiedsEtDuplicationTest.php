@@ -104,6 +104,36 @@ final class PiedsEtDuplicationTest extends FonctionnelTestCase
         self::assertCount(1, $original->getCroix());
     }
 
+    /** Seul le créateur modifie sa voie (pas même un admin) ; tout grimpeur connecté peut la dupliquer. */
+    public function testSeulLeCreateurModifieMaisTousDupliquent(): void
+    {
+        $auteur = $this->creerUtilisateur('auteur');
+        $voie = $this->voieAvecUnPied($auteur);
+        $id = $voie->getId();
+
+        foreach ([$this->creerUtilisateur('grimpeur'), $this->creerUtilisateur('admin', admin: true)] as $autre) {
+            $this->client->loginUser($autre);
+            $page = $this->client->request('GET', "/voies/$id");
+            self::assertCount(0, $page->selectLink('Modifier'), $autre->getPseudo());
+            self::assertCount(1, $page->selectLink('Dupliquer'), $autre->getPseudo());
+            $this->client->request('GET', "/voies/$id/modifier");
+            self::assertResponseStatusCodeSame(403, $autre->getPseudo());
+            $this->client->request('POST', "/voies/$id/modifier", ['voie' => ['nom' => 'Pirate']]);
+            self::assertResponseStatusCodeSame(403, $autre->getPseudo());
+            $this->client->request('GET', "/voies/$id/dupliquer");
+            self::assertResponseIsSuccessful($autre->getPseudo());
+        }
+
+        $this->client->loginUser($auteur);
+        $page = $this->client->request('GET', "/voies/$id");
+        self::assertCount(1, $page->selectLink('Modifier'));
+        $this->client->request('GET', "/voies/$id/modifier");
+        self::assertResponseIsSuccessful();
+
+        $this->em->clear();
+        self::assertSame('Dalle grise', $this->em->find(Voie::class, $id)->getNom());
+    }
+
     public function testUnVisiteurAnonymeNePeutPasDupliquer(): void
     {
         $voie = $this->voieAvecUnPied($this->creerUtilisateur('auteur'));
