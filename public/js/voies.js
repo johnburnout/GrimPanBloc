@@ -9,6 +9,20 @@
     const lire = (cle) => { try { return localStorage.getItem(cle); } catch (e) { return null; } };
     const ecrire = (cle, valeur) => { try { localStorage.setItem(cle, valeur); } catch (e) { /* stockage indisponible */ } };
 
+    // Panneau « Partager » (accueil) : se ferme en touchant ailleurs ou avec Échap
+    const partage = document.querySelector('details.partage');
+    if (partage) {
+        document.addEventListener('click', (e) => {
+            if (partage.open && !partage.contains(e.target)) partage.open = false;
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && partage.open) {
+                partage.open = false;
+                partage.querySelector('summary').focus();
+            }
+        });
+    }
+
     const choixSysteme = document.querySelector('[data-filtre-systeme]');
     if (choixSysteme) {
         const majPlages = () => document.querySelectorAll('.plage').forEach(f => {

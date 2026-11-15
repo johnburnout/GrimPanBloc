@@ -81,6 +81,23 @@ h2, h3 { font-weight: 650; }
 
 .titre-actions { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; justify-content: space-between; }
 .fil { margin: 0; }
+
+/* Accueil : bouton « Partager » qui déplie le QR code de l'adresse du site */
+.partage { position: relative; }
+.partage > summary { list-style: none; cursor: pointer; }
+.partage > summary::-webkit-details-marker { display: none; }
+.partage[open] > summary { background: var(--fond); }
+.partage-contenu {
+    position: absolute; right: 0; top: calc(100% + .5rem); z-index: 20;
+    width: min(20rem, calc(100vw - 32px)); padding: 1rem; text-align: center;
+    background: var(--surface); border: 1px solid var(--bord); border-radius: var(--rayon);
+    box-shadow: 0 8px 28px rgba(0,0,0,.18);
+}
+/* Fond blanc et marge : indispensables pour que les téléphones lisent le code */
+.partage-contenu .qr { background: #fff; border-radius: 6px; }
+.partage-contenu .qr svg { display: block; width: 100%; height: auto; }
+.partage-url { margin: .5rem 0 .25rem; font-weight: 600; word-break: break-all; }
+.partage-contenu .aide { margin: 0; font-size: .9rem; }
 .vide, .aide, .meta, small { color: var(--texte-doux); }
 
 /* --- Boutons et formulaires -------------------------------------------- */

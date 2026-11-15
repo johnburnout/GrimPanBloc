@@ -1,7 +1,19 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Les voies</h1>
+    {% set urlSite = url('app_home') %}
+    <div class="titre-actions">
+        <h1>Les voies</h1>
+        {# Partage d'un téléphone à l'autre : l'autre personne scanne le QR code #}
+        <details class="partage">
+            <summary class="btn btn-secondaire">Partager</summary>
+            <div class="partage-contenu">
+                <div class="qr">{{ qr_code_svg(urlSite) }}</div>
+                <p class="partage-url">{{ urlSite }}</p>
+                <p class="aide">Faites scanner ce QR code avec l'appareil photo d'un autre téléphone.</p>
+            </div>
+        </details>
+    </div>
 
     {{ include('voie/_explorateur.html.twig') }}
 {% endblock %}
