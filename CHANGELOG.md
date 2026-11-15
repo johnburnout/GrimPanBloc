@@ -7,6 +7,15 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [1.11.1] - 2026-11-15
+
+### Corrigé
+- **Mises à jour introuvables sur un hébergement mutualisé** : la page « Mises à
+  jour » affichait « Impossible de connaître la dernière version publiée » quand
+  la limite de l'API GitHub (60 requêtes par heure, partagée par tous les sites
+  de l'hébergeur) était atteinte. La dernière version est désormais lue
+  directement sur github.com dans ce cas.
+
 ## [1.11.0] - 2026-11-15
 
 ### Ajouté
