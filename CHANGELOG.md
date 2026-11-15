@@ -7,6 +7,18 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [1.12.0] - 2026-11-15
+
+### Ajouté
+- **Règlement intérieur** : dans Administration → Réglages, section
+  « Informations sur la salle », envoi d'un PDF (10 Mo au plus), à remplacer ou
+  supprimer à tout moment. La page « Informations » propose alors un lien
+  « Lire le règlement intérieur (PDF) ».
+- **Autres informations** : texte libre affiché en bas de la page
+  « Informations » (tarifs, accès, consignes…), mis en forme avec Markdown
+  (titres, gras, italique, listes, liens, tableaux). Le HTML saisi dans le
+  texte est affiché tel quel, jamais interprété.
+
 ## [1.11.1] - 2026-11-15
 
 ### Corrigé
