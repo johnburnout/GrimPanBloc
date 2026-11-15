@@ -11,7 +11,7 @@
 {% set masque = 'masque-voie-' ~ voie.id %}
 <figure class="photo-voie {{ classe|default('') }}">
     {# Dans les listes (classe « miniature ») : la miniature, bien plus légère #}
-    <img src="{{ asset(classe|default('') == 'miniature' ? miniature(photo) : photo.chemin) }}" alt="Photo de la voie {{ voie.nom }}" loading="lazy">
+    <img src="{{ asset(classe|default('') == 'miniature' ? miniature(photo) : photo.chemin) }}" alt="{{ 'voie.photo_alt'|trans({nom: voie.nom}) }}" loading="lazy">
     <svg viewBox="0 0 {{ W }} {{ H }}" preserveAspectRatio="none" aria-hidden="true">
         <defs>
             <mask id="{{ masque }}">

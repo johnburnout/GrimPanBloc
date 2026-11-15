@@ -3,10 +3,12 @@
 namespace App\Mail;
 
 use App\Entity\User;
+use App\Exception\EchecOperation;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Envoie les mails du site avec le serveur SMTP configuré dans l'administration.
@@ -14,18 +16,20 @@ use Symfony\Component\Mime\Email;
  */
 final class MailerSite
 {
-    public function __construct(private readonly ReglagesSmtp $reglages)
-    {
+    public function __construct(
+        private readonly ReglagesSmtp $reglages,
+        private readonly TranslatorInterface $translator,
+    ) {
     }
 
-    /** Mail générique de vérification de la configuration SMTP. */
+    /** Mail générique de vérification de la configuration SMTP, dans la langue de l'administrateur. */
     public function envoyerTest(string $destinataire): void
     {
         $this->envoyer(
             (new Email())
                 ->to($destinataire)
-                ->subject('GrimPanBloc : mail de test')
-                ->text("Bonjour,\n\nCe message confirme que GrimPanBloc peut envoyer des mails avec le serveur SMTP configuré.\n\nEnvoyé le ".date('d/m/Y à H:i').".\n\n— GrimPanBloc"),
+                ->subject($this->translator->trans('mail.test.objet'))
+                ->text($this->translator->trans('mail.test.texte', ['date' => date('d/m/Y'), 'heure' => date('H:i')])),
         );
     }
 
@@ -72,7 +76,7 @@ final class MailerSite
     private function mailer(): Mailer
     {
         if (!$this->reglages->estConfigure()) {
-            throw new \RuntimeException('Le serveur SMTP n\'est pas configuré (serveur et adresse d\'expédition requis).');
+            throw new EchecOperation('erreur.smtp_non_configure');
         }
         $r = $this->reglages->lire();
         $transport = new EsmtpTransport($r['hote'], $r['port'], 'ssl' === $r['chiffrement']);

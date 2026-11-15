@@ -40,6 +40,10 @@ JavaScript natif (aucune étape de build) · AssetMapper.
 
 ## Fonctionnalités
 
+- **Langues** : français, anglais, espagnol, italien et russe. La langue du navigateur est
+  utilisée d'office ; le pied de page permet d'en changer (choix mémorisé, et enregistré
+  dans le compte d'un grimpeur connecté). Les textes sont dans `translations/`
+  (format ICU pour les pluriels) ; l'assistant d'installation et les commandes restent en français.
 - **Comptes** : inscription (email, pseudo, mot de passe), connexion avec « se souvenir de moi », déconnexion.
 - **Secteurs** : zones du mur (pan, dévers, dalle…), chacune avec ses photos et ses voies.
 - **Création de voie** :
@@ -569,6 +573,9 @@ sudo systemctl reload php8.4-fpm
 - **Réduction des photos** : après la mise à jour qui l'introduit, lance une fois
   `php bin/console app:photos:reduire` pour réduire les photos déjà envoyées.
   Commence par `--simulation` pour voir ce qui sera fait.
+- **Langues** (2.0.0) : la mise à jour ajoute une colonne au compte des utilisateurs
+  (langue choisie). Les messages affichés pendant la mise à jour depuis une 1.x
+  restent en français.
 - **Miniatures des photos** (1.3.11) : la mise à jour crée celles des photos déjà
   envoyées, une fois le site rouvert. Si elle le signale, termine en SSH avec
   `php bin/console app:photos:miniatures`. En attendant, les listes affichent

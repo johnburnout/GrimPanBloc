@@ -6,6 +6,7 @@ use App\Entity\Secteur;
 use App\Entity\User;
 use App\Entity\Voie;
 use App\Enum\TypePrise;
+use App\Exception\Messages;
 use App\Form\VoieType;
 use App\Security\ConfirmationSuppression;
 use App\Security\VoieVoter;
@@ -19,6 +20,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Translation\TranslatableMessage;
 
 #[Route('/voies')]
 class VoieController extends AbstractController
@@ -39,7 +41,7 @@ class VoieController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->voies->enregistrer($voie, $secteur, $user, $form->get('nouvellePhoto')->getData());
-            $this->addFlash('success', 'Voie « '.$voie->getNom().' » créée.');
+            $this->addFlash('success', new TranslatableMessage('flash.voie.creee', ['nom' => $voie->getNom()]));
 
             return $this->redirectToRoute('voie_show', ['id' => $voie->getId()]);
         }
@@ -66,7 +68,7 @@ class VoieController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->voies->enregistrer($copie, $secteur, $user, $form->get('nouvellePhoto')->getData());
-            $this->addFlash('success', 'Voie « '.$copie->getNom().' » créée (copie de « '.$voie->getNom().' »).');
+            $this->addFlash('success', new TranslatableMessage('flash.voie.copiee', ['nom' => $copie->getNom(), 'source' => $voie->getNom()]));
 
             return $this->redirectToRoute('voie_show', ['id' => $copie->getId()]);
         }
@@ -91,7 +93,7 @@ class VoieController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->voies->enregistrer($voie, $secteur, $user, $trace ? $form->get('nouvellePhoto')->getData() : null);
-            $this->addFlash('success', 'Voie « '.$voie->getNom().' » modifiée.');
+            $this->addFlash('success', new TranslatableMessage('flash.voie.modifiee', ['nom' => $voie->getNom()]));
 
             return $this->redirectToRoute('voie_show', ['id' => $voie->getId()]);
         }
@@ -128,7 +130,7 @@ class VoieController extends AbstractController
 
         if ('retirer' === $action) {
             if ($this->croix->retirer($voie, $user)) {
-                $this->addFlash('success', 'Croix retirée.');
+                $this->addFlash('success', new TranslatableMessage('flash.croix.retiree'));
             }
 
             return $this->redirectToRoute('voie_show', ['id' => $voie->getId()]);
@@ -141,14 +143,14 @@ class VoieController extends AbstractController
         try {
             $croix = $this->croix->cocher($voie, $user, $payload->getString('cotation'));
         } catch (\InvalidArgumentException $e) {
-            $this->addFlash('error', $e->getMessage());
+            $this->addFlash('error', Messages::de($e));
 
             return $this->redirectToRoute('voie_show', ['id' => $voie->getId()]);
         }
 
         $this->addFlash('success', $existante
-            ? \sprintf('Cotation proposée modifiée : %s.', $croix->getCotation())
-            : 'Bravo ! Voie cochée comme réussie.');
+            ? new TranslatableMessage('flash.croix.cotation_modifiee', ['cotation' => $voie->getSysteme()->cotation($croix->getCotation()) ?? (string) $croix->getCotation()])
+            : new TranslatableMessage('flash.croix.posee'));
 
         return $this->redirectToRoute('voie_show', ['id' => $voie->getId()]);
     }
@@ -156,18 +158,18 @@ class VoieController extends AbstractController
     #[Route('/{id}/supprimer', name: 'voie_delete', requirements: ['id' => '\d+'], methods: ['POST'])]
     #[IsGranted(VoieVoter::SUPPRIMER, subject: 'voie')]
     #[IsCsrfTokenValid(new Expression('"supprimer" ~ args["voie"].getId()'))]
-    public function delete(Voie $voie, Request $request): Response
+    public function delete(Voie $voie, Request $request, ConfirmationSuppression $confirmation): Response
     {
         // Garde-fou : supprimer une voie validée efface aussi les croix des autres grimpeurs.
-        if ($voie->estValidee() && !ConfirmationSuppression::estConfirmee($request->getPayload()->getString('confirmation'))) {
-            $this->addFlash('error', ConfirmationSuppression::MESSAGE_ANNULATION);
+        if ($voie->estValidee() && !$confirmation->estConfirmee($request->getPayload()->getString('confirmation'))) {
+            $this->addFlash('error', ConfirmationSuppression::annulation());
 
             return $this->redirectToRoute('voie_show', ['id' => $voie->getId()]);
         }
 
         $secteurId = $voie->getPhoto()->getSecteur()->getId();
         $this->voies->supprimer($voie);
-        $this->addFlash('success', 'Voie supprimée.');
+        $this->addFlash('success', new TranslatableMessage('flash.voie.supprimee'));
 
         return $this->redirectToRoute('secteur_show', ['id' => $secteurId]);
     }

@@ -32,10 +32,10 @@ final class ClubType extends AbstractType
                 'constraints' => [new Image(
                     maxSize: '5M',
                     mimeTypes: ['image/png', 'image/jpeg', 'image/webp'],
-                    maxSizeMessage: 'Le logo ne doit pas dépasser 5 Mo.',
-                    mimeTypesMessage: 'Le logo doit être une image PNG, JPEG ou WebP.',
+                    maxSizeMessage: 'logo.taille',
+                    mimeTypesMessage: 'logo.format',
                     maxPixels: PhotoOptimiseur::PIXELS_MAX,
-                    maxPixelsMessage: 'Le logo dépasse 25 mégapixels : réduisez-le avant de l\'envoyer.',
+                    maxPixelsMessage: 'logo.pixels',
                 )],
             ]);
     }

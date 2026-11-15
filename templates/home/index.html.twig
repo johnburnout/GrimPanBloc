@@ -3,14 +3,14 @@
 {% block body %}
     {% set urlSite = url('app_home') %}
     <div class="titre-actions">
-        <h1>Les voies</h1>
+        <h1>{{ 'accueil.titre'|trans }}</h1>
         {# Partage d'un téléphone à l'autre : l'autre personne scanne le QR code #}
         <details class="partage">
-            <summary class="btn btn-secondaire">Partager</summary>
+            <summary class="btn btn-secondaire">{{ 'accueil.partager'|trans }}</summary>
             <div class="partage-contenu">
                 <div class="qr">{{ qr_code_svg(urlSite) }}</div>
                 <p class="partage-url">{{ urlSite }}</p>
-                <p class="aide">Faites scanner ce QR code avec l'appareil photo d'un autre téléphone.</p>
+                <p class="aide">{{ 'accueil.partager_aide'|trans }}</p>
             </div>
         </details>
     </div>

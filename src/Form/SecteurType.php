@@ -15,8 +15,8 @@ class SecteurType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('nom', TextType::class, ['label' => 'Nom du secteur', 'attr' => ['placeholder' => 'Pan, dévers, dalle…']])
-            ->add('description', TextareaType::class, ['label' => 'Description', 'required' => false]);
+            ->add('nom', TextType::class, ['label' => 'secteurs.form.nom', 'attr' => ['placeholder' => 'secteurs.form.nom_exemple']])
+            ->add('description', TextareaType::class, ['label' => 'secteurs.form.description', 'required' => false]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

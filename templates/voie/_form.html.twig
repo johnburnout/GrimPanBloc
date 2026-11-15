@@ -2,7 +2,7 @@
 {{ form_errors(form) }}
 
 <section class="etape">
-    <h2>1. La photo</h2>
+    <h2>{{ 'voie.form.etape_photo'|trans }}</h2>
     {% if form.photo.vars.choices is not empty %}
         {{ form_row(form.photo) }}
     {% else %}
@@ -12,61 +12,55 @@
 </section>
 
 <section class="etape">
-    <h2>2. Les prises</h2>
-    <p class="aide">Choisissez un type dans la barre d'outils, puis <strong>touchez deux fois</strong> la photo
-        (double-clic à la souris) pour placer une prise. Faites glisser une prise d'un doigt pour la déplacer ;
-        touchez-la une fois pour lui donner le type choisi et régler sa taille.
-        Zoomez avec deux doigts ou le curseur sur le côté ; déplacez l'image avec deux doigts
-        (ou un doigt posé à côté des prises). Le bouton en bas du curseur passe en plein écran,
-        et la barre d'outils se déplace par sa poignée <span aria-hidden="true">⠿</span>.</p>
+    <h2>{{ 'voie.form.etape_prises'|trans }}</h2>
+    <p class="aide">{{ 'voie.form.aide_prises'|trans|raw }} <span aria-hidden="true">⠿</span>.</p>
 
     <div id="editeur" class="editeur">
-        <p class="editeur-vide" id="editeur-vide">Choisissez ou envoyez une photo pour commencer.</p>
+        <p class="editeur-vide" id="editeur-vide">{{ 'voie.form.editeur_vide'|trans }}</p>
         <div class="vue" id="vue" hidden>
             <div class="scene" id="scene"></div>
 
-            <div class="barre-outils" id="barre-outils" role="toolbar" aria-label="Outils de marquage">
-                <button type="button" class="poignee" id="poignee" title="Déplacer la barre d'outils" aria-label="Déplacer la barre d'outils">⠿</button>
+            <div class="barre-outils" id="barre-outils" role="toolbar" aria-label="{{ 'voie.form.outils'|trans }}">
+                <button type="button" class="poignee" id="poignee" title="{{ 'voie.form.deplacer_barre'|trans }}" aria-label="{{ 'voie.form.deplacer_barre'|trans }}">⠿</button>
                 {% for t in typesPrise %}
                     <button type="button" class="outil" data-outil="{{ t.value }}" aria-pressed="{{ t.value == 'main' ? 'true' : 'false' }}">
-                        <span class="pastille prise-{{ t.value }}"></span> {{ t.libelle }}
+                        <span class="pastille prise-{{ t.value }}"></span> {{ t|trans }}
                     </button>
                 {% endfor %}
-                <button type="button" class="outil" data-outil="gomme">✕ Effacer</button>
-                <label class="taille">Taille <input type="range" id="taille-prise" min="1" max="10" step="0.5" value="3"></label>
-                <button type="button" class="outil" id="annuler" title="Annuler la dernière action">↶</button>
-                <button type="button" class="outil replier" id="replier" aria-expanded="true" title="Replier la barre d'outils" aria-label="Replier la barre d'outils">▴</button>
+                <button type="button" class="outil" data-outil="gomme">✕ {{ 'voie.form.effacer'|trans }}</button>
+                <label class="taille">{{ 'voie.form.taille'|trans }} <input type="range" id="taille-prise" min="1" max="10" step="0.5" value="3"></label>
+                <button type="button" class="outil" id="annuler" title="{{ 'voie.form.annuler'|trans }}" aria-label="{{ 'voie.form.annuler'|trans }}">↶</button>
+                <button type="button" class="outil replier" id="replier" aria-expanded="true" title="{{ 'js.replier_barre'|trans }}" aria-label="{{ 'js.replier_barre'|trans }}">▴</button>
             </div>
 
-            <div class="zoom" id="zoom" role="group" aria-label="Zoom">
-                <button type="button" data-zoom="plus" aria-label="Zoomer">+</button>
-                <input type="range" id="zoom-curseur" min="0" max="3" step="0.01" value="0" aria-label="Niveau de zoom">
-                <button type="button" data-zoom="moins" aria-label="Dézoomer">−</button>
-                <button type="button" data-zoom="ajuster" title="Voir toute la photo" aria-label="Voir toute la photo">
+            <div class="zoom" id="zoom" role="group" aria-label="{{ 'js.zoom'|trans }}">
+                <button type="button" data-zoom="plus" aria-label="{{ 'js.zoomer'|trans }}">+</button>
+                <input type="range" id="zoom-curseur" min="0" max="3" step="0.01" value="0" aria-label="{{ 'js.niveau_zoom'|trans }}">
+                <button type="button" data-zoom="moins" aria-label="{{ 'js.dezoomer'|trans }}">−</button>
+                <button type="button" data-zoom="ajuster" title="{{ 'js.voir_toute_photo'|trans }}" aria-label="{{ 'js.voir_toute_photo'|trans }}">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="1.5"/></svg>
                 </button>
-                <button type="button" id="plein-ecran" title="Plein écran" aria-label="Plein écran" aria-pressed="false">
+                <button type="button" id="plein-ecran" title="{{ 'js.plein_ecran'|trans }}" aria-label="{{ 'js.plein_ecran'|trans }}" aria-pressed="false">
                     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>
                 </button>
             </div>
         </div>
     </div>
-    <p class="compteur"><span id="nb-prises">0</span> prise(s)</p>
+    <p class="compteur"><span id="nb-prises">0</span> {{ 'voie.form.prises'|trans }}</p>
     {{ form_errors(form.prises) }}
     {{ form_widget(form.prises) }}
 </section>
 
 <section class="etape">
-    <h2>3. Infos et cotation</h2>
+    <h2>{{ 'voie.form.etape_infos'|trans }}</h2>
     {{ form_row(form.nom) }}
     {{ form_row(form.systeme) }}
     <div data-pour-systeme="fr">{{ form_row(form.cotationFr) }}</div>
     <div data-pour-systeme="couleur">{{ form_row(form.cotationCouleur) }}</div>
     <div class="choix-pieds">{{ form_row(form.piedsLibres) }}</div>
-    <p class="aide">En pieds libres, les prises de pied ne sont pas montrées aux grimpeurs
-        (elles restent enregistrées et apparaissent en transparence ici).</p>
+    <p class="aide">{{ 'voie.form.aide_pieds'|trans }}</p>
     {{ form_row(form.description) }}
 </section>
 
-<button type="submit" class="btn btn-grand">{{ bouton|default('Enregistrer la voie') }}</button>
+<button type="submit" class="btn btn-grand">{{ bouton|default('voie.form.enregistrer')|trans }}</button>
 {{ form_end(form) }}

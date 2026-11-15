@@ -1,30 +1,30 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Connexion · GrimPanBloc{% endblock %}
+{% block title %}{{ 'connexion.titre'|trans }} · GrimPanBloc{% endblock %}
 
 {% block body %}
 <div class="carte-form">
-    <h1>Connexion</h1>
+    <h1>{{ 'connexion.titre'|trans }}</h1>
 
     {% if error %}
-        {# Motif réel (traduit en français par Symfony) : identifiants invalides, compte désactivé… #}
-        <div class="flash flash-error">{{ error.messageKey == 'Invalid credentials.' ? 'Email ou mot de passe incorrect.' : error.messageKey|trans(error.messageData, 'security') }}</div>
+        {# Motif réel (traduit par Symfony, domaine « security ») : identifiants invalides, compte désactivé… #}
+        <div class="flash flash-error">{{ error.messageKey == 'Invalid credentials.' ? 'connexion.identifiants_incorrects'|trans : error.messageKey|trans(error.messageData, 'security') }}</div>
     {% endif %}
 
     <form method="post">
-        <label for="username">Email</label>
+        <label for="username">{{ 'commun.email'|trans }}</label>
         <input type="email" value="{{ last_username }}" name="_username" id="username" autocomplete="email" required autofocus>
 
-        <label for="password">Mot de passe</label>
+        <label for="password">{{ 'commun.mot_de_passe'|trans }}</label>
         <input type="password" name="_password" id="password" autocomplete="current-password" required>
 
-        <label class="case"><input type="checkbox" name="_remember_me"> Rester connecté</label>
+        <label class="case"><input type="checkbox" name="_remember_me"> {{ 'connexion.rester_connecte'|trans }}</label>
 
         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-        <button class="btn" type="submit">Se connecter</button>
+        <button class="btn" type="submit">{{ 'connexion.se_connecter'|trans }}</button>
     </form>
 
-    <p>Pas encore de compte ? <a href="{{ path('app_register') }}">Inscription</a></p>
+    <p>{{ 'connexion.pas_de_compte'|trans }} <a href="{{ path('app_register') }}">{{ 'nav.inscription'|trans }}</a></p>
 </div>
 {% endblock %}

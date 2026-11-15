@@ -5,10 +5,14 @@ namespace App\Sauvegarde;
 use App\Entity\Secteur;
 use App\Entity\User;
 use App\Enum\TypeSauvegarde;
+use App\Exception\ArgumentInvalide;
+use App\Exception\EchecOperation;
+use App\Exception\Messages;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Translation\TranslatableMessage;
 
 /**
  * Sauvegarde et restauration des secteurs, voies et photos (Administration → Sauvegardes).
@@ -147,7 +151,7 @@ final class GestionSauvegardes
         $chemin = $this->depot->nouveauChemin(TypeSauvegarde::Importee);
         $fichier->move(\dirname($chemin), basename($chemin));
 
-        return $this->depot->trouver(basename($chemin)) ?? throw new \RuntimeException('Archive importée introuvable.');
+        return $this->depot->trouver(basename($chemin)) ?? throw new EchecOperation('erreur.sauvegarde.importee_introuvable');
     }
 
     public function supprimer(Sauvegarde $sauvegarde): void
@@ -158,7 +162,7 @@ final class GestionSauvegardes
     /**
      * Résumé de chaque sauvegarde (null si l'archive est illisible).
      *
-     * @return list<array{sauvegarde: Sauvegarde, resume: ?ResumeSauvegarde, erreur: ?string}>
+     * @return list<array{sauvegarde: Sauvegarde, resume: ?ResumeSauvegarde, erreur: TranslatableMessage|string|null}>
      */
     public function lister(): array
     {
@@ -166,7 +170,7 @@ final class GestionSauvegardes
             try {
                 return ['sauvegarde' => $s, 'resume' => $this->archive->lireResume($s->chemin), 'erreur' => null];
             } catch (\Throwable $e) {
-                return ['sauvegarde' => $s, 'resume' => null, 'erreur' => $e->getMessage()];
+                return ['sauvegarde' => $s, 'resume' => null, 'erreur' => Messages::de($e)];
             }
         }, $this->depot->lister());
     }
@@ -182,7 +186,7 @@ final class GestionSauvegardes
             $this->depot->purgerAutomatiques($this->reglage->automatiquesGardees());
         }
 
-        return $this->depot->trouver(basename($chemin)) ?? throw new \RuntimeException('Sauvegarde introuvable après sa création.');
+        return $this->depot->trouver(basename($chemin)) ?? throw new EchecOperation('erreur.sauvegarde.introuvable_apres');
     }
 
     /**
@@ -194,7 +198,7 @@ final class GestionSauvegardes
     {
         $secteurs = array_values(array_filter($donnees['secteurs'], fn (array $s) => $s['id'] === $secteur));
         if ([] === $secteurs) {
-            throw new \InvalidArgumentException('Ce secteur ne fait pas partie de la sauvegarde.');
+            throw new ArgumentInvalide('erreur.sauvegarde.secteur_absent');
         }
         $photos = array_values(array_filter($donnees['photos'], fn (array $p) => $p['secteur'] === $secteur));
         $idsPhotos = array_flip(array_column($photos, 'id'));
@@ -214,7 +218,7 @@ final class GestionSauvegardes
     {
         $verrou = $this->verrous->createLock('grimpanbloc-sauvegardes', 3600);
         if (!$verrou->acquire()) {
-            throw new \RuntimeException('Une sauvegarde ou une restauration est déjà en cours : réessayez dans quelques minutes.');
+            throw new EchecOperation('erreur.sauvegarde.en_cours');
         }
         try {
             return $operation();

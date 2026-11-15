@@ -1,0 +1,498 @@
+commun.logo_club: 'Logo del club'
+commun.actions: Acciones
+commun.enregistrer: Guardar
+commun.supprimer: Eliminar
+commun.formulaire_expire: 'El formulario ha caducado: recarga la página y vuelve a intentarlo.'
+nav.accueil: 'GrimPanBloc, inicio'
+nav.voies: Vías
+nav.secteurs: Sectores
+nav.infos: Info
+nav.administration: Administración
+nav.mon_compte: 'Mi cuenta'
+nav.deconnexion: 'Cerrar sesión'
+nav.connexion: 'Iniciar sesión'
+nav.inscription: Registrarse
+pied.langue: Idioma
+maj.bandeau: 'GrimPanBloc {version} está disponible (versión instalada: {installee}).'
+maj.bandeau_lien: 'Ver la actualización'
+js.plein_ecran: 'Pantalla completa'
+js.quitter_plein_ecran: 'Salir de pantalla completa'
+js.zoom: Zoom
+js.zoomer: Acercar
+js.dezoomer: Alejar
+js.niveau_zoom: 'Nivel de zoom'
+js.voir_toute_photo: 'Ver toda la foto'
+js.deplier_barre: 'Desplegar la barra de herramientas'
+js.replier_barre: 'Plegar la barra de herramientas'
+js.photo_zone: 'Foto de la zona'
+accueil.titre: 'Las vías'
+accueil.partager: Compartir
+accueil.partager_aide: 'Escanea este código QR con la cámara de otro teléfono.'
+voies.aucune: 'Todavía no hay ninguna vía.'
+voies.aucune_filtre: 'Ninguna vía coincide con estos filtros.'
+voies.tri.cotation: Grado
+voies.tri.nom: Nombre
+voies.tri.secteur: Sector
+voies.tri.ouvreur: Equipador
+voies.filtre.secteur: Sector
+voies.filtre.tous: Todos
+voies.filtre.echelle: Escala
+voies.filtre.toutes: Todas
+voies.filtre.echelle_fr: Francesa
+voies.filtre.echelle_couleur: Colores
+voies.filtre.de: De
+voies.filtre.a: a
+voies.trier_par: 'Ordenar por'
+voies.ordre: Orden
+voies.croissant: Ascendente
+voies.decroissant: Descendente
+voies.valider: Aplicar
+voies.nombre: '{n, plural, one {# vía} other {# vías}}'
+voies.miniatures: Miniaturas
+voies.miniature: Miniatura
+voies.taille: Tamaño
+voies.taille_icones: 'Tamaño de los iconos'
+voies.mode_affichage: 'Modo de visualización'
+voies.vue_icones: Iconos
+voies.vue_liste: Lista
+voie.dupliquer: Duplicar
+voie.dupliquer_nom: 'Duplicar {nom}'
+voie.photo_alt: 'Foto de la vía {nom}'
+enum.type_prise.depart: Salida
+enum.type_prise.main: Mano
+enum.type_prise.pied: Pie
+enum.type_prise.top: Top
+enum.systeme_cotation.fr: 'Escala francesa'
+enum.systeme_cotation.couleur: Colores
+enum.couleur.vert: Verde
+enum.couleur.jaune: Amarillo
+enum.couleur.bleu: Azul
+enum.couleur.orange: Naranja
+enum.couleur.rouge: Rojo
+enum.couleur.noir: Negro
+enum.couleur.blanc: Blanco
+enum.type_sauvegarde.manuelle: Manual
+enum.type_sauvegarde.automatique: Automática
+enum.type_sauvegarde.importee: Importada
+voie.modifier: Editar
+voie.supprimer_ellipse: Eliminar…
+voie.supprimer_confirmer: '¿Eliminar esta vía?'
+voie.pieds_libres: 'pies libres'
+voie.pieds_imposes: 'pies obligados'
+voie.ouverte_par: 'abierta por {pseudo} el {date}'
+voie.nombre_prises: '{n, plural, one {# presa} other {# presas}}'
+voie.cotation: Grado
+voie.cotation_proposee_par: 'propuesto por {pseudo} (equipador). Se sustituirá por la opinión de quienes encadenen la vía.'
+voie.cotation_d_apres: 'según {n, plural, one {# escalador que ha} other {# escaladores que han}} encadenado la vía'
+voie.proposition_createur: 'propuesta del equipador:'
+voie.cotations_proposees: 'Grados propuestos'
+voie.reussites: Encadenamientos
+voie.personne: 'Nadie ha encadenado todavía esta vía.'
+voie.ma_cotation: 'Mi grado'
+voie.cotation_que_je_propose: 'Grado que propongo'
+voie.modifier_ma_cotation: 'Cambiar mi grado'
+voie.retirer_croix: 'Quitar mi marca'
+voie.j_ai_reussi: 'He encadenado esta vía'
+voie.propre_croix: 'Tu propia marca no bloquea la vía ni cuenta como voto: solo cuentan las de los demás escaladores.'
+voie.supprimer_titre: 'Eliminar la vía'
+voie.supprimer_validee: 'Esta vía la ha encadenado {autres, plural, one {# escalador más} other {# escaladores más}}. Al eliminarla también se borrarán {croix, plural, one {# marca} other {# marcas}}. Esta acción es definitiva.'
+voie.copie_de: 'Copia de {nom}'
+voie.nouvelle: 'Nueva vía'
+voie.copie_titre: 'Copia de «{nom}»'
+voie.copie_aide: 'Se copian la foto, las presas, el grado y las indicaciones de {lien}: ajústalos y guarda. La vía original no cambia.'
+voie.modifier_nom: 'Editar {nom}'
+voie.modifier_titre: 'Editar la vía'
+voie.verrouillee: 'Esta vía ya la ha encadenado {grimpeurs}: la foto, las presas y el grado están bloqueados. Todavía puedes corregir el nombre y la descripción.'
+voie.form.etape_photo: '1. La foto'
+voie.form.etape_prises: '2. Las presas'
+voie.form.etape_infos: '3. Datos y grado'
+voie.form.aide_prises: 'Elige un tipo en la barra de herramientas y <strong>toca dos veces</strong> la foto (doble clic con el ratón) para colocar una presa. Arrastra una presa con un dedo para moverla; tócala una vez para darle el tipo elegido y ajustar su tamaño. Haz zoom con dos dedos o con el control lateral; mueve la imagen con dos dedos (o con un dedo fuera de las presas). El botón bajo el control pasa a pantalla completa, y la barra de herramientas se mueve con su asa'
+voie.form.editeur_vide: 'Elige o sube una foto para empezar.'
+voie.form.outils: 'Herramientas de marcado'
+voie.form.deplacer_barre: 'Mover la barra de herramientas'
+voie.form.effacer: Borrar
+voie.form.taille: Tamaño
+voie.form.annuler: 'Deshacer la última acción'
+voie.form.prises: presa(s)
+voie.form.aide_pieds: 'Con pies libres, las presas de pie no se muestran a los escaladores (siguen guardadas y aparecen en transparencia aquí).'
+voie.form.enregistrer: 'Guardar la vía'
+voie.form.enregistrer_modifications: 'Guardar los cambios'
+confirmation.supprimer: ELIMINAR
+confirmation.restaurer: RESTAURAR
+confirmation.tapez: 'Escribe {mot} para confirmar'
+confirmation.en_majuscules: 'Escribe {mot} en mayúsculas'
+confirmation.supprimer_definitivement: 'Eliminar definitivamente'
+confirmation.annulee.suppression: 'Eliminación cancelada: escribe {mot} para confirmar.'
+confirmation.annulee.nettoyage: 'Vaciado cancelado: escribe {mot} para confirmar.'
+confirmation.annulee.restauration: 'Restauración cancelada: escribe {mot} para confirmar.'
+commun.email: 'Correo electrónico'
+commun.mot_de_passe: Contraseña
+commun.pseudo: 'Nombre de usuario'
+secteurs.titre: Sectores
+secteurs.nouveau: 'Nuevo sector'
+secteurs.aucun_admin: 'No hay ningún sector. Empieza creando uno (plafón, muro, desplome…).'
+secteurs.aucun: 'No hay ningún sector. Un administrador debe crear uno primero (plafón, muro, desplome…).'
+secteurs.creer: Crear
+secteurs.connectez_vous: 'Inicia sesión para crear una vía'
+secteurs.nettoyer_ellipse: 'Vaciar el sector…'
+secteurs.supprimer_ellipse: 'Eliminar el sector…'
+connexion.titre: 'Iniciar sesión'
+connexion.identifiants_incorrects: 'Correo electrónico o contraseña incorrectos.'
+connexion.rester_connecte: 'Mantener la sesión iniciada'
+connexion.se_connecter: 'Iniciar sesión'
+connexion.pas_de_compte: '¿Todavía no tienes cuenta?'
+inscription.titre: 'Crear una cuenta'
+inscription.bouton: Registrarse
+profil.titre: 'Mi perfil'
+profil.onglet_profil: Perfil
+profil.onglet_croix: 'Mis encadenamientos'
+profil.onglet_voies: 'Mis vías'
+profil.aucune_croix: 'Todavía no has marcado ninguna vía como encadenada.'
+profil.col_voie: Vía
+profil.col_cotation_affichee: 'Grado mostrado'
+profil.col_le: Fecha
+profil.votre_voie: '(tu vía)'
+profil.croix_total: '{n, plural, one {# vía encadenada} other {# vías encadenadas}}. Para cambiar el grado que propones, abre la ficha de la vía.'
+profil.non_modifiable: '(no se puede cambiar)'
+profil.inscrit_le: 'Registrado el'
+profil.aucune_voie: 'Todavía no has creado ninguna vía.'
+infos.titre: Información
+infos.vide: 'Todavía no se ha introducido la información del rocódromo.'
+infos.renseigner: 'Introducirla en los ajustes'
+infos.adresse: Dirección
+infos.carte: 'Mapa: ubicación del rocódromo'
+infos.voir_osm: 'Ver en OpenStreetMap'
+infos.google_maps: 'Google Maps'
+infos.itineraire: 'Cómo llegar'
+infos.site_internet: 'Sitio web'
+infos.la_salle: 'El rocódromo'
+infos.hauteur: Altura
+infos.surface: 'Superficie escalable'
+infos.horaires: Horario
+infos.ferme: Cerrado
+infos.reglement: 'Reglamento interno'
+infos.lire_reglement: 'Leer el reglamento interno (PDF)'
+infos.autres: 'Otra información'
+infos.modifier: 'Editar esta información'
+jour.lundi: Lunes
+jour.mardi: Martes
+jour.mercredi: Miércoles
+jour.jeudi: Jueves
+jour.vendredi: Viernes
+jour.samedi: Sábado
+jour.dimanche: Domingo
+admin.onglet.reglages: Ajustes
+admin.onglet.utilisateurs: Usuarios
+admin.onglet.photos: Fotos
+admin.onglet.sauvegardes: 'Copias de seguridad'
+admin.onglet.fiche: 'Hoja para imprimir'
+admin.onglet.mise_a_jour: Actualizaciones
+reglages.https.titre: 'Seguridad de la conexión'
+reglages.https.page_en_http: 'Esta página está abierta en <strong>HTTP</strong>: las contraseñas circulan sin cifrar. Ábrela en {lien} para activar la redirección.'
+reglages.https.forcer: 'Usar siempre HTTPS: los visitantes que llegan por <code>http://</code> se redirigen a <code>https://</code>'
+reglages.https.aide: 'Actívalo solo si el certificado HTTPS está instalado y se renueva automáticamente (es el caso en la mayoría de los alojamientos, con Let’s Encrypt). Los navegadores recuerdan esta elección durante 30 días.'
+reglages.club.titre: 'Identidad del rocódromo o del club'
+reglages.club.aide: 'El logo aparece en la cabecera del sitio y en la {fiche}. PNG, JPEG o WebP, 5 MB como máximo. Se reduce a {cote} px.'
+reglages.club.fiche: 'hoja para imprimir'
+reglages.club.nom: 'Nombre del rocódromo o del club'
+reglages.club.logo_actuel: 'Logo actual'
+reglages.club.supprimer_logo: 'Eliminar el logo'
+reglages.club.remplacer_logo: 'Sustituir el logo'
+reglages.club.logo: Logo
+reglages.salle.titre: 'Información del rocódromo'
+reglages.salle.aide: 'Se muestra en la página {lien}, accesible para todos desde el menú. Todos los campos son opcionales: lo que esté vacío no se muestra.'
+reglages.salle.adresse: 'Dirección postal'
+reglages.salle.coordonnees: 'Ubicación en el mapa (latitud, longitud)'
+reglages.salle.coordonnees_aide: 'En OpenStreetMap o Google Maps, un clic derecho sobre la ubicación del rocódromo muestra sus coordenadas: cópialas aquí. Aparecerá un mapa en la página Información.'
+reglages.salle.hauteur: 'Altura (m)'
+reglages.salle.surface: 'Superficie escalable (m²)'
+reglages.salle.afficher_horaires: 'Mostrar el horario en la página Información'
+reglages.salle.horaires_aide: 'Una línea por día, por ejemplo «18 h – 22 h». Deja vacíos los días de cierre.'
+reglages.salle.remarque_horaires: 'Nota sobre el horario'
+reglages.salle.remarque_exemple: 'Cerrado durante las vacaciones escolares'
+reglages.salle.autres_aide: 'Texto libre que se muestra al final de la página Información (tarifas, acceso, normas…). Formato {lien}: negrita, cursiva, título, lista, enlace; una línea vacía entre dos párrafos.'
+reglages.salle.reglement_aide: 'Archivo PDF de 10 MB como máximo, enlazado desde la página Información.'
+reglages.salle.reglement_actuel: 'Reglamento interno actual (PDF)'
+reglages.salle.envoye_le: 'subido el {date}'
+reglages.salle.supprimer_reglement: 'Eliminar el reglamento interno'
+reglages.salle.remplacer_reglement: 'Sustituir el reglamento interno'
+reglages.salle.reglement_pdf: 'Reglamento interno (PDF)'
+reglages.smtp.titre: 'Servidor de envío de correo (SMTP)'
+reglages.smtp.aide: 'Estos datos los proporciona tu alojamiento o tu proveedor de correo. La contraseña se guarda cifrada.'
+reglages.smtp.serveur: Servidor
+reglages.smtp.port: Puerto
+reglages.smtp.chiffrement: Cifrado
+reglages.smtp.identifiant: Usuario
+reglages.smtp.mot_de_passe_garde: '(guardada: déjala vacía para conservarla)'
+reglages.smtp.effacer_mot_de_passe: 'Borrar la contraseña guardada'
+reglages.smtp.expediteur: 'Dirección del remitente'
+reglages.smtp.expediteur_nom: 'Nombre del remitente'
+reglages.smtp.starttls: 'STARTTLS (puerto 587)'
+reglages.smtp.ssl: 'SSL/TLS (puerto 465)'
+reglages.smtp.aucun: 'Ninguno (no recomendado)'
+reglages.mail_test.titre: 'Correo de prueba'
+reglages.mail_test.renseignez: 'Introduce primero el servidor y la dirección del remitente.'
+reglages.mail_test.aide: 'Envía un mensaje genérico para comprobar los ajustes anteriores.'
+reglages.mail_test.destinataire: Destinatario
+reglages.mail_test.envoyer: 'Enviar el correo de prueba'
+reglages.groupe.titre: 'Enviar un mensaje'
+reglages.groupe.aide: 'Se envía un correo a cada destinatario: los demás no ven las direcciones. Escribe {pseudo} para insertar el nombre de usuario del destinatario. Las cuentas desactivadas o eliminadas no reciben nada.'
+reglages.groupe.confirmer: '¿Enviar este mensaje?'
+reglages.groupe.destinataires: Destinatarios
+reglages.groupe.tous: 'Todos los usuarios ({n})'
+reglages.groupe.admins: 'Los administradores ({n})'
+reglages.groupe.objet: Asunto
+reglages.groupe.message: Mensaje
+reglages.groupe.envoyer: Enviar
+utilisateurs.croix: Marcas
+utilisateurs.statut: Estado
+utilisateurs.vous: (tú)
+utilisateurs.supprime_le: 'Eliminado el {date}'
+utilisateurs.desactive: Desactivado
+utilisateurs.actif: Activo
+utilisateurs.admin: admin
+utilisateurs.retirer_admin: 'Quitar admin'
+utilisateurs.nommer_admin: 'Nombrar admin'
+utilisateurs.desactiver: Desactivar
+utilisateurs.reactiver: Reactivar
+utilisateurs.aide: 'Una cuenta desactivada ya no puede iniciar sesión (reversible). Una cuenta eliminada pierde su correo y su contraseña (irreversible); sus vías y marcas siguen visibles con su nombre de usuario.'
+utilisateurs.supprimer_titre: 'Eliminar la cuenta de {pseudo}'
+utilisateurs.supprimer_email: 'El correo ({email}) y la contraseña se borran: la persona ya no podrá iniciar sesión.'
+utilisateurs.supprimer_voies: '{voies, plural, one {# vía} other {# vías}} y {croix, plural, one {# marca} other {# marcas}} siguen visibles con el nombre de usuario «{pseudo}». Solo un administrador podrá eliminar esas vías.'
+utilisateurs.supprimer_pseudo: 'El nombre de usuario queda reservado. Esta acción es definitiva.'
+photos.aide: 'Fotos que ninguna vía utiliza. Se quedan en su sector para poder servir a una nueva vía; elimina las que ya no vayan a servir. La eliminación es definitiva.'
+photos.aucune: 'Ninguna foto sin usar.'
+photos.total: '{n, plural, one {# foto sin usar} other {# fotos sin usar}}'
+photos.page_sur: 'página {page} de {pages}'
+photos.voir_en_grand: 'Ver la foto en grande'
+photos.alt: 'Foto del sector {secteur}'
+photos.envoyee: 'Subida el {date} por {pseudo}'
+photos.confirmer: '¿Eliminar definitivamente esta foto del sector «{secteur}»?'
+photos.pages: Páginas
+photos.precedente: Anterior
+photos.suivante: Siguiente
+sauvegardes.aide: 'Una copia de seguridad contiene los sectores, las vías (con sus presas y sus marcas) y las fotos. Las cuentas de usuario y los ajustes no se incluyen. Se hace una copia automática antes de cada restauración, vaciado de sector y actualización, y al menos una vez por semana.'
+sauvegardes.nouvelle: 'Nueva copia de seguridad'
+sauvegardes.note: 'Nota (opcional)'
+sauvegardes.note_exemple: 'Antes del cambio de vías de junio'
+sauvegardes.sauvegarder: 'Hacer una copia ahora'
+sauvegardes.enregistrees: 'Copias guardadas'
+sauvegardes.aucune: 'Todavía no hay ninguna copia de seguridad.'
+sauvegardes.total: '{n, plural, one {# copia} other {# copias}} · {taille} MB en total'
+sauvegardes.col_date: Fecha
+sauvegardes.col_type: Tipo
+sauvegardes.col_contenu: Contenido
+sauvegardes.col_taille: Tamaño
+sauvegardes.contenu: '{secteurs, plural, one {# sector} other {# sectores}}, {voies, plural, one {# vía} other {# vías}}, {photos, plural, one {# foto} other {# fotos}}'
+sauvegardes.version: 'versión {version}'
+sauvegardes.illisible: 'Ilegible: {erreur}'
+sauvegardes.mo: '{taille} MB'
+sauvegardes.telecharger: Descargar
+sauvegardes.restaurer_ellipse: Restaurar…
+sauvegardes.confirmer_suppression: '¿Eliminar definitivamente la copia del {date}?'
+sauvegardes.emplacement: 'Las copias se guardan en el servidor, en {dossier}. Descarga una de vez en cuando: si se pierde el servidor, también se pierden ellas.'
+sauvegardes.conservees: 'Copias automáticas conservadas'
+sauvegardes.conservees_aide: 'Por encima de este número, se eliminan las copias automáticas más antiguas. Las copias manuales e importadas nunca se eliminan automáticamente.'
+sauvegardes.nombre: 'Número ({min} a {max})'
+sauvegardes.importer_titre: 'Importar una copia de seguridad'
+sauvegardes.importer_aide: 'Un archivo descargado desde esta página, aquí o en otro sitio GrimPanBloc. Tamaño máximo aceptado por el servidor: {taille}. El archivo se añade a la lista anterior; no se restaura nada sin tu confirmación.'
+sauvegardes.archive: 'Archivo (.zip)'
+sauvegardes.importer: Importar
+restaurer.titre_page: 'Restaurar una copia de seguridad'
+restaurer.titre: 'Restaurar la copia del {date} a las {heure}'
+restaurer.point1: 'Primero se guarda automáticamente el estado actual: la restauración se puede deshacer restaurando esa copia.'
+restaurer.point2: 'Las vías, fotos y marcas se recuperan tal como estaban en el momento de la copia; los enlaces a las vías siguen siendo válidos.'
+restaurer.point3: 'Los autores se identifican por su nombre de usuario. Una vía cuyo autor ya no existe en este sitio se te asigna a ti; una marca cuyo escalador ya no existe se ignora.'
+restaurer.quoi: '¿Qué hay que restaurar?'
+restaurer.tous: 'Todos los sectores'
+restaurer.tous_effet: 'se sustituyen todas las vías y fotos actuales, y se eliminan los sectores creados después.'
+restaurer.seulement: 'Solo el sector {nom}'
+restaurer.contenu_secteur: '{voies, plural, one {# vía} other {# vías}}, {photos, plural, one {# foto} other {# fotos}}'
+restaurer.remplace: 'sustituye todo el contenido actual del sector «{nom}».'
+restaurer.recree: 'el sector, eliminado desde entonces, se vuelve a crear.'
+restaurer.apres: 'Después de la restauración, esta copia manual debe ser…'
+restaurer.gardee: conservada
+restaurer.supprimee: eliminada
+restaurer.bouton: Restaurar
+nettoyer.titre_court: 'Vaciar {nom}'
+nettoyer.titre: 'Vaciar el sector «{nom}»'
+nettoyer.vide: 'Este sector ya está vacío: ninguna vía, ninguna foto.'
+nettoyer.voies: '{voies, plural, one {Se elimina # vía del sector} other {Se eliminan # vías del sector}}, con sus presas y {croix, plural, one {# marca} other {# marcas}}.'
+nettoyer.photos: '{photos, plural, one {Se elimina # foto del sector} other {Se eliminan # fotos del sector}}, incluidas las que ninguna vía utiliza.'
+nettoyer.conserve: 'El sector en sí (nombre, descripción) se conserva, listo para nuevas vías.'
+nettoyer.bouton: 'Vaciar el sector'
+secteur.sauvegarde_avant: 'Justo antes se hace una copia automática: el sector podrá restaurarse desde Administración → {lien}.'
+supprimer_secteur.titre_court: 'Eliminar {nom}'
+supprimer_secteur.titre: 'Eliminar el sector «{nom}»'
+supprimer_secteur.disparait: 'El sector {nom} desaparece de la lista de sectores.'
+supprimer_secteur.voies: '{voies, plural, one {Se elimina # vía} other {Se eliminan # vías}}, con sus presas y {croix, plural, one {# marca} other {# marcas}}.'
+supprimer_secteur.photos: '{photos, plural, one {Se elimina # foto} other {Se eliminan # fotos}}, incluidas las que ninguna vía utiliza.'
+supprimer_secteur.bouton: 'Eliminar el sector'
+fiche.imprimer: Imprimir
+fiche.titre: 'Las vías del rocódromo'
+fiche.accroche: 'Todas las vías del plafón, sus presas y su grado, en tu teléfono.'
+fiche.etape1: 'Escanea el código QR con la cámara de tu teléfono.'
+fiche.etape2: 'Crea tu cuenta en unos segundos.'
+fiche.etape3: 'Consulta las vías, marca las que encadenes y propone su grado.'
+maj.derniere: 'Última actualización'
+maj.version_installee: 'Versión instalada:'
+maj.inconnue: 'No se puede conocer la última versión publicada (ninguna publicación, o GitHub inaccesible).'
+maj.a_jour: 'GrimPanBloc está actualizado: la última versión publicada es la {version}.'
+maj.disponible: 'La versión {version} está disponible.'
+maj.disponible_le: 'La versión {version} está disponible (publicada el {date}).'
+maj.nouveautes: Novedades
+maj.voir_github: 'Ver la publicación en GitHub'
+maj.pas_installable: 'Esta publicación no contiene ningún archivo instalable: actualiza a mano (consulta el README).'
+maj.impossible_navigateur: 'En este servidor no es posible actualizar desde el navegador:'
+maj.en_ssh: 'Lánzala por SSH:'
+maj.installer: Instalar
+maj.point1: 'El sitio pasa a mantenimiento durante unos segundos.'
+maj.point2: 'Las fotos, la configuración ({fichier}) y la base de datos se conservan; la base se actualiza si es necesario.'
+maj.point3: 'El código actual se conserva en {dossier}.'
+maj.point4: 'Haz antes una copia de la base de datos (herramienta de tu alojamiento o {outil}).'
+maj.en_cours: Actualizando…
+maj.mettre_a_jour: 'Actualizar a la versión {version}'
+maj.verifier: 'Comprobar ahora'
+maj.verifier_aide: '(si no, GrimPanBloc lo comprueba una vez al día)'
+flash.voie.creee: 'Vía «{nom}» creada.'
+flash.voie.copiee: 'Vía «{nom}» creada (copia de «{source}»).'
+flash.voie.modifiee: 'Vía «{nom}» modificada.'
+flash.voie.supprimee: 'Vía eliminada.'
+flash.croix.retiree: 'Marca quitada.'
+flash.croix.cotation_modifiee: 'Grado propuesto modificado: {cotation}.'
+flash.croix.posee: '¡Bravo! Vía marcada como encadenada.'
+flash.secteur.cree: 'Sector creado.'
+flash.secteur.nettoye: 'Sector «{nom}» vaciado: {voies, plural, one {# vía} other {# vías}} y {photos, plural, one {# foto eliminada} other {# fotos eliminadas}}.'
+flash.secteur.supprime: 'Sector «{nom}» eliminado, con {voies, plural, one {# vía} other {# vías}} y {photos, plural, one {# foto} other {# fotos}}.'
+flash.secteur.echec_nettoyage: 'El vaciado ha fallado, no se ha eliminado nada: {erreur}'
+flash.secteur.echec_suppression: 'La eliminación ha fallado: {erreur}'
+flash.secteur.sauvegarde_avant: 'Copia hecha justo antes ({date}): en caso de error, restaura este sector desde Administración → Copias de seguridad.'
+flash.profil.enregistre: 'Perfil guardado.'
+flash.bienvenue: '¡Bienvenido/a, {pseudo}!'
+flash.photo.supprimee: 'Foto del sector «{secteur}» eliminada.'
+flash.utilisateur.dernier_admin: 'Debe quedar al menos un administrador activo.'
+flash.utilisateur.plus_admin: '{pseudo} ya no es administrador.'
+flash.utilisateur.reactivez: 'Reactiva primero esta cuenta.'
+flash.utilisateur.admin: '{pseudo} es ahora administrador.'
+flash.utilisateur.pas_soi_desactiver: 'No puedes desactivar tu propia cuenta.'
+flash.utilisateur.reactive: 'Cuenta de {pseudo} reactivada.'
+flash.utilisateur.desactive: 'Cuenta de {pseudo} desactivada: ya no puede iniciar sesión.'
+flash.utilisateur.deja_supprime: 'Esta cuenta ya está eliminada.'
+flash.utilisateur.pas_soi_supprimer: 'No puedes eliminar tu propia cuenta.'
+flash.utilisateur.supprime: 'Cuenta de {pseudo} eliminada. Sus vías siguen visibles con su nombre de usuario.'
+flash.sauvegarde.creee: 'Copia de seguridad creada ({taille} MB).'
+flash.sauvegarde.echec: 'La copia de seguridad ha fallado: {erreur}'
+flash.sauvegarde.importee: 'Archivo importado: ya puedes restaurarlo.'
+flash.sauvegarde.conservation: 'Se conservarán las {n} últimas copias automáticas.{supprimees, plural, =0 {} one { Se ha eliminado # copia más antigua.} other { Se han eliminado # copias más antiguas.}}'
+flash.sauvegarde.supprimee: 'Copia del {date} eliminada.'
+flash.restauration.choisir: 'Elige qué hay que restaurar.'
+flash.restauration.garder: 'Indica si hay que conservar esta copia después de la restauración.'
+flash.restauration.echec: 'La restauración ha fallado, no se ha modificado nada: {erreur}'
+flash.restauration.tout: 'Copia restaurada'
+flash.restauration.secteur: 'Sector «{nom}» restaurado'
+flash.restauration.bilan: '{debut}: {voies, plural, one {# vía} other {# vías}}, {photos, plural, one {# foto} other {# fotos}} y {croix, plural, one {# marca} other {# marcas}}.{ignorees, plural, =0 {} one { # marca ignorada: escalador ausente de este sitio.} other { # marcas ignoradas: escaladores ausentes de este sitio.}}{sans_fichier, plural, =0 {} one { # foto sin archivo en la copia.} other { # fotos sin archivo en la copia.}}'
+flash.restauration.etat_precedent: 'El estado anterior se ha guardado automáticamente ({date}).'
+flash.restauration.supprimee: 'La copia restaurada se ha eliminado.'
+flash.restauration.non_supprimee: 'No se ha podido eliminar la copia restaurada: {erreur}'
+flash.reglages.https_d_abord: 'Abre primero esta página en HTTPS (https://…) para activar este ajuste.'
+flash.reglages.https_active: 'El sitio usa ahora siempre HTTPS.'
+flash.reglages.https_desactive: 'Redirección a HTTPS desactivada.'
+flash.reglages.club: 'Identidad del club guardada.'
+flash.reglages.salle: 'Información del rocódromo guardada.'
+flash.reglages.smtp: 'Ajustes SMTP guardados.'
+flash.reglages.mail_test: 'Correo de prueba enviado a {destinataire}.'
+flash.reglages.echec_envoi: 'Error en el envío: {erreur}'
+flash.reglages.groupe_envoye: 'Mensaje enviado a {n, plural, one {# destinatario} other {# destinatarios}}.'
+flash.reglages.echec_pour: 'Error para {erreur}'
+flash.maj.deja_a_jour: 'GrimPanBloc ya está actualizado.'
+flash.maj.sauvegarde_echec: 'Actualización cancelada: la copia de seguridad previa ha fallado. {erreur}'
+flash.maj.echec: 'La actualización ha fallado: {erreur}'
+flash.maj.lien_invalide: 'Enlace de finalización no válido o caducado.'
+flash.maj.reussie: 'GrimPanBloc ha pasado de la versión {depuis} a la versión {version}.'
+maj.finalisation.titre: 'Finalizando la actualización'
+maj.finalisation.texte: 'Actualizando la base de datos, unos segundos.'
+maj.finalisation.bouton: 'Terminar la actualización'
+maj.journal.sauvegarde: 'Sectores, vías y fotos guardados (Administración → Copias de seguridad, {date}).'
+maj.journal.telechargee: 'Archivo descargado ({taille, number} MB), suma SHA-256 verificada.'
+maj.journal.extraite: 'Archivo extraído y comprobado.'
+maj.journal.maintenance: 'Sitio en mantenimiento.'
+maj.journal.code_remplace: 'Código sustituido. Versión anterior conservada en {dossier}.'
+maj.journal.cache: 'Caché vaciada.'
+maj.journal.base: 'Base de datos actualizada, mantenimiento terminado.'
+maj.probleme.zip: 'Falta la extensión PHP «zip».'
+maj.probleme.ecriture: 'El servidor web no puede escribir en {dossier}.'
+maj.probleme.racine: 'la raíz del proyecto'
+maj.erreur.pas_d_archive: 'La publicación {tag} no contiene ningún archivo instalable.'
+maj.erreur.pas_plus_recente: 'La versión {version} no es más reciente que la instalada ({installee}).'
+maj.erreur.problemes: 'Actualización imposible: {problemes}'
+maj.erreur.migrations: 'Las migraciones de la base de datos han fallado: {sortie}'
+maj.erreur.deplacer: 'No se puede mover {element} (¿permisos insuficientes?).'
+maj.erreur.installer: 'No se puede instalar {element}.'
+maj.erreur.annulee: 'Actualización cancelada, la versión anterior sigue en su sitio: {erreur}'
+maj.erreur.empreinte: 'La suma SHA-256 del archivo no coincide: descarga dañada o modificada.'
+maj.erreur.archive_illisible: 'Archivo ilegible.'
+maj.erreur.chemin_interdit: 'Ruta prohibida en el archivo: {chemin}'
+maj.erreur.sans_version: 'Archivo no válido: no se encuentra el fichero VERSION.'
+maj.erreur.mauvaise_version: 'El archivo anuncia la versión «{annoncee}» en lugar de la {attendue}.'
+maj.erreur.incomplete: 'Archivo incompleto: falta {fichier}.'
+maj.erreur.telechargement: 'Descarga imposible (HTTP {code}).'
+maj.erreur.trop_volumineuse: 'Archivo demasiado grande.'
+maj.erreur.maintenance: 'No se puede activar el modo mantenimiento (var/ sin permiso de escritura).'
+maj.avertissement.logos: 'No se han podido compilar los logos: ejecuta «{commande}».'
+maj.avertissement.miniatures: 'No se han podido crear algunas miniaturas de fotos: ejecuta «{commande}».'
+erreur.sauvegarde.zip_absente: 'Falta la extensión PHP «zip»: copia de seguridad imposible.'
+erreur.sauvegarde.creation: 'No se puede crear el archivo (¿carpeta de copias sin permiso de escritura?).'
+erreur.sauvegarde.ecriture: 'No se puede escribir el archivo: {detail}'
+erreur.sauvegarde.enregistrement: 'No se puede guardar el archivo en la carpeta de copias.'
+erreur.sauvegarde.plus_recente: 'Esta copia procede de una versión más reciente de GrimPanBloc: actualiza primero el sitio.'
+erreur.sauvegarde.donnees_absentes: 'Archivo no válido: datos ausentes o demasiado grandes.'
+erreur.sauvegarde.pas_une_sauvegarde: 'Este fichero no es una copia de seguridad de GrimPanBloc.'
+erreur.sauvegarde.donnees_illisibles: 'Archivo no válido: datos ilegibles.'
+erreur.sauvegarde.espace_disque: 'Espacio en disco insuficiente para la copia: se necesitan {besoin, number} MB y quedan {libre, number} MB libres. Elimina copias antiguas.'
+erreur.sauvegarde.importee_introuvable: 'No se encuentra el archivo importado.'
+erreur.sauvegarde.introuvable_apres: 'No se encuentra la copia después de crearla.'
+erreur.sauvegarde.secteur_absent: 'Este sector no forma parte de la copia.'
+erreur.sauvegarde.en_cours: 'Ya hay una copia o una restauración en curso: vuelve a intentarlo dentro de unos minutos.'
+erreur.sauvegarde.conservation: 'Entre {min} y {max} copias automáticas.'
+erreur.sauvegarde.resume_illisible: 'resumen ilegible'
+erreur.restauration.dossier_photos: 'No se puede escribir en la carpeta de fotos.'
+erreur.restauration.pas_une_image: 'Archivo no válido: {fichier} no es una imagen JPEG, PNG o WebP.'
+erreur.restauration.photo_illisible: 'Archivo no válido: foto {fichier} ilegible o demasiado grande.'
+erreur.smtp_non_configure: 'El servidor SMTP no está configurado (se necesitan el servidor y la dirección del remitente).'
+erreur.reglement_pdf: 'El reglamento interno debe ser un archivo PDF.'
+erreur.logo_format: 'El logo debe ser una imagen PNG, JPEG o WebP.'
+erreur.image_illisible: 'Imagen ilegible.'
+erreur.dossier: 'No se puede crear la carpeta «{dossier}».'
+erreur.logo_enregistrement: 'No se puede guardar el logo.'
+erreur.croix_cotation: 'Elige el grado que propones.'
+erreur.photo_utilisee: 'Esta foto la usa una vía: elimina o modifica primero la vía.'
+erreur.photo_enregistrement: 'No se puede guardar la foto «{fichier}».'
+mail.test.objet: 'GrimPanBloc: correo de prueba'
+mail.test.texte: |-
+    Hola:
+
+    Este mensaje confirma que GrimPanBloc puede enviar correos con el servidor SMTP configurado.
+
+    Enviado el {date} a las {heure}.
+
+    — GrimPanBloc
+voie.form.nom: 'Nombre de la vía'
+voie.form.description: 'Descripción / indicaciones'
+voie.form.photo_existante: 'Foto existente del sector'
+voie.form.envoyer_nouvelle: '— Subir una foto nueva —'
+voie.form.nouvelle_photo: 'Foto nueva'
+voie.form.echelle: Escala
+voie.form.couleur: Color
+voie.form.pieds: Pies
+voie.form.pieds_imposes: 'Pies obligados'
+voie.form.pieds_libres: 'Pies libres'
+inscription.confirmation: 'Confirmar la contraseña'
+profil.nouveau_mot_de_passe: 'Nueva contraseña'
+profil.nouveau_mot_de_passe_aide: 'Déjala vacía para conservar la contraseña actual.'
+profil.confirmation_mot_de_passe: 'Confirmar la nueva contraseña'
+profil.mot_de_passe_actuel: 'Contraseña actual'
+profil.mot_de_passe_actuel_aide: 'Obligatoria para guardar un cambio.'
+secteurs.form.nom: 'Nombre del sector'
+secteurs.form.nom_exemple: 'Plafón, desplome, placa…'
+secteurs.form.description: Descripción
+voie.form.photo_choix: 'Foto n.º {id} del {date}'

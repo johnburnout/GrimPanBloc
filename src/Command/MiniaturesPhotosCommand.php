@@ -2,11 +2,13 @@
 
 namespace App\Command;
 
+use App\Exception\Messages;
 use App\Repository\PhotoRepository;
 use App\Service\MiniaturesPhotos;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Crée les miniatures manquantes (photos envoyées avant leur introduction).
@@ -21,6 +23,7 @@ class MiniaturesPhotosCommand
     public function __construct(
         private readonly PhotoRepository $photos,
         private readonly MiniaturesPhotos $miniatures,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -40,7 +43,7 @@ class MiniaturesPhotosCommand
                 }
             } catch (\Throwable $e) {
                 ++$echecs;
-                $io->warning(\sprintf('%s : %s', $fichier, $e->getMessage()));
+                $io->warning(\sprintf('%s : %s', $fichier, Messages::texte($e, $this->translator, 'fr')));
             }
         }
 

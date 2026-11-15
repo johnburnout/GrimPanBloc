@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Exception\Messages;
 use App\MiseAJour\InstallateurMiseAJour;
 use App\MiseAJour\LanceurCommandes;
 use App\MiseAJour\Maintenance;
@@ -14,6 +15,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Mise à jour en un clic depuis l'administration.
@@ -34,6 +37,7 @@ class AdminMiseAJourController extends AbstractController
         private readonly VerificateurMiseAJour $verificateur,
         private readonly InstallateurMiseAJour $installateur,
         private readonly VersionInstallee $version,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -58,7 +62,7 @@ class AdminMiseAJourController extends AbstractController
     {
         $release = $this->verificateur->miseAJourDisponible(true);
         if (!$release) {
-            $this->addFlash('info', 'GrimPanBloc est déjà à jour.');
+            $this->addFlash('info', new TranslatableMessage('flash.maj.deja_a_jour'));
 
             return $this->redirectToRoute('admin_mise_a_jour');
         }
@@ -69,21 +73,30 @@ class AdminMiseAJourController extends AbstractController
         $session = $request->getSession();
         $urlFinaliser = $this->generateUrl('admin_mise_a_jour_finaliser');
         $reponse = new Response(headers: ['Cache-Control' => 'no-store']);
+        // Textes de la page de finalisation, traduits avec l'ancien code (voir pageFinalisation())
+        $textes = [
+            'langue' => $request->getLocale(),
+            'titre' => $this->translator->trans('maj.finalisation.titre'),
+            'texte' => $this->translator->trans('maj.finalisation.texte'),
+            'bouton' => $this->translator->trans('maj.finalisation.bouton'),
+        ];
+        class_exists(TranslatableMessage::class);
+        class_exists(Messages::class);
 
         // Secteurs, voies et photos sauvegardés avant de toucher au code (et aux migrations)
         try {
             $sauvegarde = $sauvegardes->creerAutomatique("avant la mise à jour vers la version {$release->version}");
-            $journal[] = 'Secteurs, voies et photos sauvegardés (Administration → Sauvegardes, '.$sauvegarde->creeLe->format('d/m/Y H:i:s').').';
+            $journal[] = new TranslatableMessage('maj.journal.sauvegarde', ['date' => $sauvegarde->creeLe->format('d/m/Y H:i:s')]);
         } catch (\Throwable $e) {
-            $this->addFlash('error', 'Mise à jour annulée : la sauvegarde préalable a échoué. '.$e->getMessage());
+            $this->addFlash('error', new TranslatableMessage('flash.maj.sauvegarde_echec', ['erreur' => Messages::de($e)]));
 
             return $this->redirectToRoute('admin_mise_a_jour');
         }
 
         try {
-            $jeton = $this->installateur->installer($release, function (string $ligne) use (&$journal) { $journal[] = $ligne; });
+            $jeton = $this->installateur->installer($release, function (TranslatableMessage $ligne) use (&$journal) { $journal[] = $ligne; });
         } catch (\Throwable $e) {
-            $this->addFlash('error', 'La mise à jour a échoué : '.$e->getMessage());
+            $this->addFlash('error', new TranslatableMessage('flash.maj.echec', ['erreur' => Messages::de($e)]));
 
             return $this->redirectToRoute('admin_mise_a_jour');
         }
@@ -91,7 +104,7 @@ class AdminMiseAJourController extends AbstractController
         $session->set('mise_a_jour_journal', $journal);
         $session->set('mise_a_jour_depuis', $this->version->get());
         // Le jeton part en POST : il n'apparaît ni dans les logs d'accès ni dans l'historique.
-        $reponse->setContent($this->pageFinalisation($urlFinaliser, $jeton));
+        $reponse->setContent($this->pageFinalisation($urlFinaliser, $jeton, $textes));
 
         return $reponse;
     }
@@ -101,20 +114,22 @@ class AdminMiseAJourController extends AbstractController
      * PHP pur : construite après le remplacement du code, elle ne doit charger ni
      * gabarit Twig ni autre classe de l'application.
      */
-    private function pageFinalisation(string $url, string $jeton): string
+    /** @param array{langue: string, titre: string, texte: string, bouton: string} $textes */
+    private function pageFinalisation(string $url, string $jeton, array $textes): string
     {
         $url = htmlspecialchars($url, \ENT_QUOTES);
         $jeton = htmlspecialchars($jeton, \ENT_QUOTES);
+        ['langue' => $langue, 'titre' => $titre, 'texte' => $texte, 'bouton' => $bouton] = array_map(static fn (string $t) => htmlspecialchars($t, \ENT_QUOTES), $textes);
 
-        return '<!DOCTYPE html><html lang="fr"><meta charset="UTF-8">'
+        return "<!DOCTYPE html><html lang=\"$langue\"><meta charset=\"UTF-8\">"
             .'<meta name="viewport" content="width=device-width, initial-scale=1">'
-            .'<title>Finalisation de la mise à jour · GrimPanBloc</title>'
+            ."<title>$titre · GrimPanBloc</title>"
             .'<body style="font-family:system-ui,sans-serif;background:#f4f2ee;color:#1c1f24;display:grid;place-items:center;min-height:90vh;text-align:center">'
             ."<form id=\"finaliser\" method=\"post\" action=\"$url\">"
             ."<input type=\"hidden\" name=\"jeton\" value=\"$jeton\">"
-            .'<h1>Finalisation de la mise à jour…</h1>'
-            .'<p>Mise à jour de la base de données, quelques secondes.</p>'
-            .'<noscript><button type="submit">Terminer la mise à jour</button></noscript>'
+            ."<h1>{$titre}…</h1>"
+            ."<p>$texte</p>"
+            ."<noscript><button type=\"submit\">$bouton</button></noscript>"
             .'</form>'
             .'<script>document.getElementById("finaliser").submit()</script>'
             .'</body></html>';
@@ -131,7 +146,7 @@ class AdminMiseAJourController extends AbstractController
         // POST depuis la 1.3.3 ; GET (?jeton=…) quand l'ancienne version est antérieure
         $jeton = $request->isMethod('POST') ? $request->request->getString('jeton') : $request->query->getString('jeton');
         if (!$maintenance->jetonValide($jeton)) {
-            $this->addFlash('error', 'Lien de finalisation invalide ou expiré.');
+            $this->addFlash('error', new TranslatableMessage('flash.maj.lien_invalide'));
 
             return $this->redirectToRoute('admin_mise_a_jour');
         }
@@ -146,10 +161,10 @@ class AdminMiseAJourController extends AbstractController
             foreach ($this->installateur->finaliser($lanceur->lancer(...)) as $avertissement) {
                 $this->addFlash('error', $avertissement);
             }
-            $journal[] = 'Base de données à jour, maintenance terminée.';
-            $this->addFlash('success', sprintf('GrimPanBloc est passé de la version %s à la version %s.', $depuis, $this->version->get()));
+            $journal[] = new TranslatableMessage('maj.journal.base');
+            $this->addFlash('success', new TranslatableMessage('flash.maj.reussie', ['depuis' => $depuis, 'version' => $this->version->get()]));
         } catch (\Throwable $e) {
-            $this->addFlash('error', $e->getMessage());
+            $this->addFlash('error', Messages::de($e));
         }
         $session->set('mise_a_jour_dernier_journal', $journal);
 

@@ -22,6 +22,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Translation\TranslatableMessage;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\Count;
 use Symfony\Component\Validator\Constraints\Image;
@@ -35,11 +36,11 @@ class VoieType extends AbstractType
         /** @var Secteur $secteur */
         $secteur = $options['secteur'];
 
-        $builder->add('nom', TextType::class, ['label' => 'Nom de la voie']);
+        $builder->add('nom', TextType::class, ['label' => 'voie.form.nom']);
 
         // Voie validée : seuls le nom et la description restent modifiables.
         if (!$options['trace']) {
-            $builder->add('description', TextareaType::class, ['label' => 'Description / consignes', 'required' => false]);
+            $builder->add('description', TextareaType::class, ['label' => 'voie.form.description', 'required' => false]);
 
             return;
         }
@@ -47,16 +48,18 @@ class VoieType extends AbstractType
         $builder
             ->add('photo', EntityType::class, [
                 'class' => Photo::class,
-                'label' => 'Photo existante du secteur',
+                'label' => 'voie.form.photo_existante',
                 'required' => false,
-                'placeholder' => '— Envoyer une nouvelle photo —',
+                'placeholder' => 'voie.form.envoyer_nouvelle',
                 'query_builder' => fn (EntityRepository $r) => $r->createQueryBuilder('p')
                     ->andWhere('p.secteur = :s')->setParameter('s', $secteur)
                     ->orderBy('p.creeLe', 'DESC'),
+                'choice_label' => fn (Photo $p) => new TranslatableMessage('voie.form.photo_choix', ['id' => $p->getId(), 'date' => $p->getCreeLe()->format('d/m/Y')]),
+                'choice_translation_domain' => 'messages',
                 'choice_attr' => fn (Photo $p) => ['data-src' => '/'.$p->getChemin()],
             ])
             ->add('nouvellePhoto', FileType::class, [
-                'label' => 'Nouvelle photo',
+                'label' => 'voie.form.nouvelle_photo',
                 'mapped' => false,
                 'required' => false,
                 // Pas d'attribut « capture » : il imposerait l'appareil photo sur téléphone,
@@ -64,9 +67,9 @@ class VoieType extends AbstractType
                 'attr' => ['accept' => 'image/jpeg,image/png,image/webp'],
                 'constraints' => [
                     new Image(maxSize: '15M', mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
-                        mimeTypesMessage: 'Formats acceptés : JPEG, PNG, WebP.',
+                        mimeTypesMessage: 'voie.photo.format',
                         maxPixels: PhotoOptimiseur::PIXELS_MAX,
-                        maxPixelsMessage: 'La photo dépasse 25 mégapixels : réduisez-la avant de l\'envoyer.'),
+                        maxPixelsMessage: 'voie.photo.trop_grande'),
                     new Callback(self::exigerUnePhoto(...)),
                 ],
             ])
@@ -75,36 +78,37 @@ class VoieType extends AbstractType
                 'attr' => ['data-prises' => ''],
                 'getter' => fn (Voie $v) => $v->getPrises()->toArray(),
                 'setter' => fn (Voie $v, array $prises) => $v->remplacerPrises($prises),
-                'constraints' => [new Count(min: 1, minMessage: 'Marquez au moins une prise sur la photo.')],
+                'constraints' => [new Count(min: 1, minMessage: 'voie.prises.min')],
             ])
             // L'ordre compte : le système doit être défini avant la cotation.
             ->add('systeme', EnumType::class, [
                 'class' => SystemeCotation::class,
-                'label' => 'Échelle',
+                'label' => 'voie.form.echelle',
                 'expanded' => true,
-                'choice_label' => fn (SystemeCotation $s) => $s->libelle(),
+                'choice_label' => fn (SystemeCotation $s) => $s,
             ])
             ->add('cotationFr', EnumType::class, [
                 'class' => CotationFr::class,
-                'label' => 'Cotation',
+                'label' => 'voie.cotation',
                 'required' => false,
                 'placeholder' => '—',
                 'choice_label' => fn (CotationFr $c) => $c->libelle(),
+                'choice_translation_domain' => false,
             ])
             ->add('cotationCouleur', EnumType::class, [
                 'class' => CotationCouleur::class,
-                'label' => 'Couleur',
+                'label' => 'voie.form.couleur',
                 'required' => false,
                 'placeholder' => '—',
-                'choice_label' => fn (CotationCouleur $c) => $c->libelle(),
+                'choice_label' => fn (CotationCouleur $c) => $c,
             ])
             // Pieds libres : les prises de pied restent enregistrées mais ne s'affichent pas
             ->add('piedsLibres', ChoiceType::class, [
-                'label' => 'Pieds',
+                'label' => 'voie.form.pieds',
                 'expanded' => true,
-                'choices' => ['Pieds imposés' => false, 'Pieds libres' => true],
+                'choices' => ['voie.form.pieds_imposes' => false, 'voie.form.pieds_libres' => true],
             ])
-            ->add('description', TextareaType::class, ['label' => 'Description / consignes', 'required' => false]);
+            ->add('description', TextareaType::class, ['label' => 'voie.form.description', 'required' => false]);
 
         $builder->get('prises')->addModelTransformer(new PrisesJsonTransformer());
     }
@@ -114,7 +118,7 @@ class VoieType extends AbstractType
     {
         $voie = $context->getRoot()->getData();
         if (null === $fichier && null === $voie?->getPhoto()) {
-            $context->addViolation('Envoyez une photo ou choisissez-en une existante.');
+            $context->addViolation('voie.photo.requise');
         }
     }
 

@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\Croix;
 use App\Entity\User;
 use App\Entity\Voie;
+use App\Exception\ArgumentInvalide;
 use Doctrine\ORM\EntityManagerInterface;
 
 /**
@@ -29,7 +30,7 @@ final class GestionCroix
         $cotation = null;
         if ($voie->getAuteur() !== $grimpeur) {
             $cotation = $voie->getSysteme()->cotation($cotationProposee)->value
-                ?? throw new \InvalidArgumentException('Choisissez la cotation que vous proposez.');
+                ?? throw new ArgumentInvalide('erreur.croix_cotation');
         }
 
         $croix = $voie->getCroixDe($grimpeur) ?? new Croix($voie, $grimpeur);

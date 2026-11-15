@@ -2,7 +2,10 @@
 
 namespace App\Enum;
 
-enum SystemeCotation: string
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
+enum SystemeCotation: string implements TranslatableInterface
 {
     case Francaise = 'fr';
     case Couleur = 'couleur';
@@ -41,5 +44,11 @@ enum SystemeCotation: string
             self::Francaise => 'Échelle française',
             self::Couleur => 'Couleurs',
         };
+    }
+
+    /** Libellé dans la langue de l'interface (libelle() : en français). */
+    public function trans(TranslatorInterface $translator, ?string $locale = null): string
+    {
+        return $translator->trans('enum.systeme_cotation.'.$this->value, locale: $locale);
     }
 }

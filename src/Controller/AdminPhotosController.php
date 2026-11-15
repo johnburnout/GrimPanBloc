@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Photo;
+use App\Exception\Messages;
 use App\Repository\PhotoRepository;
 use App\Service\GestionPhotos;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,6 +13,7 @@ use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Translation\TranslatableMessage;
 
 /**
  * Photos qu'aucune voie n'utilise : elles restent dans leur secteur pour être
@@ -45,9 +47,9 @@ class AdminPhotosController extends AbstractController
     {
         try {
             $gestion->supprimer($photo);
-            $this->addFlash('success', sprintf('Photo du secteur « %s » supprimée.', $photo->getSecteur()->getNom()));
+            $this->addFlash('success', new TranslatableMessage('flash.photo.supprimee', ['secteur' => $photo->getSecteur()->getNom()]));
         } catch (\LogicException $e) {
-            $this->addFlash('error', $e->getMessage());
+            $this->addFlash('error', Messages::de($e));
         }
 
         // Retour à la page où l'on était

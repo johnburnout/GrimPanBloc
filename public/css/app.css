@@ -462,3 +462,10 @@ fieldset.choix { border: 0; padding: 0; margin: .5rem 0; }
 .texte-libre th, .texte-libre td { border: 1px solid var(--bord); padding: .35rem .6rem; text-align: left; }
 .texte-libre blockquote { margin: .75rem 0; padding-left: 1rem; border-left: 3px solid var(--bord); color: var(--texte-doux); }
 .texte-libre code { background: var(--fond); padding: .1rem .3rem; border-radius: 4px; }
+
+/* Pied de page : version et choix de la langue */
+.pied { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; justify-content: space-between; align-items: center; }
+.langues { display: flex; flex-wrap: wrap; gap: .25rem .9rem; }
+.langues a { color: var(--texte-doux); text-decoration: none; }
+.langues a:hover { text-decoration: underline; }
+.langues a[aria-current] { color: var(--texte); font-weight: 600; }

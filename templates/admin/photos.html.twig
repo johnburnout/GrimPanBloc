@@ -1,41 +1,41 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Photos · Administration · GrimPanBloc{% endblock %}
+{% block title %}{{ 'admin.onglet.photos'|trans }} · {{ 'nav.administration'|trans }} · GrimPanBloc{% endblock %}
 
 {% block body %}
-    <h1>Administration</h1>
+    <h1>{{ 'nav.administration'|trans }}</h1>
     {{ include('admin/_onglets.html.twig', {actif: 'photos'}) }}
 
-    <p class="aide">Photos qu'aucune voie n'utilise. Elles restent dans leur secteur pour pouvoir servir à une nouvelle voie ; supprimez celles qui ne serviront plus. La suppression est définitive.</p>
+    <p class="aide">{{ 'photos.aide'|trans }}</p>
 
     {% if photos is empty %}
-        <p class="vide">Aucune photo inutilisée.</p>
+        <p class="vide">{{ 'photos.aucune'|trans }}</p>
     {% else %}
-        <p class="meta">{{ total }} photo{{ total > 1 ? 's' }} inutilisée{{ total > 1 ? 's' }}{% if pages > 1 %} · page {{ page }} sur {{ pages }}{% endif %}</p>
+        <p class="meta">{{ 'photos.total'|trans({n: total}) }}{% if pages > 1 %} · {{ 'photos.page_sur'|trans({page: page, pages: pages}) }}{% endif %}</p>
         <ul class="grille-photos">
             {% for photo in photos %}
                 <li class="carte-photo">
                     <div class="cadre-photo">
                         {# Clic : la photo en grand, dans un nouvel onglet #}
-                        <a href="{{ asset(photo.chemin) }}" target="_blank" rel="noopener" title="Voir la photo en grand">
-                            <img src="{{ asset(miniature(photo)) }}" alt="Photo du secteur {{ photo.secteur.nom }}" loading="lazy">
+                        <a href="{{ asset(photo.chemin) }}" target="_blank" rel="noopener" title="{{ 'photos.voir_en_grand'|trans }}">
+                            <img src="{{ asset(miniature(photo)) }}" alt="{{ 'photos.alt'|trans({secteur: photo.secteur.nom}) }}" loading="lazy">
                         </a>
                     </div>
                     <div class="carte-infos">
                         <strong><a href="{{ path('secteur_show', {id: photo.secteur.id}) }}">{{ photo.secteur.nom }}</a></strong><br>
-                        <small>Envoyée le {{ photo.creeLe|date('d/m/Y') }} par {{ photo.auteur.pseudo }}</small>
+                        <small>{{ 'photos.envoyee'|trans({date: photo.creeLe|date('d/m/Y'), pseudo: photo.auteur.pseudo}) }}</small>
                     </div>
                     <form method="post" action="{{ path('admin_photo_supprimer', {id: photo.id} + (page > 1 ? {page: page} : {})) }}"
-                          onsubmit="return confirm('Supprimer définitivement cette photo du secteur « {{ photo.secteur.nom|e('js') }} » ?')">
+                          onsubmit="return confirm('{{ 'photos.confirmer'|trans({secteur: photo.secteur.nom})|e('js') }}')">
                         <input type="hidden" name="_token" value="{{ csrf_token('photo' ~ photo.id) }}">
-                        <button class="btn btn-petit btn-danger">Supprimer</button>
+                        <button class="btn btn-petit btn-danger">{{ 'commun.supprimer'|trans }}</button>
                     </form>
                 </li>
             {% endfor %}
         </ul>
         {% if pages > 1 %}
-            <nav class="pagination" aria-label="Pages">
-                {% if page > 1 %}<a href="{{ path('admin_photos', {page: page - 1}) }}" rel="prev">← Précédente</a>{% endif %}
+            <nav class="pagination" aria-label="{{ 'photos.pages'|trans }}">
+                {% if page > 1 %}<a href="{{ path('admin_photos', {page: page - 1}) }}" rel="prev">← {{ 'photos.precedente'|trans }}</a>{% endif %}
                 {% for n in 1..pages %}
                     {% if n == page %}
                         <span aria-current="page">{{ n }}</span>
@@ -45,7 +45,7 @@
                         <span class="pagination-ellipse">…</span>
                     {% endif %}
                 {% endfor %}
-                {% if page < pages %}<a href="{{ path('admin_photos', {page: page + 1}) }}" rel="next">Suivante →</a>{% endif %}
+                {% if page < pages %}<a href="{{ path('admin_photos', {page: page + 1}) }}" rel="next">{{ 'photos.suivante'|trans }} →</a>{% endif %}
             </nav>
         {% endif %}
     {% endif %}

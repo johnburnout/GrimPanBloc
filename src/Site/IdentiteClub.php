@@ -2,6 +2,8 @@
 
 namespace App\Site;
 
+use App\Exception\ArgumentInvalide;
+use App\Exception\EchecOperation;
 use App\Repository\ReglageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -54,7 +56,7 @@ final class IdentiteClub
     {
         $infos = @getimagesize($fichier->getPathname());
         if (false === $infos || !isset(self::TYPES[$infos[2]])) {
-            throw new \InvalidArgumentException('Le logo doit être une image PNG, JPEG ou WebP.');
+            throw new ArgumentInvalide('erreur.logo_format');
         }
         [$l, $h, $type] = $infos;
         $source = match ($type) {
@@ -63,7 +65,7 @@ final class IdentiteClub
             IMAGETYPE_WEBP => @imagecreatefromwebp($fichier->getPathname()),
         };
         if (false === $source) {
-            throw new \InvalidArgumentException('Image illisible.');
+            throw new ArgumentInvalide('erreur.image_illisible');
         }
 
         $ratio = min(1, self::COTE_MAX_LOGO / max($l, $h));
@@ -77,7 +79,7 @@ final class IdentiteClub
 
         $dossier = $this->racine.'/public/uploads/logo';
         if (!is_dir($dossier) && !@mkdir($dossier, 0775, true)) {
-            throw new \RuntimeException('Impossible de créer le dossier public/uploads/logo/.');
+            throw new EchecOperation('erreur.dossier', ['dossier' => 'public/uploads/logo/']);
         }
         $extension = self::TYPES[$type];
         $relatif = 'uploads/logo/club-'.bin2hex(random_bytes(6)).'.'.$extension;
@@ -87,7 +89,7 @@ final class IdentiteClub
             'webp' => imagewebp($image, $this->racine.'/public/'.$relatif, 90),
         };
         if (!$ok) {
-            throw new \RuntimeException('Impossible d\'enregistrer le logo.');
+            throw new EchecOperation('erreur.logo_enregistrement');
         }
 
         $this->supprimerFichierLogo();

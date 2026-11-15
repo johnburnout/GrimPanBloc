@@ -1,29 +1,27 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Supprimer {{ secteur.nom }} · Administration · GrimPanBloc{% endblock %}
+{% block title %}{{ 'supprimer_secteur.titre_court'|trans({nom: secteur.nom}) }} · {{ 'nav.administration'|trans }} · GrimPanBloc{% endblock %}
 
 {% block body %}
     <p class="fil"><a href="{{ path('secteur_show', {id: secteur.id}) }}">← {{ secteur.nom }}</a></p>
-    <h1>Supprimer le secteur « {{ secteur.nom }} »</h1>
+    <h1>{{ 'supprimer_secteur.titre'|trans({nom: secteur.nom}) }}</h1>
 
     <section class="zone-danger">
         <ul>
-            <li>Le secteur <strong>{{ secteur.nom }}</strong> disparaît de la liste des secteurs.</li>
+            <li>{{ 'supprimer_secteur.disparait'|trans({nom: '<strong>' ~ secteur.nom|e ~ '</strong>'})|raw }}</li>
             {% if contenu.voies > 0 %}
-                <li>Ses <strong>{{ contenu.voies }} voie(s)</strong> sont supprimées, avec leurs prises et leurs <strong>{{ contenu.croix }} croix</strong>.</li>
+                <li>{{ 'supprimer_secteur.voies'|trans({voies: contenu.voies, croix: contenu.croix}) }}</li>
             {% endif %}
             {% if contenu.photos > 0 %}
-                <li>Ses <strong>{{ contenu.photos }} photo(s)</strong> sont supprimées, y compris celles qu'aucune voie n'utilise.</li>
+                <li>{{ 'supprimer_secteur.photos'|trans({photos: contenu.photos}) }}</li>
             {% endif %}
-            <li>Une sauvegarde automatique est faite juste avant : le secteur pourra être restauré depuis Administration → <a href="{{ path('admin_sauvegardes') }}">Sauvegardes</a>.</li>
+            <li>{{ 'secteur.sauvegarde_avant'|trans({lien: '<a href="' ~ path('admin_sauvegardes') ~ '">' ~ 'admin.onglet.sauvegardes'|trans ~ '</a>'})|raw }}</li>
         </ul>
-        {% set mot = constant('App\\Security\\ConfirmationSuppression::MOT') %}
+        {% set mot = 'confirmation.supprimer'|trans %}
         <form method="post">
             <input type="hidden" name="_token" value="{{ csrf_token('supprimer-secteur' ~ secteur.id) }}">
-            <label for="confirmation">Tapez <strong>{{ mot }}</strong> pour confirmer</label>
-            <input type="text" id="confirmation" name="confirmation" required autocomplete="off" autocapitalize="characters" spellcheck="false"
-                   pattern="\s*{{ mot }}\s*" title="Tapez {{ mot }} en majuscules">
-            <button class="btn btn-danger">Supprimer le secteur</button>
+            {{ include('_confirmation.html.twig') }}
+            <button class="btn btn-danger">{{ 'supprimer_secteur.bouton'|trans }}</button>
         </form>
     </section>
 {% endblock %}

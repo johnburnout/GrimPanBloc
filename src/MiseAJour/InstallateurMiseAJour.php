@@ -2,7 +2,10 @@
 
 namespace App\MiseAJour;
 
+use App\Exception\EchecOperation;
+use App\Exception\Messages;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Translation\TranslatableMessage;
 
 /**
  * Installe une release GitHub par-dessus la version en place.
@@ -51,17 +54,17 @@ final class InstallateurMiseAJour
     /**
      * Problèmes qui empêchent la mise à jour depuis le navigateur.
      *
-     * @return list<string>
+     * @return list<TranslatableMessage>
      */
     public function problemes(): array
     {
         $p = [];
         if (!class_exists(\ZipArchive::class)) {
-            $p[] = 'L\'extension PHP « zip » est absente.';
+            $p[] = new TranslatableMessage('maj.probleme.zip');
         }
-        foreach (['' => 'la racine du projet', '/public' => 'public/', '/var' => 'var/'] as $chemin => $nom) {
+        foreach (['' => 'maj.probleme.racine', '/public' => 'public/', '/var' => 'var/'] as $chemin => $nom) {
             if (!is_writable($this->racine.$chemin)) {
-                $p[] = "Le serveur web ne peut pas écrire dans $nom.";
+                $p[] = new TranslatableMessage('maj.probleme.ecriture', ['dossier' => str_contains($nom, '/') ? $nom : new TranslatableMessage($nom)]);
             }
         }
 
@@ -71,18 +74,23 @@ final class InstallateurMiseAJour
     /**
      * Étapes 1 à 5. Renvoie le jeton de maintenance à passer à finaliser().
      *
-     * @param callable(string): void $journal reçoit une ligne par étape
+     * @param callable(TranslatableMessage): void $journal reçoit une ligne par étape
      */
     public function installer(Release $release, callable $journal): string
     {
+        // Classes utilisées après le remplacement du code : chargées tant que l'ancien est en place
+        class_exists(TranslatableMessage::class);
+        class_exists(EchecOperation::class);
+        class_exists(Messages::class);
+
         if (!$release->estInstallable()) {
-            throw new \RuntimeException("La release {$release->tag} ne contient pas d'archive installable.");
+            throw new EchecOperation('maj.erreur.pas_d_archive', ['tag' => $release->tag]);
         }
         if (!$this->version->estDepasseePar($release->version)) {
-            throw new \RuntimeException("La version {$release->version} n'est pas plus récente que la version installée ({$this->version->get()}).");
+            throw new EchecOperation('maj.erreur.pas_plus_recente', ['version' => $release->version, 'installee' => $this->version->get()]);
         }
         if ($p = $this->problemes()) {
-            throw new \RuntimeException(implode("\n", $p));
+            throw new EchecOperation('maj.erreur.problemes', ['problemes' => $p[0]]);
         }
 
         $travail = $this->dossierTravail();
@@ -92,15 +100,15 @@ final class InstallateurMiseAJour
         // 1. Téléchargement et empreinte
         $zip = $travail.'/telechargement.zip';
         $taille = $this->archive->telecharger($release, $zip);
-        $journal(\sprintf('Archive téléchargée (%s Mo), empreinte SHA-256 vérifiée.', number_format($taille / 1048576, 1, ',', ' ')));
+        $journal(new TranslatableMessage('maj.journal.telechargee', ['taille' => round($taille / 1048576, 1)]));
 
         // 2. Extraction et contrôle
         $nouvelle = $this->archive->extraire($release, $zip, $travail.'/nouvelle');
-        $journal('Archive extraite et contrôlée.');
+        $journal(new TranslatableMessage('maj.journal.extraite'));
 
         // 3. Maintenance
         $jeton = $this->maintenance->activer();
-        $journal('Site en maintenance.');
+        $journal(new TranslatableMessage('maj.journal.maintenance'));
 
         // 4. Remplacement du code
         try {
@@ -109,11 +117,11 @@ final class InstallateurMiseAJour
             $this->maintenance->desactiver();
             throw $e;
         }
-        $journal('Code remplacé. Ancienne version conservée dans '.substr($precedente, \strlen($this->racine) + 1).'/.');
+        $journal(new TranslatableMessage('maj.journal.code_remplace', ['dossier' => substr($precedente, \strlen($this->racine) + 1).'/']));
 
         // 5. Caches
         $this->viderCaches();
-        $journal('Cache vidé.');
+        $journal(new TranslatableMessage('maj.journal.cache'));
 
         $this->fs->remove([$zip, $travail.'/nouvelle']);
         $this->nettoyerAnciennesSauvegardes($precedente);
@@ -127,7 +135,7 @@ final class InstallateurMiseAJour
      *
      * @param callable(array<string, mixed>): array{code: int, sortie: string} $console lance une commande Symfony
      *
-     * @return list<string> avertissements
+     * @return list<TranslatableMessage> avertissements
      */
     public function finaliser(callable $console): array
     {
@@ -135,11 +143,11 @@ final class InstallateurMiseAJour
         try {
             $r = $console(['command' => 'doctrine:migrations:migrate', '--allow-no-migration' => true]);
             if (0 !== $r['code']) {
-                throw new \RuntimeException("Les migrations de la base ont échoué :\n".$r['sortie']);
+                throw new EchecOperation('maj.erreur.migrations', ['sortie' => $r['sortie']]);
             }
             $r = $console(['command' => 'asset-map:compile']);
             if (0 !== $r['code']) {
-                $avertissements[] = 'Les logos n\'ont pas pu être compilés : lancez « php bin/console asset-map:compile ».';
+                $avertissements[] = new TranslatableMessage('maj.avertissement.logos', ['commande' => 'php bin/console asset-map:compile']);
             }
         } finally {
             $this->maintenance->desactiver();
@@ -149,7 +157,7 @@ final class InstallateurMiseAJour
         // une photo sans miniature s'affiche simplement en entier.
         $r = $console(['command' => 'app:photos:miniatures']);
         if (0 !== $r['code']) {
-            $avertissements[] = 'Certaines miniatures de photos n\'ont pas pu être créées : lancez « php bin/console app:photos:miniatures ».';
+            $avertissements[] = new TranslatableMessage('maj.avertissement.miniatures', ['commande' => 'php bin/console app:photos:miniatures']);
         }
 
         return $avertissements;
@@ -186,13 +194,13 @@ final class InstallateurMiseAJour
                 $sauvegarde = $precedente.'/'.$rel;
                 $existait = file_exists($cible) || is_link($cible);
                 if ($existait && !@rename($cible, $sauvegarde)) {
-                    throw new \RuntimeException("Impossible de déplacer $rel (droits insuffisants ?).");
+                    throw new EchecOperation('maj.erreur.deplacer', ['element' => $rel]);
                 }
                 if (!@rename($nouvelle.'/'.$rel, $cible)) {
                     if ($existait) {
                         @rename($sauvegarde, $cible);
                     }
-                    throw new \RuntimeException("Impossible d'installer $rel.");
+                    throw new EchecOperation('maj.erreur.installer', ['element' => $rel]);
                 }
                 $faits[] = [$rel, $existait];
             }
@@ -211,7 +219,7 @@ final class InstallateurMiseAJour
                     @rename($precedente.'/'.$rel, $this->racine.'/'.$rel);
                 }
             }
-            throw new \RuntimeException('Mise à jour annulée, l\'ancienne version est restée en place : '.$e->getMessage(), 0, $e);
+            throw new EchecOperation('maj.erreur.annulee', ['erreur' => Messages::de($e)], $e);
         }
 
         return $precedente;

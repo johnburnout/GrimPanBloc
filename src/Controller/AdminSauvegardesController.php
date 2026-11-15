@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Enum\TypeSauvegarde;
+use App\Exception\Messages;
 use App\Form\Sauvegardes\ConservationType;
 use App\Form\Sauvegardes\ImportType;
 use App\Repository\SecteurRepository;
@@ -13,6 +14,7 @@ use App\Sauvegarde\DepotSauvegardes;
 use App\Sauvegarde\GestionSauvegardes;
 use App\Sauvegarde\ReglageSauvegardes;
 use App\Sauvegarde\Sauvegarde;
+use App\Security\ConfirmationSuppression;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\Form\FormError;
@@ -25,6 +27,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Sauvegardes des secteurs, voies et photos : création, téléchargement, import,
@@ -35,13 +39,14 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class AdminSauvegardesController extends AbstractController
 {
     /** Mot à taper pour confirmer une restauration. */
-    public const MOT_RESTAURATION = 'RESTAURER';
     private const NOM = '[A-Za-z0-9-]+\.zip';
 
     public function __construct(
         private readonly GestionSauvegardes $gestion,
         private readonly DepotSauvegardes $depot,
         private readonly ReglageSauvegardes $reglage,
+        private readonly ConfirmationSuppression $confirmation,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -57,9 +62,9 @@ class AdminSauvegardesController extends AbstractController
     {
         try {
             $s = $this->gestion->creerManuelle(mb_substr(trim($request->getPayload()->getString('motif')), 0, 200));
-            $this->addFlash('success', \sprintf('Sauvegarde créée (%s).', $this->taille($s->taille)));
+            $this->addFlash('success', new TranslatableMessage('flash.sauvegarde.creee', ['taille' => $this->taille($s->taille)]));
         } catch (\Throwable $e) {
-            $this->addFlash('error', 'La sauvegarde a échoué : '.$e->getMessage());
+            $this->addFlash('error', new TranslatableMessage('flash.sauvegarde.echec', ['erreur' => Messages::de($e)]));
         }
 
         return $this->redirectToRoute('admin_sauvegardes');
@@ -72,11 +77,11 @@ class AdminSauvegardesController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             try {
                 $s = $this->gestion->importer($form->get('archive')->getData());
-                $this->addFlash('success', 'Archive importée : vous pouvez maintenant la restaurer.');
+                $this->addFlash('success', new TranslatableMessage('flash.sauvegarde.importee'));
 
                 return $this->redirectToRoute('admin_sauvegarde_restaurer', ['nom' => $s->nom]);
             } catch (\InvalidArgumentException $e) {
-                $form->get('archive')->addError(new FormError($e->getMessage()));
+                $form->get('archive')->addError(new FormError(Messages::texte($e, $this->translator)));
             }
         }
 
@@ -92,8 +97,7 @@ class AdminSauvegardesController extends AbstractController
             $this->reglage->definirAutomatiquesGardees($n);
             // Appliqué tout de suite, pas seulement à la prochaine sauvegarde automatique
             $supprimees = $this->depot->purgerAutomatiques($n);
-            $this->addFlash('success', \sprintf('Les %d dernières sauvegardes automatiques seront conservées.', $n)
-                .($supprimees ? \sprintf(' %d sauvegarde(s) plus ancienne(s) supprimée(s).', \count($supprimees)) : ''));
+            $this->addFlash('success', new TranslatableMessage('flash.sauvegarde.conservation', ['n' => $n, 'supprimees' => \count($supprimees)]));
 
             return $this->redirectToRoute('admin_sauvegardes');
         }
@@ -117,7 +121,7 @@ class AdminSauvegardesController extends AbstractController
         try {
             $resume = $archive->lireResume($s->chemin);
         } catch (\InvalidArgumentException $e) {
-            $this->addFlash('error', $e->getMessage());
+            $this->addFlash('error', Messages::de($e));
 
             return $this->redirectToRoute('admin_sauvegardes');
         }
@@ -126,26 +130,26 @@ class AdminSauvegardesController extends AbstractController
             $payload = $request->getPayload();
             $retour = $this->redirectToRoute('admin_sauvegarde_restaurer', ['nom' => $nom]);
             if (!$this->isCsrfTokenValid('restaurer'.$nom, $payload->getString('_token'))) {
-                $this->addFlash('error', 'Le formulaire a expiré : rechargez la page et recommencez.');
+                $this->addFlash('error', new TranslatableMessage('commun.formulaire_expire'));
 
                 return $retour;
             }
-            if (self::MOT_RESTAURATION !== trim($payload->getString('confirmation'))) {
-                $this->addFlash('error', 'Restauration annulée : tapez '.self::MOT_RESTAURATION.' pour confirmer.');
+            if (!$this->confirmation->estConfirmee($payload->getString('confirmation'), ConfirmationSuppression::RESTAURER)) {
+                $this->addFlash('error', ConfirmationSuppression::annulation('restauration', ConfirmationSuppression::RESTAURER));
 
                 return $retour;
             }
             $portee = $payload->getString('portee');
             $secteur = 'tout' === $portee ? null : (ctype_digit($portee) ? (int) $portee : -1);
             if (-1 === $secteur || (null !== $secteur && null === $resume->secteur($secteur))) {
-                $this->addFlash('error', 'Choisissez ce qu\'il faut restaurer.');
+                $this->addFlash('error', new TranslatableMessage('flash.restauration.choisir'));
 
                 return $retour;
             }
             // Sauvegarde manuelle : l'administrateur choisit de la garder ou non
             $supprimer = 'supprimer' === $payload->getString('apres');
             if (TypeSauvegarde::Manuelle === $s->type && !\in_array($payload->getString('apres'), ['garder', 'supprimer'], true)) {
-                $this->addFlash('error', 'Indiquez s\'il faut garder cette sauvegarde après la restauration.');
+                $this->addFlash('error', new TranslatableMessage('flash.restauration.garder'));
 
                 return $retour;
             }
@@ -153,18 +157,20 @@ class AdminSauvegardesController extends AbstractController
             try {
                 ['avant' => $avant, 'bilan' => $bilan] = $this->gestion->restaurer($s, $secteur, $admin);
             } catch (\Throwable $e) {
-                $this->addFlash('error', 'La restauration a échoué, rien n\'a été modifié : '.$e->getMessage());
+                $this->addFlash('error', new TranslatableMessage('flash.restauration.echec', ['erreur' => Messages::de($e)]));
 
                 return $retour;
             }
-            $this->addFlash('success', $this->messageBilan($bilan, null === $secteur ? 'Sauvegarde restaurée' : \sprintf('Secteur « %s » restauré', $resume->secteur($secteur)['nom'] ?? '')));
-            $this->addFlash('info', \sprintf('L\'état précédent a été sauvegardé automatiquement (%s).', $avant->creeLe->format('d/m/Y H:i:s')));
+            $this->addFlash('success', $this->messageBilan($bilan, null === $secteur
+                ? new TranslatableMessage('flash.restauration.tout')
+                : new TranslatableMessage('flash.restauration.secteur', ['nom' => $resume->secteur($secteur)['nom'] ?? ''])));
+            $this->addFlash('info', new TranslatableMessage('flash.restauration.etat_precedent', ['date' => $avant->creeLe->format('d/m/Y H:i:s')]));
             if ($supprimer && TypeSauvegarde::Manuelle === $s->type) {
                 try {
                     $this->gestion->supprimer($s);
-                    $this->addFlash('info', 'La sauvegarde restaurée a été supprimée.');
+                    $this->addFlash('info', new TranslatableMessage('flash.restauration.supprimee'));
                 } catch (\Throwable $e) {
-                    $this->addFlash('error', 'La sauvegarde restaurée n\'a pas pu être supprimée : '.$e->getMessage());
+                    $this->addFlash('error', new TranslatableMessage('flash.restauration.non_supprimee', ['erreur' => Messages::de($e)]));
                 }
             }
 
@@ -180,7 +186,6 @@ class AdminSauvegardesController extends AbstractController
             'sauvegarde' => $s,
             'resume' => $resume,
             'existants' => $existants,
-            'mot' => self::MOT_RESTAURATION,
         ]);
     }
 
@@ -191,9 +196,9 @@ class AdminSauvegardesController extends AbstractController
         $s = $this->trouver($nom);
         try {
             $this->gestion->supprimer($s);
-            $this->addFlash('success', \sprintf('Sauvegarde du %s supprimée.', $s->creeLe->format('d/m/Y H:i')));
+            $this->addFlash('success', new TranslatableMessage('flash.sauvegarde.supprimee', ['date' => $s->creeLe->format('d/m/Y H:i')]));
         } catch (\Throwable $e) {
-            $this->addFlash('error', $e->getMessage());
+            $this->addFlash('error', Messages::de($e));
         }
 
         return $this->redirectToRoute('admin_sauvegardes');
@@ -227,7 +232,7 @@ class AdminSauvegardesController extends AbstractController
     {
         return $this->createForm(ImportType::class, null, [
             'action' => $this->generateUrl('admin_sauvegarde_importer'),
-            'csrf_message' => 'Le formulaire a expiré : rechargez la page et recommencez.',
+            'csrf_message' => 'commun.formulaire_expire',
         ]);
     }
 
@@ -236,25 +241,25 @@ class AdminSauvegardesController extends AbstractController
     {
         return $this->createForm(ConservationType::class, ['automatiques' => $this->reglage->automatiquesGardees()], [
             'action' => $this->generateUrl('admin_sauvegardes_conservation'),
-            'csrf_message' => 'Le formulaire a expiré : rechargez la page et recommencez.',
+            'csrf_message' => 'commun.formulaire_expire',
         ]);
     }
 
-    private function messageBilan(BilanRestauration $b, string $debut): string
+    private function messageBilan(BilanRestauration $b, TranslatableMessage $debut): TranslatableMessage
     {
-        $message = \sprintf('%s : %d voie(s), %d photo(s) et %d croix.', $debut, $b->voies, $b->photos, $b->croix);
-        if ($b->croixIgnorees > 0) {
-            $message .= \sprintf(' %d croix ignorée(s) : grimpeur absent de ce site.', $b->croixIgnorees);
-        }
-        if ($b->photosSansFichier > 0) {
-            $message .= \sprintf(' %d photo(s) sans fichier dans la sauvegarde.', $b->photosSansFichier);
-        }
-
-        return $message;
+        return new TranslatableMessage('flash.restauration.bilan', [
+            'debut' => $debut, 'voies' => $b->voies, 'photos' => $b->photos, 'croix' => $b->croix,
+            'ignorees' => $b->croixIgnorees, 'sans_fichier' => $b->photosSansFichier,
+        ]);
     }
 
+    /** Taille en Mo, écrite à la façon de la langue de la page (« 1,5 », « 1.5 »). */
     private function taille(int $octets): string
     {
-        return number_format($octets / 1048576, 1, ',', ' ').' Mo';
+        $format = new \NumberFormatter($this->translator->getLocale(), \NumberFormatter::DECIMAL);
+        $format->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, 1);
+        $format->setAttribute(\NumberFormatter::MAX_FRACTION_DIGITS, 1);
+
+        return (string) $format->format($octets / 1048576);
     }
 }

@@ -5,6 +5,8 @@ namespace App\Sauvegarde;
 use App\Enum\SystemeCotation;
 use App\Enum\TypePrise;
 use App\Enum\TypeSauvegarde;
+use App\Exception\ArgumentInvalide;
+use App\Exception\EchecOperation;
 use App\MiseAJour\VersionInstallee;
 use App\Service\MiniaturesPhotos;
 use Doctrine\DBAL\Connection;
@@ -53,7 +55,7 @@ final class ArchiveSauvegarde
     public function ecrire(string $chemin, TypeSauvegarde $type, string $motif): ResumeSauvegarde
     {
         if (!class_exists(\ZipArchive::class)) {
-            throw new \RuntimeException('L\'extension PHP « zip » est absente : sauvegarde impossible.');
+            throw new EchecOperation('erreur.sauvegarde.zip_absente');
         }
         $donnees = $this->exporter();
 
@@ -80,7 +82,7 @@ final class ArchiveSauvegarde
         $temporaire = \dirname($chemin).'/.en-cours-'.bin2hex(random_bytes(6)).'.zip';
         $zip = new \ZipArchive();
         if (true !== $zip->open($temporaire, \ZipArchive::CREATE | \ZipArchive::EXCL)) {
-            throw new \RuntimeException('Impossible de créer l\'archive (dossier des sauvegardes non accessible en écriture ?).');
+            throw new EchecOperation('erreur.sauvegarde.creation');
         }
         try {
             $zip->setArchiveComment('GrimPanBloc : sauvegarde des secteurs, voies et photos');
@@ -92,10 +94,10 @@ final class ArchiveSauvegarde
                 $zip->setCompressionName($nom, \ZipArchive::CM_STORE);
             }
             if (!$zip->close()) {
-                throw new \RuntimeException('Écriture de l\'archive impossible : '.$zip->getStatusString());
+                throw new EchecOperation('erreur.sauvegarde.ecriture', ['detail' => $zip->getStatusString()]);
             }
             if (!@rename($temporaire, $chemin)) {
-                throw new \RuntimeException('Impossible d\'enregistrer l\'archive dans le dossier des sauvegardes.');
+                throw new EchecOperation('erreur.sauvegarde.enregistrement');
             }
         } catch (\Throwable $e) {
             @unlink($temporaire);
@@ -115,7 +117,7 @@ final class ArchiveSauvegarde
             $zip->close();
         }
         if ($resume->format > self::FORMAT) {
-            throw new \InvalidArgumentException('Cette sauvegarde vient d\'une version plus récente de GrimPanBloc : mettez d\'abord le site à jour.');
+            throw new ArgumentInvalide('erreur.sauvegarde.plus_recente');
         }
 
         return $resume;
@@ -134,7 +136,7 @@ final class ArchiveSauvegarde
         try {
             $stat = $zip->statName('donnees.json');
             if (false === $stat || $stat['size'] > self::DONNEES_MAX) {
-                throw new \InvalidArgumentException('Archive invalide : données absentes ou trop volumineuses.');
+                throw new ArgumentInvalide('erreur.sauvegarde.donnees_absentes');
             }
             $d = json_decode((string) $zip->getFromName('donnees.json'), true);
         } finally {
@@ -148,11 +150,11 @@ final class ArchiveSauvegarde
     public function ouvrir(string $chemin): \ZipArchive
     {
         if (!class_exists(\ZipArchive::class)) {
-            throw new \RuntimeException('L\'extension PHP « zip » est absente.');
+            throw new EchecOperation('erreur.sauvegarde.zip_absente');
         }
         $zip = new \ZipArchive();
         if (true !== $zip->open($chemin, \ZipArchive::RDONLY) || false === $zip->locateName('resume.json')) {
-            throw new \InvalidArgumentException('Ce fichier n\'est pas une sauvegarde GrimPanBloc.');
+            throw new ArgumentInvalide('erreur.sauvegarde.pas_une_sauvegarde');
         }
 
         return $zip;
@@ -235,10 +237,10 @@ final class ArchiveSauvegarde
     private function valider(mixed $d): array
     {
         if (!\is_array($d) || !\is_int($d['format'] ?? null)) {
-            throw new \InvalidArgumentException('Archive invalide : données illisibles.');
+            throw new ArgumentInvalide('erreur.sauvegarde.donnees_illisibles');
         }
         if ($d['format'] > self::FORMAT) {
-            throw new \InvalidArgumentException('Cette sauvegarde vient d\'une version plus récente de GrimPanBloc : mettez d\'abord le site à jour.');
+            throw new ArgumentInvalide('erreur.sauvegarde.plus_recente');
         }
 
         $secteurs = [];
@@ -401,7 +403,7 @@ final class ArchiveSauvegarde
         // disk_free_space() est souvent désactivée sur les hébergements mutualisés : contrôle au mieux
         $libre = \function_exists('disk_free_space') ? @disk_free_space($dossier) : false;
         if (false !== $libre && $libre < $besoin * 1.1 + 10 * 1024 * 1024) {
-            throw new \RuntimeException(\sprintf('Espace disque insuffisant pour la sauvegarde : %s Mo nécessaires, %s Mo libres. Supprimez d\'anciennes sauvegardes.', number_format($besoin / 1048576, 0, ',', ' '), number_format($libre / 1048576, 0, ',', ' ')));
+            throw new EchecOperation('erreur.sauvegarde.espace_disque', ['besoin' => (int) ceil($besoin / 1048576), 'libre' => (int) floor($libre / 1048576)]);
         }
     }
 }

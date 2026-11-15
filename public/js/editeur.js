@@ -19,6 +19,9 @@
  */
 (() => {
     const SVG = 'http://www.w3.org/2000/svg';
+    // Textes traduits, fournis par la page (base.html.twig) ; le français à défaut
+    const T = (() => { try { return JSON.parse(document.getElementById('textes-js')?.textContent || '{}'); } catch { return {}; } })();
+    const t = (cle, defaut) => T[cle] || defaut;
     const ZOOM_MAX = 8;               // le curseur va de 2^0 à 2^3
     const SEUIL_GLISSE = 6;           // px d'écran avant qu'un toucher devienne un glissé
     const DELAI_DOUBLE = 350;         // ms entre les deux touchers d'un double toucher
@@ -157,7 +160,7 @@
         editeur.classList.toggle('plein-ecran', actif);
         document.body.classList.toggle('plein-ecran-actif', actif);
         boutonPleinEcran.setAttribute('aria-pressed', actif ? 'true' : 'false');
-        boutonPleinEcran.title = actif ? 'Quitter le plein écran' : 'Plein écran';
+        boutonPleinEcran.title = actif ? t('quitter_plein_ecran', 'Quitter le plein écran') : t('plein_ecran', 'Plein écran');
         dimensionner();
     };
 
@@ -214,7 +217,8 @@
         const repliee = barre.classList.toggle('repliee');
         boutonReplier.setAttribute('aria-expanded', repliee ? 'false' : 'true');
         boutonReplier.textContent = repliee ? '▾' : '▴';
-        boutonReplier.title = repliee ? 'Déplier la barre d\'outils' : 'Replier la barre d\'outils';
+        boutonReplier.title = repliee ? t('deplier_barre', 'Déplier la barre d\'outils') : t('replier_barre', 'Replier la barre d\'outils');
+        boutonReplier.setAttribute('aria-label', boutonReplier.title);
         placerBarre();
     });
 
@@ -228,7 +232,7 @@
         if (!src) return;
 
         const img = new Image();
-        img.alt = 'Photo de la zone';
+        img.alt = t('photo_zone', 'Photo de la zone');
         img.draggable = false;
         img.onload = () => {
             W = img.naturalWidth;

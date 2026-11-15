@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Exception\Messages;
 use App\MiseAJour\InstallateurMiseAJour;
 use App\MiseAJour\VerificateurMiseAJour;
 use App\MiseAJour\VersionInstallee;
@@ -11,6 +12,8 @@ use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Mise à jour en SSH (même mécanisme que la page d'administration).
@@ -26,6 +29,7 @@ class MiseAJourCommand
         private readonly InstallateurMiseAJour $installateur,
         private readonly VersionInstallee $version,
         private readonly GestionSauvegardes $sauvegardes,
+        private readonly TranslatorInterface $translator,
         private readonly string $racine,
     ) {
     }
@@ -58,19 +62,24 @@ class MiseAJourCommand
             return Command::SUCCESS;
         }
 
+        // Catalogue français chargé (et formateur ICU) avant le remplacement du code et
+        // l'effacement du cache : les lignes du journal sont traduites ensuite sans rien relire.
+        $this->texte(new TranslatableMessage('maj.journal.telechargee', ['taille' => 1.5]));
+        class_exists(Messages::class);
+
         try {
             $s = $this->sauvegardes->creerAutomatique("avant la mise à jour vers la version {$release->version}");
             $io->text('✔ Secteurs, voies et photos sauvegardés : '.$s->chemin);
         } catch (\Throwable $e) {
-            $io->error('Mise à jour annulée : la sauvegarde préalable a échoué. '.$e->getMessage());
+            $io->error($this->texte(new TranslatableMessage('flash.maj.sauvegarde_echec', ['erreur' => Messages::de($e)])));
 
             return Command::FAILURE;
         }
 
         try {
-            $this->installateur->installer($release, fn (string $ligne) => $io->text('✔ '.$ligne));
+            $this->installateur->installer($release, fn (TranslatableMessage $ligne) => $io->text('✔ '.$this->texte($ligne)));
         } catch (\Throwable $e) {
-            $io->error($e->getMessage());
+            $io->error(Messages::texte($e, $this->translator, 'fr'));
 
             return Command::FAILURE;
         }
@@ -90,10 +99,10 @@ class MiseAJourCommand
         };
         try {
             foreach ($this->installateur->finaliser($console) as $avertissement) {
-                $io->warning($avertissement);
+                $io->warning($this->texte($avertissement));
             }
         } catch (\Throwable $e) {
-            $io->error($e->getMessage());
+            $io->error(Messages::texte($e, $this->translator, 'fr'));
 
             return Command::FAILURE;
         }
@@ -101,5 +110,11 @@ class MiseAJourCommand
         $io->note('Si OPcache est configuré avec validate_timestamps = 0, rechargez PHP-FPM : sudo systemctl reload php8.4-fpm');
 
         return Command::SUCCESS;
+    }
+
+    /** La ligne de commande reste en français. */
+    private function texte(TranslatableMessage $message): string
+    {
+        return $message->trans($this->translator, 'fr');
     }
 }

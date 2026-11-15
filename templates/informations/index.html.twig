@@ -1,26 +1,26 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Informations · {{ club_nom() ?: 'GrimPanBloc' }}{% endblock %}
+{% block title %}{{ 'infos.titre'|trans }} · {{ club_nom() ?: 'GrimPanBloc' }}{% endblock %}
 
 {% block body %}
-    <h1>Informations{% if club_nom() %} — {{ club_nom() }}{% endif %}</h1>
+    <h1>{{ 'infos.titre'|trans }}{% if club_nom() %} — {{ club_nom() }}{% endif %}</h1>
 
     {% if not renseigne and not reglement %}
-        <p class="vide">Les informations sur la salle n'ont pas encore été renseignées.</p>
+        <p class="vide">{{ 'infos.vide'|trans }}</p>
         {% if is_granted('ROLE_ADMIN') %}
-            <p><a class="btn" href="{{ path('admin_reglages') }}">Les renseigner dans les réglages</a></p>
+            <p><a class="btn" href="{{ path('admin_reglages') }}">{{ 'infos.renseigner'|trans }}</a></p>
         {% endif %}
     {% else %}
         <div class="infos-salle">
             {% if infos.adresse or position %}
                 <section class="carte-form-large infos-lieu">
-                    <h2>Adresse</h2>
+                    <h2>{{ 'infos.adresse'|trans }}</h2>
                     {% if infos.adresse %}
                         <address>{{ infos.adresse|nl2br }}</address>
                     {% endif %}
                     {% if position %}
                         {% set lat = position[0] %}{% set lon = position[1] %}
-                        <iframe class="carte-salle" title="Carte : emplacement de la salle"
+                        <iframe class="carte-salle" title="{{ 'infos.carte'|trans }}"
                                 src="https://www.openstreetmap.org/export/embed.html?bbox={{ [lon - 0.006, lat - 0.004, lon + 0.006, lat + 0.004]|join(',') }}&amp;layer=mapnik&amp;marker={{ lat }},{{ lon }}"
                                 loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
                         {% set requete = lat ~ ',' ~ lon %}
@@ -29,12 +29,12 @@
                     {% endif %}
                     <p class="liens-carte">
                         {% if position %}
-                            <a href="https://www.openstreetmap.org/?mlat={{ position[0] }}&amp;mlon={{ position[1] }}#map=17/{{ position[0] }}/{{ position[1] }}" target="_blank" rel="noopener">Voir sur OpenStreetMap</a>
+                            <a href="https://www.openstreetmap.org/?mlat={{ position[0] }}&amp;mlon={{ position[1] }}#map=17/{{ position[0] }}/{{ position[1] }}" target="_blank" rel="noopener">{{ 'infos.voir_osm'|trans }}</a>
                         {% else %}
-                            <a href="https://www.openstreetmap.org/search?query={{ requete|url_encode }}" target="_blank" rel="noopener">Voir sur OpenStreetMap</a>
+                            <a href="https://www.openstreetmap.org/search?query={{ requete|url_encode }}" target="_blank" rel="noopener">{{ 'infos.voir_osm'|trans }}</a>
                         {% endif %}
-                        <a href="https://www.google.com/maps/search/?api=1&amp;query={{ requete|url_encode }}" target="_blank" rel="noopener">Google Maps</a>
-                        <a href="https://www.google.com/maps/dir/?api=1&amp;destination={{ requete|url_encode }}" target="_blank" rel="noopener">Itinéraire</a>
+                        <a href="https://www.google.com/maps/search/?api=1&amp;query={{ requete|url_encode }}" target="_blank" rel="noopener">{{ 'infos.google_maps'|trans }}</a>
+                        <a href="https://www.google.com/maps/dir/?api=1&amp;destination={{ requete|url_encode }}" target="_blank" rel="noopener">{{ 'infos.itineraire'|trans }}</a>
                     </p>
                 </section>
             {% endif %}
@@ -43,31 +43,31 @@
             {% if infos.site_web or infos.hauteur is not null or infos.surface is not null or horairesVisibles or reglement %}
             <section class="carte-form-large">
                 {% if infos.site_web %}
-                    <h2>Site internet</h2>
+                    <h2>{{ 'infos.site_internet'|trans }}</h2>
                     <p><a href="{{ infos.site_web }}" target="_blank" rel="noopener" class="site-salle">{{ infos.site_web|replace({'https://': '', 'http://': ''})|trim('/', 'right') }}</a></p>
                 {% endif %}
 
                 {% if infos.hauteur is not null or infos.surface is not null %}
-                    <h2>La salle</h2>
+                    <h2>{{ 'infos.la_salle'|trans }}</h2>
                     <dl class="caracteristiques">
                         {% if infos.hauteur is not null %}
-                            <dt>Hauteur</dt>
-                            <dd>{{ infos.hauteur|number_format(infos.hauteur == infos.hauteur|round ? 0 : 1, ',', ' ') }} m</dd>
+                            <dt>{{ 'infos.hauteur'|trans }}</dt>
+                            <dd>{{ infos.hauteur|nombre(infos.hauteur == infos.hauteur|round ? 0 : 1) }} m</dd>
                         {% endif %}
                         {% if infos.surface is not null %}
-                            <dt>Surface grimpable</dt>
-                            <dd>{{ infos.surface|number_format(0, ',', ' ') }} m²</dd>
+                            <dt>{{ 'infos.surface'|trans }}</dt>
+                            <dd>{{ infos.surface|nombre }} m²</dd>
                         {% endif %}
                     </dl>
                 {% endif %}
 
                 {% if horairesVisibles %}
-                    <h2>Horaires d'ouverture</h2>
+                    <h2>{{ 'infos.horaires'|trans }}</h2>
                     <table class="horaires">
-                        {% for jour, libelle in constant('App\\Site\\InformationsSalle::JOURS') %}
+                        {% for jour in constant('App\\Site\\InformationsSalle::JOURS')|keys %}
                             <tr{% if not infos.horaires[jour] %} class="ferme"{% endif %}>
-                                <th scope="row">{{ libelle }}</th>
-                                <td>{{ infos.horaires[jour] ?: 'Fermé' }}</td>
+                                <th scope="row">{{ ('jour.' ~ jour)|trans }}</th>
+                                <td>{{ infos.horaires[jour] ?: 'infos.ferme'|trans }}</td>
                             </tr>
                         {% endfor %}
                     </table>
@@ -75,20 +75,20 @@
                 {% endif %}
 
                 {% if reglement %}
-                    <h2>Règlement intérieur</h2>
-                    <p><a class="lien-document" href="{{ path('informations_reglement', {v: reglement.timestamp}) }}" target="_blank" rel="noopener">Lire le règlement intérieur (PDF)</a></p>
+                    <h2>{{ 'infos.reglement'|trans }}</h2>
+                    <p><a class="lien-document" href="{{ path('informations_reglement', {v: reglement.timestamp}) }}" target="_blank" rel="noopener">{{ 'infos.lire_reglement'|trans }}</a></p>
                 {% endif %}
             </section>
             {% endif %}
         </div>
         {% if infos.autres %}
             <section class="carte-form-large texte-libre">
-                <h2>Autres informations</h2>
+                <h2>{{ 'infos.autres'|trans }}</h2>
                 {{ infos.autres|markdown }}
             </section>
         {% endif %}
         {% if is_granted('ROLE_ADMIN') %}
-            <p><a href="{{ path('admin_reglages') }}">Modifier ces informations</a></p>
+            <p><a href="{{ path('admin_reglages') }}">{{ 'infos.modifier'|trans }}</a></p>
         {% endif %}
     {% endif %}
 {% endblock %}

@@ -1,0 +1,4 @@
+{# Champ de confirmation d'une action définitive. Variable : mot (déjà traduit, ex. « SUPPRIMER ») #}
+<label for="confirmation">{{ 'confirmation.tapez'|trans({mot: '<strong>' ~ mot|e ~ '</strong>'})|raw }}</label>
+<input type="text" id="confirmation" name="confirmation" required autocomplete="off" autocapitalize="characters" spellcheck="false"
+       pattern="\s*{{ mot }}\s*" title="{{ 'confirmation.en_majuscules'|trans({mot: mot}) }}">

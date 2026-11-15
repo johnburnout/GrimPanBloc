@@ -2,11 +2,14 @@
 
 namespace App\Enum;
 
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 /**
  * Cotation sur l'échelle française, de 3a à 9c.
  * L'ordre des cas définit la difficulté (voir rang()).
  */
-enum CotationFr: string
+enum CotationFr: string implements TranslatableInterface
 {
     case C3a = '3a';
     case C3b = '3b';
@@ -51,5 +54,11 @@ enum CotationFr: string
             8 => '#d63030',
             default => '#1d1d1d',
         };
+    }
+
+    /** Cotation française : identique dans toutes les langues (« 6a+ »). */
+    public function trans(TranslatorInterface $translator, ?string $locale = null): string
+    {
+        return $this->libelle();
     }
 }

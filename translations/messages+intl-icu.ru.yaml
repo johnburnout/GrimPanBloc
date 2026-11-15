@@ -1,0 +1,498 @@
+commun.logo_club: 'Логотип клуба'
+commun.actions: Действия
+commun.enregistrer: Сохранить
+commun.supprimer: Удалить
+commun.formulaire_expire: 'Срок действия формы истёк: обновите страницу и попробуйте снова.'
+nav.accueil: 'GrimPanBloc, главная'
+nav.voies: Трассы
+nav.secteurs: Секторы
+nav.infos: Инфо
+nav.administration: Администрирование
+nav.mon_compte: 'Мой профиль'
+nav.deconnexion: Выйти
+nav.connexion: Войти
+nav.inscription: Регистрация
+pied.langue: Язык
+maj.bandeau: 'Доступна версия GrimPanBloc {version} (установлена версия {installee}).'
+maj.bandeau_lien: 'Посмотреть обновление'
+js.plein_ecran: 'Во весь экран'
+js.quitter_plein_ecran: 'Выйти из полноэкранного режима'
+js.zoom: Масштаб
+js.zoomer: Увеличить
+js.dezoomer: Уменьшить
+js.niveau_zoom: 'Уровень масштаба'
+js.voir_toute_photo: 'Показать всё фото'
+js.deplier_barre: 'Развернуть панель инструментов'
+js.replier_barre: 'Свернуть панель инструментов'
+js.photo_zone: 'Фото зоны'
+accueil.titre: Трассы
+accueil.partager: Поделиться
+accueil.partager_aide: 'Отсканируйте этот QR-код камерой другого телефона.'
+voies.aucune: 'Трасс пока нет.'
+voies.aucune_filtre: 'Нет трасс, подходящих под эти фильтры.'
+voies.tri.cotation: Категория
+voies.tri.nom: Название
+voies.tri.secteur: Сектор
+voies.tri.ouvreur: Постановщик
+voies.filtre.secteur: Сектор
+voies.filtre.tous: Все
+voies.filtre.echelle: Шкала
+voies.filtre.toutes: Все
+voies.filtre.echelle_fr: Французская
+voies.filtre.echelle_couleur: Цвета
+voies.filtre.de: От
+voies.filtre.a: до
+voies.trier_par: 'Сортировать по'
+voies.ordre: Порядок
+voies.croissant: 'По возрастанию'
+voies.decroissant: 'По убыванию'
+voies.valider: Применить
+voies.nombre: '{n, plural, one {# трасса} few {# трассы} many {# трасс} other {# трассы}}'
+voies.miniatures: Миниатюры
+voies.miniature: Миниатюра
+voies.taille: Размер
+voies.taille_icones: 'Размер значков'
+voies.mode_affichage: 'Режим отображения'
+voies.vue_icones: Значки
+voies.vue_liste: Список
+voie.dupliquer: Дублировать
+voie.dupliquer_nom: 'Дублировать {nom}'
+voie.photo_alt: 'Фото трассы {nom}'
+enum.type_prise.depart: Старт
+enum.type_prise.main: Рука
+enum.type_prise.pied: Нога
+enum.type_prise.top: Топ
+enum.systeme_cotation.fr: 'Французская шкала'
+enum.systeme_cotation.couleur: Цвета
+enum.couleur.vert: Зелёный
+enum.couleur.jaune: Жёлтый
+enum.couleur.bleu: Синий
+enum.couleur.orange: Оранжевый
+enum.couleur.rouge: Красный
+enum.couleur.noir: Чёрный
+enum.couleur.blanc: Белый
+enum.type_sauvegarde.manuelle: Ручная
+enum.type_sauvegarde.automatique: Автоматическая
+enum.type_sauvegarde.importee: Импортированная
+voie.modifier: Изменить
+voie.supprimer_ellipse: Удалить…
+voie.supprimer_confirmer: 'Удалить эту трассу?'
+voie.pieds_libres: 'ноги свободные'
+voie.pieds_imposes: 'ноги по трассе'
+voie.ouverte_par: 'поставил(а) {pseudo} {date}'
+voie.nombre_prises: '{n, plural, one {# зацеп} few {# зацепа} many {# зацепов} other {# зацепа}}'
+voie.cotation: Категория
+voie.cotation_proposee_par: 'предложена {pseudo} (постановщик). Её заменит мнение скалолазов, которые пролезут трассу.'
+voie.cotation_d_apres: 'по мнению {n, plural, one {# скалолаза, пролезшего} few {# скалолазов, пролезших} many {# скалолазов, пролезших} other {# скалолаза, пролезших}} трассу'
+voie.proposition_createur: 'предложение постановщика:'
+voie.cotations_proposees: 'Предложенные категории'
+voie.reussites: Пролазы
+voie.personne: 'Эту трассу ещё никто не пролез.'
+voie.ma_cotation: 'Моя категория'
+voie.cotation_que_je_propose: 'Предлагаемая мной категория'
+voie.modifier_ma_cotation: 'Изменить мою категорию'
+voie.retirer_croix: 'Снять мою отметку'
+voie.j_ai_reussi: 'Я пролез(ла) эту трассу'
+voie.propre_croix: 'Ваша собственная отметка не блокирует трассу и не считается голосом: учитываются только отметки других скалолазов.'
+voie.supprimer_titre: 'Удалить трассу'
+voie.supprimer_validee: 'Другие скалолазы, пролезшие эту трассу: {autres}. При удалении будут стёрты все отметки: {croix, plural, one {# пролаз} few {# пролаза} many {# пролазов} other {# пролаза}}. Это действие необратимо.'
+voie.copie_de: 'Копия {nom}'
+voie.nouvelle: 'Новая трасса'
+voie.copie_titre: 'Копия «{nom}»'
+voie.copie_aide: 'Фото, зацепы, категория и указания трассы {lien} скопированы: поправьте их и сохраните. Исходная трасса не изменится.'
+voie.modifier_nom: 'Изменить {nom}'
+voie.modifier_titre: 'Изменить трассу'
+voie.verrouillee: 'Эту трассу уже пролезли: {grimpeurs}. Фото, зацепы и категория заблокированы. Название и описание ещё можно исправить.'
+voie.form.etape_photo: '1. Фото'
+voie.form.etape_prises: '2. Зацепы'
+voie.form.etape_infos: '3. Описание и категория'
+voie.form.aide_prises: 'Выберите тип на панели инструментов, затем <strong>дважды коснитесь</strong> фото (двойной щелчок мышью), чтобы поставить зацеп. Перетащите зацеп одним пальцем, чтобы переместить его; коснитесь его один раз, чтобы задать выбранный тип и настроить размер. Масштабируйте двумя пальцами или ползунком сбоку; перемещайте изображение двумя пальцами (или одним пальцем в стороне от зацепов). Кнопка под ползунком включает полноэкранный режим, а панель инструментов перемещается за ручку'
+voie.form.editeur_vide: 'Выберите или загрузите фото, чтобы начать.'
+voie.form.outils: 'Инструменты разметки'
+voie.form.deplacer_barre: 'Переместить панель инструментов'
+voie.form.effacer: Стереть
+voie.form.taille: Размер
+voie.form.annuler: 'Отменить последнее действие'
+voie.form.prises: зацеп(ов)
+voie.form.aide_pieds: 'При свободных ногах зацепы для ног не показываются скалолазам (они сохраняются и видны здесь полупрозрачными).'
+voie.form.enregistrer: 'Сохранить трассу'
+voie.form.enregistrer_modifications: 'Сохранить изменения'
+confirmation.supprimer: УДАЛИТЬ
+confirmation.restaurer: ВОССТАНОВИТЬ
+confirmation.tapez: 'Введите {mot} для подтверждения'
+confirmation.en_majuscules: 'Введите {mot} заглавными буквами'
+confirmation.supprimer_definitivement: 'Удалить навсегда'
+confirmation.annulee.suppression: 'Удаление отменено: введите {mot} для подтверждения.'
+confirmation.annulee.nettoyage: 'Очистка отменена: введите {mot} для подтверждения.'
+confirmation.annulee.restauration: 'Восстановление отменено: введите {mot} для подтверждения.'
+commun.email: 'Эл. почта'
+commun.mot_de_passe: Пароль
+commun.pseudo: 'Имя пользователя'
+secteurs.titre: Секторы
+secteurs.nouveau: 'Новый сектор'
+secteurs.aucun_admin: 'Секторов нет. Начните с создания сектора (стенд, стена, нависание…).'
+secteurs.aucun: 'Секторов нет. Сначала администратор должен создать сектор (стенд, стена, нависание…).'
+secteurs.creer: Создать
+secteurs.connectez_vous: 'Войдите, чтобы создать трассу'
+secteurs.nettoyer_ellipse: 'Очистить сектор…'
+secteurs.supprimer_ellipse: 'Удалить сектор…'
+connexion.titre: Вход
+connexion.identifiants_incorrects: 'Неверный адрес эл. почты или пароль.'
+connexion.rester_connecte: 'Не выходить из системы'
+connexion.se_connecter: Войти
+connexion.pas_de_compte: 'Ещё нет учётной записи?'
+inscription.titre: 'Создать учётную запись'
+inscription.bouton: Зарегистрироваться
+profil.titre: 'Мой профиль'
+profil.onglet_profil: Профиль
+profil.onglet_croix: 'Мои пролазы'
+profil.onglet_voies: 'Мои трассы'
+profil.aucune_croix: 'Вы ещё не отметили ни одной пролезенной трассы.'
+profil.col_voie: Трасса
+profil.col_cotation_affichee: 'Показанная категория'
+profil.col_le: Дата
+profil.votre_voie: '(ваша трасса)'
+profil.croix_total: 'Пролезено: {n, plural, one {# трасса} few {# трассы} many {# трасс} other {# трассы}}. Чтобы изменить предлагаемую категорию, откройте страницу трассы.'
+profil.non_modifiable: '(нельзя изменить)'
+profil.inscrit_le: 'Дата регистрации'
+profil.aucune_voie: 'Вы ещё не создали ни одной трассы.'
+infos.titre: Информация
+infos.vide: 'Информация о скалодроме ещё не заполнена.'
+infos.renseigner: 'Заполнить в настройках'
+infos.adresse: Адрес
+infos.carte: 'Карта: расположение скалодрома'
+infos.voir_osm: 'Открыть в OpenStreetMap'
+infos.google_maps: 'Google Maps'
+infos.itineraire: Маршрут
+infos.site_internet: Сайт
+infos.la_salle: Скалодром
+infos.hauteur: Высота
+infos.surface: 'Площадь лазания'
+infos.horaires: 'Часы работы'
+infos.ferme: Закрыто
+infos.reglement: Правила
+infos.lire_reglement: 'Прочитать правила (PDF)'
+infos.autres: 'Другая информация'
+infos.modifier: 'Изменить эту информацию'
+jour.lundi: Понедельник
+jour.mardi: Вторник
+jour.mercredi: Среда
+jour.jeudi: Четверг
+jour.vendredi: Пятница
+jour.samedi: Суббота
+jour.dimanche: Воскресенье
+admin.onglet.reglages: Настройки
+admin.onglet.utilisateurs: Пользователи
+admin.onglet.photos: Фото
+admin.onglet.sauvegardes: 'Резервные копии'
+admin.onglet.fiche: 'Лист для печати'
+admin.onglet.mise_a_jour: Обновления
+reglages.https.titre: 'Безопасность соединения'
+reglages.https.page_en_http: 'Эта страница открыта по <strong>HTTP</strong>: пароли передаются в открытом виде. Откройте её по {lien}, чтобы включить перенаправление.'
+reglages.https.forcer: 'Всегда использовать HTTPS: посетители, пришедшие по <code>http://</code>, перенаправляются на <code>https://</code>'
+reglages.https.aide: 'Включайте, только если сертификат HTTPS установлен и обновляется автоматически (так у большинства хостингов, с Let’s Encrypt). Браузеры запоминают этот выбор на 30 дней.'
+reglages.club.titre: 'Название и логотип скалодрома или клуба'
+reglages.club.aide: 'Логотип отображается в шапке сайта и на {fiche}. PNG, JPEG или WebP, не более 5 МБ. Он уменьшается до {cote} пикс.'
+reglages.club.fiche: 'листе для печати'
+reglages.club.nom: 'Название скалодрома или клуба'
+reglages.club.logo_actuel: 'Текущий логотип'
+reglages.club.supprimer_logo: 'Удалить логотип'
+reglages.club.remplacer_logo: 'Заменить логотип'
+reglages.club.logo: Логотип
+reglages.salle.titre: 'Информация о скалодроме'
+reglages.salle.aide: 'Показывается на странице {lien}, доступной всем из меню. Все поля необязательны: пустые не показываются.'
+reglages.salle.adresse: 'Почтовый адрес'
+reglages.salle.coordonnees: 'Расположение на карте (широта, долгота)'
+reglages.salle.coordonnees_aide: 'В OpenStreetMap или Google Maps щелчок правой кнопкой по месту скалодрома показывает его координаты: скопируйте их сюда. На странице «Информация» появится карта.'
+reglages.salle.hauteur: 'Высота (м)'
+reglages.salle.surface: 'Площадь лазания (м²)'
+reglages.salle.afficher_horaires: 'Показывать часы работы на странице «Информация»'
+reglages.salle.horaires_aide: 'Одна строка на день, например «18:00 – 22:00». Оставьте пустыми выходные дни.'
+reglages.salle.remarque_horaires: 'Примечание о часах работы'
+reglages.salle.remarque_exemple: 'Закрыто во время школьных каникул'
+reglages.salle.autres_aide: 'Свободный текст внизу страницы «Информация» (цены, как добраться, правила…). Оформление {lien}: жирный, курсив, заголовок, список, ссылка; пустая строка между абзацами.'
+reglages.salle.reglement_aide: 'PDF-файл не более 10 МБ, ссылка на него размещается на странице «Информация».'
+reglages.salle.reglement_actuel: 'Текущие правила (PDF)'
+reglages.salle.envoye_le: 'загружено {date}'
+reglages.salle.supprimer_reglement: 'Удалить правила'
+reglages.salle.remplacer_reglement: 'Заменить правила'
+reglages.salle.reglement_pdf: 'Правила (PDF)'
+reglages.smtp.titre: 'Сервер отправки почты (SMTP)'
+reglages.smtp.aide: 'Эти данные предоставляет ваш хостинг или почтовый сервис. Пароль хранится в зашифрованном виде.'
+reglages.smtp.serveur: Сервер
+reglages.smtp.port: Порт
+reglages.smtp.chiffrement: Шифрование
+reglages.smtp.identifiant: Логин
+reglages.smtp.mot_de_passe_garde: '(сохранён: оставьте пустым, чтобы не менять)'
+reglages.smtp.effacer_mot_de_passe: 'Удалить сохранённый пароль'
+reglages.smtp.expediteur: 'Адрес отправителя'
+reglages.smtp.expediteur_nom: 'Имя отправителя'
+reglages.smtp.starttls: 'STARTTLS (порт 587)'
+reglages.smtp.ssl: 'SSL/TLS (порт 465)'
+reglages.smtp.aucun: 'Нет (не рекомендуется)'
+reglages.mail_test.titre: 'Тестовое письмо'
+reglages.mail_test.renseignez: 'Сначала укажите сервер и адрес отправителя.'
+reglages.mail_test.aide: 'Отправляет обычное сообщение, чтобы проверить настройки выше.'
+reglages.mail_test.destinataire: Получатель
+reglages.mail_test.envoyer: 'Отправить тестовое письмо'
+reglages.groupe.titre: 'Отправить сообщение'
+reglages.groupe.aide: 'Каждому получателю отправляется отдельное письмо: адреса не видны другим. Напишите {pseudo}, чтобы вставить имя пользователя получателя. Отключённые и удалённые учётные записи ничего не получают.'
+reglages.groupe.confirmer: 'Отправить это сообщение?'
+reglages.groupe.destinataires: Получатели
+reglages.groupe.tous: 'Все пользователи ({n})'
+reglages.groupe.admins: 'Администраторы ({n})'
+reglages.groupe.objet: Тема
+reglages.groupe.message: Сообщение
+reglages.groupe.envoyer: Отправить
+utilisateurs.croix: Пролазы
+utilisateurs.statut: Статус
+utilisateurs.vous: (вы)
+utilisateurs.supprime_le: 'Удалён {date}'
+utilisateurs.desactive: Отключён
+utilisateurs.actif: Активен
+utilisateurs.admin: админ
+utilisateurs.retirer_admin: 'Снять права админа'
+utilisateurs.nommer_admin: 'Сделать админом'
+utilisateurs.desactiver: Отключить
+utilisateurs.reactiver: Включить
+utilisateurs.aide: 'Отключённая учётная запись больше не может войти (обратимо). Удалённая учётная запись теряет адрес эл. почты и пароль (необратимо); её трассы и пролазы остаются видны под её именем.'
+utilisateurs.supprimer_titre: 'Удалить учётную запись {pseudo}'
+utilisateurs.supprimer_email: 'Адрес эл. почты ({email}) и пароль стираются: человек больше не сможет войти.'
+utilisateurs.supprimer_voies: '{voies, plural, one {# трасса} few {# трассы} many {# трасс} other {# трассы}} и {croix, plural, one {# пролаз} few {# пролаза} many {# пролазов} other {# пролаза}} остаются видны под именем «{pseudo}». Удалить эти трассы сможет только администратор.'
+utilisateurs.supprimer_pseudo: 'Имя пользователя остаётся занятым. Это действие необратимо.'
+photos.aide: 'Фото, которые не используются ни одной трассой. Они остаются в своём секторе и могут пригодиться для новой трассы; удалите те, что больше не понадобятся. Удаление необратимо.'
+photos.aucune: 'Неиспользуемых фото нет.'
+photos.total: 'Неиспользуемых фото: {n}'
+photos.page_sur: 'страница {page} из {pages}'
+photos.voir_en_grand: 'Открыть фото в полном размере'
+photos.alt: 'Фото сектора {secteur}'
+photos.envoyee: 'Загружено {date}, автор: {pseudo}'
+photos.confirmer: 'Удалить навсегда это фото сектора «{secteur}»?'
+photos.pages: Страницы
+photos.precedente: Предыдущая
+photos.suivante: Следующая
+sauvegardes.aide: 'Резервная копия содержит секторы, трассы (с зацепами и пролазами) и фото. Учётные записи и настройки в неё не входят. Автоматическая копия создаётся перед каждым восстановлением, очисткой сектора и обновлением, а также не реже раза в неделю.'
+sauvegardes.nouvelle: 'Новая резервная копия'
+sauvegardes.note: 'Заметка (необязательно)'
+sauvegardes.note_exemple: 'Перед сменой трасс в июне'
+sauvegardes.sauvegarder: 'Создать копию сейчас'
+sauvegardes.enregistrees: 'Сохранённые копии'
+sauvegardes.aucune: 'Резервных копий пока нет.'
+sauvegardes.total: '{n, plural, one {# копия} few {# копии} many {# копий} other {# копии}} · всего {taille} МБ'
+sauvegardes.col_date: Дата
+sauvegardes.col_type: Тип
+sauvegardes.col_contenu: Содержимое
+sauvegardes.col_taille: Размер
+sauvegardes.contenu: '{secteurs, plural, one {# сектор} few {# сектора} many {# секторов} other {# сектора}}, {voies, plural, one {# трасса} few {# трассы} many {# трасс} other {# трассы}}, {photos, plural, one {# фото} few {# фото} many {# фото} other {# фото}}'
+sauvegardes.version: 'версия {version}'
+sauvegardes.illisible: 'Не читается: {erreur}'
+sauvegardes.mo: '{taille} МБ'
+sauvegardes.telecharger: Скачать
+sauvegardes.restaurer_ellipse: Восстановить…
+sauvegardes.confirmer_suppression: 'Удалить навсегда копию от {date}?'
+sauvegardes.emplacement: 'Копии хранятся на сервере, в {dossier}. Время от времени скачивайте одну из них: если сервер будет потерян, пропадут и они.'
+sauvegardes.conservees: 'Хранимые автоматические копии'
+sauvegardes.conservees_aide: 'Сверх этого числа самые старые автоматические копии удаляются. Ручные и импортированные копии никогда не удаляются автоматически.'
+sauvegardes.nombre: 'Количество (от {min} до {max})'
+sauvegardes.importer_titre: 'Импортировать резервную копию'
+sauvegardes.importer_aide: 'Архив, скачанный с этой страницы, здесь или на другом сайте GrimPanBloc. Максимальный размер, принимаемый сервером: {taille}. Архив добавляется в список выше; без вашего подтверждения ничего не восстанавливается.'
+sauvegardes.archive: 'Архив (.zip)'
+sauvegardes.importer: Импортировать
+restaurer.titre_page: 'Восстановить резервную копию'
+restaurer.titre: 'Восстановить копию от {date}, {heure}'
+restaurer.point1: 'Сначала текущее состояние автоматически сохраняется: восстановление можно отменить, восстановив эту копию.'
+restaurer.point2: 'Трассы, фото и пролазы возвращаются в том виде, в каком были на момент копии; ссылки на трассы остаются рабочими.'
+restaurer.point3: 'Авторы определяются по имени пользователя. Трасса, автора которой больше нет на этом сайте, назначается вам; пролаз скалолаза, которого больше нет, игнорируется.'
+restaurer.quoi: 'Что нужно восстановить?'
+restaurer.tous: 'Все секторы'
+restaurer.tous_effet: 'все текущие трассы и фото заменяются, а секторы, созданные позже, удаляются.'
+restaurer.seulement: 'Только сектор {nom}'
+restaurer.contenu_secteur: '{voies, plural, one {# трасса} few {# трассы} many {# трасс} other {# трассы}}, {photos, plural, one {# фото} few {# фото} many {# фото} other {# фото}}'
+restaurer.remplace: 'заменяет всё текущее содержимое сектора «{nom}».'
+restaurer.recree: 'сектор, удалённый с тех пор, создаётся заново.'
+restaurer.apres: 'После восстановления эту ручную копию нужно…'
+restaurer.gardee: сохранить
+restaurer.supprimee: удалить
+restaurer.bouton: Восстановить
+nettoyer.titre_court: 'Очистить {nom}'
+nettoyer.titre: 'Очистить сектор «{nom}»'
+nettoyer.vide: 'Этот сектор уже пуст: ни трасс, ни фото.'
+nettoyer.voies: 'Удаляются трассы сектора ({voies, plural, one {# трасса} few {# трассы} many {# трасс} other {# трассы}}) вместе с их зацепами и пролазами ({croix, plural, one {# пролаз} few {# пролаза} many {# пролазов} other {# пролаза}}).'
+nettoyer.photos: 'Удаляются фото сектора ({photos, plural, one {# фото} few {# фото} many {# фото} other {# фото}}), включая те, что не используются ни одной трассой.'
+nettoyer.conserve: 'Сам сектор (название, описание) сохраняется и готов для новых трасс.'
+nettoyer.bouton: 'Очистить сектор'
+secteur.sauvegarde_avant: 'Непосредственно перед этим создаётся автоматическая копия: сектор можно будет восстановить в разделе Администрирование → {lien}.'
+supprimer_secteur.titre_court: 'Удалить {nom}'
+supprimer_secteur.titre: 'Удалить сектор «{nom}»'
+supprimer_secteur.disparait: 'Сектор {nom} исчезает из списка секторов.'
+supprimer_secteur.voies: 'Удаляются его трассы ({voies, plural, one {# трасса} few {# трассы} many {# трасс} other {# трассы}}) вместе с зацепами и пролазами ({croix, plural, one {# пролаз} few {# пролаза} many {# пролазов} other {# пролаза}}).'
+supprimer_secteur.photos: 'Удаляются его фото ({photos, plural, one {# фото} few {# фото} many {# фото} other {# фото}}), включая те, что не используются ни одной трассой.'
+supprimer_secteur.bouton: 'Удалить сектор'
+fiche.imprimer: Печать
+fiche.titre: 'Трассы скалодрома'
+fiche.accroche: 'Все трассы стенда, их зацепы и категории — в вашем телефоне.'
+fiche.etape1: 'Отсканируйте QR-код камерой телефона.'
+fiche.etape2: 'Создайте учётную запись за несколько секунд.'
+fiche.etape3: 'Смотрите трассы, отмечайте пролезенные и предлагайте их категорию.'
+maj.derniere: 'Последнее обновление'
+maj.version_installee: 'Установленная версия:'
+maj.inconnue: 'Не удаётся узнать последнюю опубликованную версию (нет релизов или GitHub недоступен).'
+maj.a_jour: 'GrimPanBloc обновлён: последняя опубликованная версия — {version}.'
+maj.disponible: 'Доступна версия {version}.'
+maj.disponible_le: 'Доступна версия {version} (опубликована {date}).'
+maj.nouveautes: 'Что нового'
+maj.voir_github: 'Открыть релиз на GitHub'
+maj.pas_installable: 'В этом релизе нет устанавливаемого архива: обновите вручную (см. README).'
+maj.impossible_navigateur: 'На этом сервере обновление из браузера невозможно:'
+maj.en_ssh: 'Запустите его по SSH:'
+maj.installer: Установить
+maj.point1: 'Сайт переходит в режим обслуживания на несколько секунд.'
+maj.point2: 'Фото, конфигурация ({fichier}) и база данных сохраняются; база при необходимости обновляется.'
+maj.point3: 'Текущий код сохраняется в {dossier}.'
+maj.point4: 'Предварительно сделайте копию базы данных (инструментом хостинга или {outil}).'
+maj.en_cours: 'Идёт обновление…'
+maj.mettre_a_jour: 'Обновить до версии {version}'
+maj.verifier: 'Проверить сейчас'
+maj.verifier_aide: '(иначе GrimPanBloc проверяет раз в день)'
+flash.voie.creee: 'Трасса «{nom}» создана.'
+flash.voie.copiee: 'Трасса «{nom}» создана (копия «{source}»).'
+flash.voie.modifiee: 'Трасса «{nom}» изменена.'
+flash.voie.supprimee: 'Трасса удалена.'
+flash.croix.retiree: 'Отметка снята.'
+flash.croix.cotation_modifiee: 'Предложенная категория изменена: {cotation}.'
+flash.croix.posee: 'Браво! Трасса отмечена как пролезенная.'
+flash.secteur.cree: 'Сектор создан.'
+flash.secteur.nettoye: 'Сектор «{nom}» очищен: удалено {voies, plural, one {# трасса} few {# трассы} many {# трасс} other {# трассы}} и {photos, plural, one {# фото} few {# фото} many {# фото} other {# фото}}.'
+flash.secteur.supprime: 'Сектор «{nom}» удалён вместе с {voies, plural, one {# трассой} few {# трассами} many {# трассами} other {# трассами}} и {photos, plural, one {# фото} few {# фото} many {# фото} other {# фото}}.'
+flash.secteur.echec_nettoyage: 'Очистка не удалась, ничего не удалено: {erreur}'
+flash.secteur.echec_suppression: 'Удаление не удалось: {erreur}'
+flash.secteur.sauvegarde_avant: 'Копия сделана непосредственно перед этим ({date}): в случае ошибки восстановите сектор в разделе Администрирование → Резервные копии.'
+flash.profil.enregistre: 'Профиль сохранён.'
+flash.bienvenue: 'Добро пожаловать, {pseudo}!'
+flash.photo.supprimee: 'Фото сектора «{secteur}» удалено.'
+flash.utilisateur.dernier_admin: 'Должен остаться хотя бы один активный администратор.'
+flash.utilisateur.plus_admin: '{pseudo} больше не администратор.'
+flash.utilisateur.reactivez: 'Сначала включите эту учётную запись.'
+flash.utilisateur.admin: '{pseudo} теперь администратор.'
+flash.utilisateur.pas_soi_desactiver: 'Нельзя отключить собственную учётную запись.'
+flash.utilisateur.reactive: 'Учётная запись {pseudo} снова включена.'
+flash.utilisateur.desactive: 'Учётная запись {pseudo} отключена: вход больше невозможен.'
+flash.utilisateur.deja_supprime: 'Эта учётная запись уже удалена.'
+flash.utilisateur.pas_soi_supprimer: 'Нельзя удалить собственную учётную запись.'
+flash.utilisateur.supprime: 'Учётная запись {pseudo} удалена. Её трассы остаются видны под её именем.'
+flash.sauvegarde.creee: 'Резервная копия создана ({taille} МБ).'
+flash.sauvegarde.echec: 'Не удалось создать резервную копию: {erreur}'
+flash.sauvegarde.importee: 'Архив импортирован: теперь его можно восстановить.'
+flash.sauvegarde.conservation: 'Будут храниться последние автоматические копии: {n}.{supprimees, plural, =0 {} other { Удалено старых копий: #.}}'
+flash.sauvegarde.supprimee: 'Копия от {date} удалена.'
+flash.restauration.choisir: 'Выберите, что нужно восстановить.'
+flash.restauration.garder: 'Укажите, нужно ли сохранить эту копию после восстановления.'
+flash.restauration.echec: 'Восстановление не удалось, ничего не изменено: {erreur}'
+flash.restauration.tout: 'Копия восстановлена'
+flash.restauration.secteur: 'Сектор «{nom}» восстановлен'
+flash.restauration.bilan: '{debut}: {voies, plural, one {# трасса} few {# трассы} many {# трасс} other {# трассы}}, {photos, plural, one {# фото} few {# фото} many {# фото} other {# фото}} и {croix, plural, one {# пролаз} few {# пролаза} many {# пролазов} other {# пролаза}}.{ignorees, plural, =0 {} other { Пропущено пролазов: # (скалолазов нет на этом сайте).}}{sans_fichier, plural, =0 {} other { Фото без файла в копии: #.}}'
+flash.restauration.etat_precedent: 'Предыдущее состояние автоматически сохранено ({date}).'
+flash.restauration.supprimee: 'Восстановленная копия удалена.'
+flash.restauration.non_supprimee: 'Не удалось удалить восстановленную копию: {erreur}'
+flash.reglages.https_d_abord: 'Сначала откройте эту страницу по HTTPS (https://…), чтобы включить эту настройку.'
+flash.reglages.https_active: 'Теперь сайт всегда использует HTTPS.'
+flash.reglages.https_desactive: 'Перенаправление на HTTPS отключено.'
+flash.reglages.club: 'Название и логотип клуба сохранены.'
+flash.reglages.salle: 'Информация о скалодроме сохранена.'
+flash.reglages.smtp: 'Настройки SMTP сохранены.'
+flash.reglages.mail_test: 'Тестовое письмо отправлено на {destinataire}.'
+flash.reglages.echec_envoi: 'Ошибка отправки: {erreur}'
+flash.reglages.groupe_envoye: 'Сообщение отправлено: {n, plural, one {# получатель} few {# получателя} many {# получателей} other {# получателя}}.'
+flash.reglages.echec_pour: 'Ошибка для {erreur}'
+flash.maj.deja_a_jour: 'GrimPanBloc уже обновлён.'
+flash.maj.sauvegarde_echec: 'Обновление отменено: не удалось создать предварительную копию. {erreur}'
+flash.maj.echec: 'Обновление не удалось: {erreur}'
+flash.maj.lien_invalide: 'Ссылка завершения недействительна или устарела.'
+flash.maj.reussie: 'GrimPanBloc обновлён с версии {depuis} до версии {version}.'
+maj.finalisation.titre: 'Завершение обновления'
+maj.finalisation.texte: 'Обновление базы данных, несколько секунд.'
+maj.finalisation.bouton: 'Завершить обновление'
+maj.journal.sauvegarde: 'Секторы, трассы и фото сохранены (Администрирование → Резервные копии, {date}).'
+maj.journal.telechargee: 'Архив скачан ({taille, number} МБ), контрольная сумма SHA-256 проверена.'
+maj.journal.extraite: 'Архив распакован и проверен.'
+maj.journal.maintenance: 'Сайт в режиме обслуживания.'
+maj.journal.code_remplace: 'Код заменён. Предыдущая версия сохранена в {dossier}.'
+maj.journal.cache: 'Кэш очищен.'
+maj.journal.base: 'База данных обновлена, обслуживание завершено.'
+maj.probleme.zip: 'Отсутствует расширение PHP «zip».'
+maj.probleme.ecriture: 'Веб-сервер не может писать в {dossier}.'
+maj.probleme.racine: 'корень проекта'
+maj.erreur.pas_d_archive: 'В релизе {tag} нет устанавливаемого архива.'
+maj.erreur.pas_plus_recente: 'Версия {version} не новее установленной ({installee}).'
+maj.erreur.problemes: 'Обновление невозможно: {problemes}'
+maj.erreur.migrations: 'Миграции базы данных не удались: {sortie}'
+maj.erreur.deplacer: 'Не удаётся переместить {element} (недостаточно прав?).'
+maj.erreur.installer: 'Не удаётся установить {element}.'
+maj.erreur.annulee: 'Обновление отменено, предыдущая версия осталась на месте: {erreur}'
+maj.erreur.empreinte: 'Контрольная сумма SHA-256 архива не совпадает: загрузка повреждена или изменена.'
+maj.erreur.archive_illisible: 'Архив не читается.'
+maj.erreur.chemin_interdit: 'Запрещённый путь в архиве: {chemin}'
+maj.erreur.sans_version: 'Недопустимый архив: файл VERSION не найден.'
+maj.erreur.mauvaise_version: 'Архив указывает версию «{annoncee}» вместо {attendue}.'
+maj.erreur.incomplete: 'Неполный архив: отсутствует {fichier}.'
+maj.erreur.telechargement: 'Не удалось скачать (HTTP {code}).'
+maj.erreur.trop_volumineuse: 'Архив слишком большой.'
+maj.erreur.maintenance: 'Не удаётся включить режим обслуживания (нет прав на запись в var/).'
+maj.avertissement.logos: 'Не удалось скомпилировать логотипы: выполните «{commande}».'
+maj.avertissement.miniatures: 'Не удалось создать некоторые миниатюры фото: выполните «{commande}».'
+erreur.sauvegarde.zip_absente: 'Отсутствует расширение PHP «zip»: резервное копирование невозможно.'
+erreur.sauvegarde.creation: 'Не удаётся создать архив (нет прав на запись в папку копий?).'
+erreur.sauvegarde.ecriture: 'Не удаётся записать архив: {detail}'
+erreur.sauvegarde.enregistrement: 'Не удаётся сохранить архив в папке копий.'
+erreur.sauvegarde.plus_recente: 'Эта копия создана более новой версией GrimPanBloc: сначала обновите сайт.'
+erreur.sauvegarde.donnees_absentes: 'Недопустимый архив: данные отсутствуют или слишком велики.'
+erreur.sauvegarde.pas_une_sauvegarde: 'Этот файл не является резервной копией GrimPanBloc.'
+erreur.sauvegarde.donnees_illisibles: 'Недопустимый архив: данные не читаются.'
+erreur.sauvegarde.espace_disque: 'Недостаточно места на диске для копии: нужно {besoin, number} МБ, свободно {libre, number} МБ. Удалите старые копии.'
+erreur.sauvegarde.importee_introuvable: 'Импортированный архив не найден.'
+erreur.sauvegarde.introuvable_apres: 'Копия не найдена после создания.'
+erreur.sauvegarde.secteur_absent: 'Этого сектора нет в копии.'
+erreur.sauvegarde.en_cours: 'Уже выполняется копирование или восстановление: повторите через несколько минут.'
+erreur.sauvegarde.conservation: 'От {min} до {max} автоматических копий.'
+erreur.sauvegarde.resume_illisible: 'сводка не читается'
+erreur.restauration.dossier_photos: 'Не удаётся записать в папку фото.'
+erreur.restauration.pas_une_image: 'Недопустимый архив: {fichier} не является изображением JPEG, PNG или WebP.'
+erreur.restauration.photo_illisible: 'Недопустимый архив: фото {fichier} не читается или слишком велико.'
+erreur.smtp_non_configure: 'Сервер SMTP не настроен (нужны сервер и адрес отправителя).'
+erreur.reglement_pdf: 'Правила должны быть в формате PDF.'
+erreur.logo_format: 'Логотип должен быть изображением PNG, JPEG или WebP.'
+erreur.image_illisible: 'Изображение не читается.'
+erreur.dossier: 'Не удаётся создать папку «{dossier}».'
+erreur.logo_enregistrement: 'Не удаётся сохранить логотип.'
+erreur.croix_cotation: 'Выберите предлагаемую категорию.'
+erreur.photo_utilisee: 'Это фото используется трассой: сначала удалите или измените трассу.'
+erreur.photo_enregistrement: 'Не удаётся сохранить фото «{fichier}».'
+mail.test.objet: 'GrimPanBloc: тестовое письмо'
+mail.test.texte: |-
+    Здравствуйте!
+
+    Это сообщение подтверждает, что GrimPanBloc может отправлять письма через настроенный сервер SMTP.
+
+    Отправлено {date} в {heure}.
+
+    — GrimPanBloc
+voie.form.nom: 'Название трассы'
+voie.form.description: 'Описание / указания'
+voie.form.photo_existante: 'Имеющееся фото сектора'
+voie.form.envoyer_nouvelle: '— Загрузить новое фото —'
+voie.form.nouvelle_photo: 'Новое фото'
+voie.form.echelle: Шкала
+voie.form.couleur: Цвет
+voie.form.pieds: Ноги
+voie.form.pieds_imposes: 'Ноги по трассе'
+voie.form.pieds_libres: 'Ноги свободные'
+inscription.confirmation: 'Подтверждение пароля'
+profil.nouveau_mot_de_passe: 'Новый пароль'
+profil.nouveau_mot_de_passe_aide: 'Оставьте пустым, чтобы сохранить текущий пароль.'
+profil.confirmation_mot_de_passe: 'Подтверждение нового пароля'
+profil.mot_de_passe_actuel: 'Текущий пароль'
+profil.mot_de_passe_actuel_aide: 'Обязателен для сохранения изменений.'
+secteurs.form.nom: 'Название сектора'
+secteurs.form.nom_exemple: 'Стенд, нависание, плита…'
+secteurs.form.description: Описание
+voie.form.photo_choix: 'Фото № {id} от {date}'

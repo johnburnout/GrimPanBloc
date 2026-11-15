@@ -9,19 +9,19 @@
         <h1>{{ include('voie/_badge.html.twig') }} {{ voie.nom }}</h1>
         <div class="actions">
             {% if is_granted('VOIE_MODIFIER', voie) %}
-                <a href="{{ path('voie_edit', {id: voie.id}) }}" class="btn btn-secondaire">Modifier</a>
+                <a href="{{ path('voie_edit', {id: voie.id}) }}" class="btn btn-secondaire">{{ 'voie.modifier'|trans }}</a>
             {% endif %}
             {% if is_granted('VOIE_DUPLIQUER', voie) %}
-                <a href="{{ path('voie_dupliquer', {id: voie.id}) }}" class="btn btn-secondaire">Dupliquer</a>
+                <a href="{{ path('voie_dupliquer', {id: voie.id}) }}" class="btn btn-secondaire">{{ 'voie.dupliquer'|trans }}</a>
             {% endif %}
             {% if is_granted('VOIE_SUPPRIMER', voie) %}
                 {% if voie.estValidee %}
-                    <a href="#suppression" class="btn btn-danger">Supprimer…</a>
+                    <a href="#suppression" class="btn btn-danger">{{ 'voie.supprimer_ellipse'|trans }}</a>
                 {% else %}
                     <form method="post" action="{{ path('voie_delete', {id: voie.id}) }}"
-                          onsubmit="return confirm('Supprimer cette voie ?')">
+                          onsubmit="return confirm('{{ 'voie.supprimer_confirmer'|trans|e('js') }}')">
                         <input type="hidden" name="_token" value="{{ csrf_token('supprimer' ~ voie.id) }}">
-                        <button class="btn btn-danger">Supprimer</button>
+                        <button class="btn btn-danger">{{ 'commun.supprimer'|trans }}</button>
                     </form>
                 {% endif %}
             {% endif %}
@@ -31,48 +31,49 @@
     {{ include('voie/_photo.html.twig', {classe: 'grande'}) }}
 
     <ul class="legende">
-        <li><span class="pastille prise-depart"></span> Départ</li>
-        <li><span class="pastille prise-main"></span> Main</li>
-        {% if not voie.piedsLibres %}<li><span class="pastille prise-pied"></span> Pied</li>{% endif %}
-        <li><span class="pastille prise-top"></span> Top</li>
+        <li><span class="pastille prise-depart"></span> {{ 'enum.type_prise.depart'|trans }}</li>
+        <li><span class="pastille prise-main"></span> {{ 'enum.type_prise.main'|trans }}</li>
+        {% if not voie.piedsLibres %}<li><span class="pastille prise-pied"></span> {{ 'enum.type_prise.pied'|trans }}</li>{% endif %}
+        <li><span class="pastille prise-top"></span> {{ 'enum.type_prise.top'|trans }}</li>
     </ul>
 
     {% if voie.description %}<p>{{ voie.description|nl2br }}</p>{% endif %}
 
     <p class="meta">
-        {{ voie.systeme.libelle }} · <strong>{{ voie.piedsLibres ? 'pieds libres' : 'pieds imposés' }}</strong> · ouverte par <strong>{{ voie.auteur.pseudo }}</strong>
-        le {{ voie.creeLe|date('d/m/Y') }} · {{ voie.prisesAffichees|length }} prise(s)
+        {{ voie.systeme|trans }} · <strong>{{ (voie.piedsLibres ? 'voie.pieds_libres' : 'voie.pieds_imposes')|trans }}</strong>
+        · {{ 'voie.ouverte_par'|trans({pseudo: '<strong>' ~ voie.auteur.pseudo|e ~ '</strong>', date: voie.creeLe|date('d/m/Y')})|raw }}
+        · {{ 'voie.nombre_prises'|trans({n: voie.prisesAffichees|length}) }}
     </p>
 
     <section class="croix">
-        <h2>Cotation</h2>
+        <h2>{{ 'voie.cotation'|trans }}</h2>
         {% set repartition = voie.repartitionCotations %}
         <p>
             {{ include('voie/_badge.html.twig') }}
             {% if repartition is empty %}
-                proposée par {{ voie.auteur.pseudo }} (créateur). Elle sera remplacée par l'avis des grimpeurs qui réussiront la voie.
+                {{ 'voie.cotation_proposee_par'|trans({pseudo: voie.auteur.pseudo}) }}
             {% else %}
-                d'après {{ voie.votesCotation|length }} grimpeur(s) ayant réussi la voie
-                · proposition du créateur : <strong>{{ voie.cotationAuteurEnum ? voie.cotationAuteurEnum.libelle : voie.cotationAuteur }}</strong>
+                {{ 'voie.cotation_d_apres'|trans({n: voie.votesCotation|length}) }}
+                · {{ 'voie.proposition_createur'|trans }} <strong>{{ voie.cotationAuteurEnum ? voie.cotationAuteurEnum|trans : voie.cotationAuteur }}</strong>
             {% endif %}
         </p>
         {% if repartition is not empty %}
-            <ul class="repartition" aria-label="Cotations proposées">
+            <ul class="repartition" aria-label="{{ 'voie.cotations_proposees'|trans }}">
                 {% for r in repartition %}
                     <li{% if r.cotation.value == voie.cotation %} class="retenue"{% endif %}>
-                        <span class="badge badge-{{ voie.systeme.value }}" style="--couleur: {{ r.cotation.couleurBadge }}">{{ r.cotation.libelle }}</span>
+                        <span class="badge badge-{{ voie.systeme.value }}" style="--couleur: {{ r.cotation.couleurBadge }}">{{ r.cotation|trans }}</span>
                         × {{ r.nombre }}
                     </li>
                 {% endfor %}
             </ul>
         {% endif %}
 
-        <h2>Réussites</h2>
+        <h2>{{ 'voie.reussites'|trans }}</h2>
         <p>
             {% if voie.croix is empty %}
-                Personne n'a encore réussi cette voie.
+                {{ 'voie.personne'|trans }}
             {% else %}
-                ✔ {{ voie.croix|map(c => c.grimpeur.pseudo ~ (c.cotation ? ' (' ~ c.cotation ~ ')' : ''))|join(', ') }}
+                ✔ {{ voie.croix|map(c => c.grimpeur.pseudo ~ (c.cotation ? ' (' ~ ((voie.systeme.cotation(c.cotation) ?? c.cotation)|trans) ~ ')' : ''))|join(', ') }}
             {% endif %}
         </p>
 
@@ -83,41 +84,35 @@
                 <input type="hidden" name="_token" value="{{ csrf_token('croix' ~ voie.id) }}">
                 {% if not estAuteur %}
                     {% set proposee = maCroix ? maCroix.cotation : voie.cotation %}
-                    <label for="cotation-proposee">{{ maCroix ? 'Ma cotation' : 'Cotation que je propose' }}</label>
+                    <label for="cotation-proposee">{{ (maCroix ? 'voie.ma_cotation' : 'voie.cotation_que_je_propose')|trans }}</label>
                     <select id="cotation-proposee" name="cotation" required>
                         {% for c in voie.systeme.cotations %}
-                            <option value="{{ c.value }}" {{ c.value == proposee ? 'selected' }}>{{ c.libelle }}</option>
+                            <option value="{{ c.value }}" {{ c.value == proposee ? 'selected' }}>{{ c|trans }}</option>
                         {% endfor %}
                     </select>
                 {% endif %}
                 {% if maCroix %}
-                    {% if not estAuteur %}<button class="btn" name="action" value="modifier">Modifier ma cotation</button>{% endif %}
-                    <button class="btn btn-secondaire" name="action" value="retirer">Retirer ma croix</button>
+                    {% if not estAuteur %}<button class="btn" name="action" value="modifier">{{ 'voie.modifier_ma_cotation'|trans }}</button>{% endif %}
+                    <button class="btn btn-secondaire" name="action" value="retirer">{{ 'voie.retirer_croix'|trans }}</button>
                 {% else %}
-                    <button class="btn" name="action" value="poser">J'ai réussi cette voie</button>
+                    <button class="btn" name="action" value="poser">{{ 'voie.j_ai_reussi'|trans }}</button>
                 {% endif %}
             </form>
             {% if estAuteur and not maCroix %}
-                <p class="aide">Votre propre croix ne verrouille pas la voie et ne vote pas : seules celles des autres grimpeurs comptent.</p>
+                <p class="aide">{{ 'voie.propre_croix'|trans }}</p>
             {% endif %}
         {% endif %}
     </section>
 
     {% if voie.estValidee and is_granted('VOIE_SUPPRIMER', voie) %}
-        {% set mot = constant('App\\Security\\ConfirmationSuppression::MOT') %}
+        {% set mot = 'confirmation.supprimer'|trans %}
         <section id="suppression" class="zone-danger">
-            <h2>Supprimer la voie</h2>
-            <p>
-                Cette voie a été réussie par {{ voie.croixValidantes|length }} autre(s) grimpeur(s).
-                La supprimer effacera aussi {{ voie.croix|length }} croix. Cette action est définitive.
-            </p>
+            <h2>{{ 'voie.supprimer_titre'|trans }}</h2>
+            <p>{{ 'voie.supprimer_validee'|trans({autres: voie.croixValidantes|length, croix: voie.croix|length}) }}</p>
             <form method="post" action="{{ path('voie_delete', {id: voie.id}) }}">
                 <input type="hidden" name="_token" value="{{ csrf_token('supprimer' ~ voie.id) }}">
-                <label for="confirmation">Tapez <strong>{{ mot }}</strong> pour confirmer</label>
-                <input type="text" id="confirmation" name="confirmation" required
-                       autocomplete="off" autocapitalize="characters" spellcheck="false"
-                       pattern="\s*{{ mot }}\s*" title="Tapez {{ mot }} en majuscules">
-                <button class="btn btn-danger">Supprimer définitivement</button>
+                {{ include('_confirmation.html.twig') }}
+                <button class="btn btn-danger">{{ 'confirmation.supprimer_definitivement'|trans }}</button>
             </form>
         </section>
     {% endif %}

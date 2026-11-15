@@ -2,6 +2,7 @@
 
 namespace App\MiseAJour;
 
+use App\Exception\EchecOperation;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 /**
@@ -35,7 +36,7 @@ final class ArchiveRelease
         $obtenue = hash_file('sha256', $zip);
         if (!preg_match('/^[0-9a-f]{64}$/', $attendue) || !hash_equals($attendue, $obtenue)) {
             @unlink($zip);
-            throw new \RuntimeException('L\'empreinte SHA-256 de l\'archive ne correspond pas : téléchargement corrompu ou modifié.');
+            throw new EchecOperation('maj.erreur.empreinte');
         }
 
         return (int) filesize($zip);
@@ -46,14 +47,14 @@ final class ArchiveRelease
     {
         $archive = new \ZipArchive();
         if (true !== $archive->open($zip)) {
-            throw new \RuntimeException('Archive illisible.');
+            throw new EchecOperation('maj.erreur.archive_illisible');
         }
         for ($i = 0; $i < $archive->numFiles; ++$i) {
             $nom = (string) $archive->getNameIndex($i);
             // Protection « zip slip » : aucun chemin absolu ni remontée de dossier
             if (str_starts_with($nom, '/') || str_contains($nom, '\\') || preg_match('#(^|/)\.\.(/|$)#', $nom)) {
                 $archive->close();
-                throw new \RuntimeException("Chemin interdit dans l'archive : $nom");
+                throw new EchecOperation('maj.erreur.chemin_interdit', ['chemin' => $nom]);
             }
         }
         $archive->extractTo($destination);
@@ -67,16 +68,16 @@ final class ArchiveRelease
             }
         }
         if (!is_file($racine.'/VERSION')) {
-            throw new \RuntimeException('Archive invalide : fichier VERSION introuvable.');
+            throw new EchecOperation('maj.erreur.sans_version');
         }
 
         $versionArchive = trim((string) @file_get_contents($racine.'/VERSION'));
         if ($versionArchive !== $release->version) {
-            throw new \RuntimeException("L'archive annonce la version « $versionArchive » au lieu de {$release->version}.");
+            throw new EchecOperation('maj.erreur.mauvaise_version', ['annoncee' => $versionArchive, 'attendue' => $release->version]);
         }
         foreach (self::INDISPENSABLES as $f) {
             if (!is_file($racine.'/'.$f)) {
-                throw new \RuntimeException("Archive incomplète : $f est absent.");
+                throw new EchecOperation('maj.erreur.incomplete', ['fichier' => $f]);
             }
         }
 
@@ -91,7 +92,7 @@ final class ArchiveRelease
             'max_duration' => 600,
         ]);
         if (200 !== $reponse->getStatusCode()) {
-            throw new \RuntimeException('Téléchargement impossible (HTTP '.$reponse->getStatusCode().').');
+            throw new EchecOperation('maj.erreur.telechargement', ['code' => $reponse->getStatusCode()]);
         }
         $f = fopen($destination, 'w');
         $taille = 0;
@@ -100,7 +101,7 @@ final class ArchiveRelease
             if ($taille > self::TAILLE_MAX) {
                 fclose($f);
                 @unlink($destination);
-                throw new \RuntimeException('Archive trop volumineuse.');
+                throw new EchecOperation('maj.erreur.trop_volumineuse');
             }
             fwrite($f, $morceau->getContent());
         }

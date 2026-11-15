@@ -9,16 +9,16 @@
 {% set route = app.current_route %}
 {% set routeParams = app.current_route_parameters %}
 {% set tris = global
-    ? {cotation: 'Cotation', nom: 'Nom', secteur: 'Secteur', ouvreur: 'Ouvreur'}
-    : {cotation: 'Cotation', nom: 'Nom', ouvreur: 'Ouvreur'} %}
+    ? {cotation: 'voies.tri.cotation'|trans, nom: 'voies.tri.nom'|trans, secteur: 'voies.tri.secteur'|trans, ouvreur: 'voies.tri.ouvreur'|trans}
+    : {cotation: 'voies.tri.cotation'|trans, nom: 'voies.tri.nom'|trans, ouvreur: 'voies.tri.ouvreur'|trans} %}
 
 <form method="get" action="{{ path(route, routeParams) }}" class="filtres" id="filtres-voies">
     <input type="hidden" name="vue" value="{{ criteres.vue }}">
 
     {% if global %}
-        <label>Secteur
+        <label>{{ 'voies.filtre.secteur'|trans }}
             <select name="secteur">
-                <option value="">Tous</option>
+                <option value="">{{ 'voies.filtre.tous'|trans }}</option>
                 {% for s in secteurs %}
                     <option value="{{ s.id }}" {{ criteres.secteurId == s.id ? 'selected' }}>{{ s.nom }}</option>
                 {% endfor %}
@@ -26,24 +26,24 @@
         </label>
     {% endif %}
 
-    <label>Échelle
+    <label>{{ 'voies.filtre.echelle'|trans }}
         <select name="systeme" data-filtre-systeme>
-            <option value="">Toutes</option>
+            <option value="">{{ 'voies.filtre.toutes'|trans }}</option>
             {% for s in enum_cases('App\\Enum\\SystemeCotation') %}
-                <option value="{{ s.value }}" {{ criteres.systemeCotation == s ? 'selected' }}>{{ s.value == 'fr' ? 'Française' : 'Couleurs' }}</option>
+                <option value="{{ s.value }}" {{ criteres.systemeCotation == s ? 'selected' }}>{{ ('voies.filtre.echelle_' ~ s.value)|trans }}</option>
             {% endfor %}
         </select>
     </label>
 
     {% for s in enum_cases('App\\Enum\\SystemeCotation') %}
         <fieldset class="plage" data-systeme="{{ s.value }}">
-            {% for borne, libelle in {min: 'De', max: 'à'} %}
+            {% for borne, libelle in {min: 'voies.filtre.de'|trans, max: 'voies.filtre.a'|trans} %}
                 {% set choisie = criteres.systemeCotation == s ? (borne == 'min' ? criteres.cotationMin : criteres.cotationMax) : null %}
                 <label>{{ libelle }}
                     <select name="{{ borne }}">
                         <option value="">—</option>
                         {% for c in s.cotations %}
-                            <option value="{{ c.value }}" {{ choisie == c ? 'selected' }}>{{ c.libelle }}</option>
+                            <option value="{{ c.value }}" {{ choisie == c ? 'selected' }}>{{ c|trans }}</option>
                         {% endfor %}
                     </select>
                 </label>
@@ -56,37 +56,37 @@
         <input type="hidden" name="tri" value="{{ criteres.tri }}">
         <input type="hidden" name="ordre" value="{{ criteres.ordre }}">
     {% else %}
-        <label>Trier par
+        <label>{{ 'voies.trier_par'|trans }}
             <select name="tri">
                 {% for valeur, libelle in tris %}
                     <option value="{{ valeur }}" {{ criteres.tri == valeur ? 'selected' }}>{{ libelle }}</option>
                 {% endfor %}
             </select>
         </label>
-        <label>Ordre
+        <label>{{ 'voies.ordre'|trans }}
             <select name="ordre">
-                <option value="asc" {{ criteres.ordre == 'asc' ? 'selected' }}>Croissant</option>
-                <option value="desc" {{ criteres.ordre == 'desc' ? 'selected' }}>Décroissant</option>
+                <option value="asc" {{ criteres.ordre == 'asc' ? 'selected' }}>{{ 'voies.croissant'|trans }}</option>
+                <option value="desc" {{ criteres.ordre == 'desc' ? 'selected' }}>{{ 'voies.decroissant'|trans }}</option>
             </select>
         </label>
     {% endif %}
 
-    <button type="submit" class="btn">Valider</button>
+    <button type="submit" class="btn">{{ 'voies.valider'|trans }}</button>
 </form>
 
 <div class="barre-affichage">
-    <p class="nombre-voies">{{ voies|length }} voie{{ voies|length > 1 ? 's' }}</p>
+    <p class="nombre-voies">{{ 'voies.nombre'|trans({n: voies|length}) }}</p>
 
     {% if criteres.estListe %}
-        <label class="case"><input type="checkbox" id="afficher-miniatures"> Miniatures</label>
+        <label class="case"><input type="checkbox" id="afficher-miniatures"> {{ 'voies.miniatures'|trans }}</label>
     {% elseif voies is not empty %}
-        <label class="taille-icones">Taille
-            <input type="range" id="taille-icones" min="120" max="420" step="10" value="220" aria-label="Taille des icônes">
+        <label class="taille-icones">{{ 'voies.taille'|trans }}
+            <input type="range" id="taille-icones" min="120" max="420" step="10" value="220" aria-label="{{ 'voies.taille_icones'|trans }}">
         </label>
     {% endif %}
 
-    <nav class="choix-vue" aria-label="Mode d'affichage">
-        {% for vue, libelle in {icones: 'Icônes', liste: 'Liste'} %}
+    <nav class="choix-vue" aria-label="{{ 'voies.mode_affichage'|trans }}">
+        {% for vue, libelle in {icones: 'voies.vue_icones'|trans, liste: 'voies.vue_liste'|trans} %}
             <a href="{{ path(route, routeParams|merge(criteres.parametres({vue: vue}))) }}"
                {% if criteres.vue == vue %}aria-current="true"{% endif %}>{{ libelle }}</a>
         {% endfor %}
@@ -94,12 +94,12 @@
 </div>
 
 {% if voies is empty %}
-    <p class="vide">Aucune voie{{ criteres.systemeCotation or (global and criteres.secteurId) ? ' ne correspond à ces filtres' : ' pour le moment' }}.</p>
+    <p class="vide">{{ (criteres.systemeCotation or (global and criteres.secteurId) ? 'voies.aucune_filtre' : 'voies.aucune')|trans }}</p>
 {% elseif criteres.estListe %}
     <table class="table-voies" id="table-voies">
         <thead>
             <tr>
-                <th class="col-miniature"><span class="visuellement-cache">Miniature</span></th>
+                <th class="col-miniature"><span class="visuellement-cache">{{ 'voies.miniature'|trans }}</span></th>
                 {% for valeur in global ? ['nom', 'cotation', 'secteur', 'ouvreur'] : ['nom', 'cotation', 'ouvreur'] %}
                     {% set actif = criteres.tri == valeur %}
                     <th{% if actif %} aria-sort="{{ criteres.ordre == 'asc' ? 'ascending' : 'descending' }}"{% endif %}>
@@ -109,7 +109,7 @@
                         </a>
                     </th>
                 {% endfor %}
-                {% if dupliquer %}<th><span class="visuellement-cache">Actions</span></th>{% endif %}
+                {% if dupliquer %}<th><span class="visuellement-cache">{{ 'commun.actions'|trans }}</span></th>{% endif %}
             </tr>
         </thead>
         <tbody>
@@ -127,7 +127,7 @@
                     {% if dupliquer %}
                         <td class="col-actions">
                             {% if is_granted('VOIE_DUPLIQUER', voie) %}
-                                <a href="{{ path('voie_dupliquer', {id: voie.id}) }}" class="lien-dupliquer" aria-label="Dupliquer {{ voie.nom }}">Dupliquer</a>
+                                <a href="{{ path('voie_dupliquer', {id: voie.id}) }}" class="lien-dupliquer" aria-label="{{ 'voie.dupliquer_nom'|trans({nom: voie.nom}) }}">{{ 'voie.dupliquer'|trans }}</a>
                             {% endif %}
                         </td>
                     {% endif %}
@@ -148,7 +148,7 @@
                     </div>
                 </a>
                 {% if dupliquer and is_granted('VOIE_DUPLIQUER', voie) %}
-                    <a href="{{ path('voie_dupliquer', {id: voie.id}) }}" class="lien-dupliquer" aria-label="Dupliquer {{ voie.nom }}">Dupliquer</a>
+                    <a href="{{ path('voie_dupliquer', {id: voie.id}) }}" class="lien-dupliquer" aria-label="{{ 'voie.dupliquer_nom'|trans({nom: voie.nom}) }}">{{ 'voie.dupliquer'|trans }}</a>
                 {% endif %}
             </li>
         {% endfor %}

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Exception\Messages;
 use App\Form\Reglages\ClubType;
 use App\Form\Reglages\EnvoiGroupeType;
 use App\Form\Reglages\HttpsType;
@@ -25,6 +26,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Réglages du site. Une seule page (GET), six formulaires postant chacun vers
@@ -43,6 +46,7 @@ class AdminReglagesController extends AbstractController
         private readonly ReglageHttps $https,
         private readonly InformationsSalle $salle,
         private readonly ReglementInterieur $reglement,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -66,11 +70,11 @@ class AdminReglagesController extends AbstractController
             $activer = (bool) $form->get('forcer_https')->getData();
             if ($activer && !$request->isSecure()) {
                 // Garde-fou : si PHP ne voit pas le HTTPS, la redirection bouclerait.
-                $form->addError(new FormError('Ouvrez d\'abord cette page en HTTPS (https://…) pour activer ce réglage.'));
+                $form->addError(new FormError($this->translator->trans('flash.reglages.https_d_abord')));
             } else {
                 $this->https->definir($activer);
 
-                return $this->enregistre($activer ? 'Le site utilise désormais toujours HTTPS.' : 'Redirection vers HTTPS désactivée.');
+                return $this->enregistre($activer ? 'flash.reglages.https_active' : 'flash.reglages.https_desactive');
             }
         }
 
@@ -91,9 +95,9 @@ class AdminReglagesController extends AbstractController
                 }
                 $this->club->definirNom($donnees['nom_club']);
 
-                return $this->enregistre('Identité du club enregistrée.');
+                return $this->enregistre('flash.reglages.club');
             } catch (\InvalidArgumentException $e) {
-                $form->get('logo')->addError(new FormError($e->getMessage()));
+                $form->get('logo')->addError(new FormError(Messages::texte($e, $this->translator)));
             }
         }
 
@@ -113,9 +117,9 @@ class AdminReglagesController extends AbstractController
                 }
                 $this->salle->enregistrer($form->getData());
 
-                return $this->enregistre('Informations sur la salle enregistrées.');
+                return $this->enregistre('flash.reglages.salle');
             } catch (\InvalidArgumentException $e) {
-                $form->get('reglement')->addError(new FormError($e->getMessage()));
+                $form->get('reglement')->addError(new FormError(Messages::texte($e, $this->translator)));
             }
         }
 
@@ -132,7 +136,7 @@ class AdminReglagesController extends AbstractController
             $motDePasse = $form->get('effacer_mot_de_passe')->getData() ? '' : ('' === $saisi ? null : $saisi);
             $this->smtp->enregistrer($form->getData(), $motDePasse);
 
-            return $this->enregistre('Réglages SMTP enregistrés.');
+            return $this->enregistre('flash.reglages.smtp');
         }
 
         return $this->page($request, $admin, $form);
@@ -147,9 +151,9 @@ class AdminReglagesController extends AbstractController
             try {
                 $this->mailer->envoyerTest($destinataire);
 
-                return $this->enregistre('Mail de test envoyé à '.$destinataire.'.');
+                return $this->enregistre('flash.reglages.mail_test', ['destinataire' => $destinataire]);
             } catch (\Throwable $e) {
-                $form->addError(new FormError('Échec de l\'envoi : '.$e->getMessage()));
+                $form->addError(new FormError($this->translator->trans('flash.reglages.echec_envoi', ['erreur' => Messages::texte($e, $this->translator)])));
             }
         }
 
@@ -167,16 +171,16 @@ class AdminReglagesController extends AbstractController
             try {
                 $r = $this->mailer->envoyerGroupe($destinataires, $objet, $corps);
                 if ($r['envoyes'] > 0) {
-                    $this->addFlash('success', \sprintf('Message envoyé à %d destinataire(s).', $r['envoyes']));
+                    $this->addFlash('success', new TranslatableMessage('flash.reglages.groupe_envoye', ['n' => $r['envoyes']]));
                 }
                 if ([] === $r['erreurs']) {
                     return $this->redirectToRoute('admin_reglages');
                 }
                 foreach (\array_slice($r['erreurs'], 0, 10) as $erreur) {
-                    $form->addError(new FormError('Échec pour '.$erreur));
+                    $form->addError(new FormError($this->translator->trans('flash.reglages.echec_pour', ['erreur' => $erreur])));
                 }
             } catch (\Throwable $e) {
-                $form->addError(new FormError('Échec de l\'envoi : '.$e->getMessage()));
+                $form->addError(new FormError($this->translator->trans('flash.reglages.echec_envoi', ['erreur' => Messages::texte($e, $this->translator)])));
             }
         }
 
@@ -214,7 +218,7 @@ class AdminReglagesController extends AbstractController
         return $this->createForm($type, $donnees, [
             'action' => $this->generateUrl('admin_reglages_'.$section),
             'csrf_token_id' => 'admin_reglages_'.$section,
-            'csrf_message' => 'Le formulaire a expiré : rechargez la page et recommencez.',
+            'csrf_message' => 'commun.formulaire_expire',
         ]);
     }
 
@@ -242,9 +246,10 @@ class AdminReglagesController extends AbstractController
         ]);
     }
 
-    private function enregistre(string $message): Response
+    /** @param array<string, mixed> $parametres */
+    private function enregistre(string $cle, array $parametres = []): Response
     {
-        $this->addFlash('success', $message);
+        $this->addFlash('success', new TranslatableMessage($cle, $parametres));
 
         return $this->redirectToRoute('admin_reglages');
     }

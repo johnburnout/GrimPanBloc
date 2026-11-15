@@ -1,5 +1,8 @@
 framework:
     default_locale: fr
+    # Langues de l'interface (voir App\Locale\Langues) : le français sert de repli
+    enabled_locales: [fr, en, es, it, ru]
     translator:
         default_path: '%kernel.project_dir%/translations'
+        fallbacks: [fr]
         providers:

@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Inscription · GrimPanBloc{% endblock %}
+{% block title %}{{ 'nav.inscription'|trans }} · GrimPanBloc{% endblock %}
 
 {% block body %}
 <div class="carte-form">
-    <h1>Créer un compte</h1>
+    <h1>{{ 'inscription.titre'|trans }}</h1>
     {{ form_start(form) }}
         {{ form_widget(form) }}
-        <button class="btn" type="submit">S'inscrire</button>
+        <button class="btn" type="submit">{{ 'inscription.bouton'|trans }}</button>
     {{ form_end(form) }}
 </div>
 {% endblock %}

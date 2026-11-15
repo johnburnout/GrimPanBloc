@@ -2,17 +2,45 @@
 
 namespace App\Security;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 /**
- * Garde-fou des suppressions définitives (voie validée, compte utilisateur) :
- * l'utilisateur doit taper ce mot dans le champ « confirmation ».
+ * Garde-fou des actions définitives (suppression d'une voie validée, d'un compte,
+ * d'un secteur ; restauration) : l'utilisateur doit taper un mot dans le champ
+ * « confirmation » (« SUPPRIMER », « DELETE »…).
+ *
+ * Le mot est accepté dans toutes les langues de l'interface : la langue peut
+ * changer entre l'affichage du formulaire et son envoi.
  */
 final class ConfirmationSuppression
 {
-    public const MOT = 'SUPPRIMER';
-    public const MESSAGE_ANNULATION = 'Suppression annulée : tapez '.self::MOT.' pour confirmer.';
+    public const SUPPRIMER = 'confirmation.supprimer';
+    public const RESTAURER = 'confirmation.restaurer';
 
-    public static function estConfirmee(string $saisie): bool
+    /** @param list<string> $langues */
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+        #[Autowire('%kernel.enabled_locales%')] private readonly array $langues,
+    ) {
+    }
+
+    public function estConfirmee(string $saisie, string $mot = self::SUPPRIMER): bool
     {
-        return self::MOT === trim($saisie);
+        $saisie = trim($saisie);
+        foreach ($this->langues as $langue) {
+            if ($saisie === $this->translator->trans($mot, [], null, $langue)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /** « Suppression annulée : tapez SUPPRIMER pour confirmer. » (ou nettoyage, restauration…) */
+    public static function annulation(string $action = 'suppression', string $mot = self::SUPPRIMER): TranslatableMessage
+    {
+        return new TranslatableMessage('confirmation.annulee.'.$action, ['mot' => new TranslatableMessage($mot)]);
     }
 }

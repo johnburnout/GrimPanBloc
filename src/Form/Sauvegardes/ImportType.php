@@ -18,8 +18,8 @@ final class ImportType extends AbstractType
     {
         $builder->add('archive', FileType::class, [
             'constraints' => [
-                new Assert\NotNull(message: 'Choisissez une archive.'),
-                new Assert\File(extensions: ['zip'], extensionsMessage: 'Choisissez une archive .zip de sauvegarde GrimPanBloc.'),
+                new Assert\NotNull(message: 'sauvegarde.archive.requise'),
+                new Assert\File(extensions: ['zip'], extensionsMessage: 'sauvegarde.archive.zip'),
             ],
         ]);
     }

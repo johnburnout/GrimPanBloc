@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mes voies · GrimPanBloc{% endblock %}
+{% block title %}{{ 'profil.onglet_voies'|trans }} · GrimPanBloc{% endblock %}
 
 {% block body %}
-    <h1>Mon compte</h1>
+    <h1>{{ 'nav.mon_compte'|trans }}</h1>
     {{ include('profil/_onglets.html.twig', {actif: 'voies'}) }}
 
     {% if voies is empty %}
-        <p class="vide">Vous n'avez encore créé aucune voie.</p>
+        <p class="vide">{{ 'profil.aucune_voie'|trans }}</p>
     {% else %}
         {{ include('voie/_liste.html.twig') }}
     {% endif %}

@@ -27,7 +27,8 @@ abstract class FonctionnelTestCase extends WebTestCase
 
     protected function setUp(): void
     {
-        $this->client = static::createClient();
+        // Le client de test annonce « en-us » par défaut : les tests lisent l'interface en français
+        $this->client = static::createClient(server: ['HTTP_ACCEPT_LANGUAGE' => 'fr-FR,fr;q=0.9']);
         // Même noyau (donc même connexion et même transaction) pour toutes les requêtes du test
         $this->client->disableReboot();
         $this->em = static::getContainer()->get(EntityManagerInterface::class);

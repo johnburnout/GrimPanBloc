@@ -7,10 +7,12 @@ use App\MiseAJour\InstallateurMiseAJour;
 use App\MiseAJour\Maintenance;
 use App\MiseAJour\Release;
 use App\MiseAJour\VersionInstallee;
+use App\Tests\Traduction;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
+use Symfony\Component\Translation\TranslatableMessage;
 
 /**
  * Installation d'une release sur une fausse installation (dossier temporaire),
@@ -178,7 +180,7 @@ final class InstallateurMiseAJourTest extends TestCase
 
     private function installer(): string
     {
-        return $this->installateur()->installer($this->release(), function (string $ligne): void { $this->journal[] = $ligne; });
+        return $this->installateur()->installer($this->release(), function (TranslatableMessage $ligne): void { $this->journal[] = Traduction::fr($ligne); });
     }
 
     /** L'installation échoue et laisse le code en place. */
@@ -188,7 +190,7 @@ final class InstallateurMiseAJourTest extends TestCase
             $this->installer();
             self::fail('L\'installation aurait dû échouer.');
         } catch (\RuntimeException $e) {
-            self::assertStringContainsString($message, $e->getMessage());
+            self::assertStringContainsString($message, Traduction::fr($e));
         }
         if ($inchange) {
             self::assertSame("1.0.0\n", $this->lire('VERSION'));

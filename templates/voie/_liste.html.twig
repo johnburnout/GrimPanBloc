@@ -1,6 +1,6 @@
 {# Grille de cartes de voies. Variable : voies #}
 {% if voies is empty %}
-    <p class="vide">Aucune voie pour le moment.</p>
+    <p class="vide">{{ 'voies.aucune'|trans }}</p>
 {% else %}
     <ul class="grille-voies">
         {% for voie in voies %}

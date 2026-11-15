@@ -27,7 +27,7 @@ final class PiedsEtDuplicationTest extends FonctionnelTestCase
         self::assertCount(1, $page->filter('.photo-voie circle.prise-main'));
         self::assertCount(0, $page->filter('.legende .prise-pied'));
         self::assertStringContainsString('pieds libres', $page->filter('.meta')->text());
-        self::assertStringContainsString('1 prise(s)', $page->filter('.meta')->text());
+        self::assertStringContainsString('· 1 prise', $page->filter('.meta')->text());
 
         // Les listes (miniatures) ne les dessinent pas non plus
         $page = $this->client->request('GET', '/');

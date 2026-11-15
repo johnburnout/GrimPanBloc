@@ -1,65 +1,64 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mises à jour · GrimPanBloc{% endblock %}
+{% block title %}{{ 'admin.onglet.mise_a_jour'|trans }} · GrimPanBloc{% endblock %}
 
 {% block body %}
-    <h1>Administration</h1>
+    <h1>{{ 'nav.administration'|trans }}</h1>
     {{ include('admin/_onglets.html.twig', {actif: 'mise_a_jour'}) }}
 
     {% set journal = app.session.get('mise_a_jour_dernier_journal') %}
     {% if journal %}
         <section class="carte-form-large">
-            <h2>Dernière mise à jour</h2>
-            <ol class="journal">{% for ligne in journal %}<li>{{ ligne }}</li>{% endfor %}</ol>
+            <h2>{{ 'maj.derniere'|trans }}</h2>
+            <ol class="journal">{% for ligne in journal %}<li>{{ ligne|trans }}</li>{% endfor %}</ol>
         </section>
         {% do app.session.remove('mise_a_jour_dernier_journal') %}
     {% endif %}
 
     <section class="carte-form-large">
-        <p>Version installée : <strong>{{ versionInstallee }}</strong></p>
+        <p>{{ 'maj.version_installee'|trans }} <strong>{{ versionInstallee }}</strong></p>
 
         {% if release is null %}
-            <p class="aide">Impossible de connaître la dernière version publiée (aucune release, ou GitHub injoignable).</p>
+            <p class="aide">{{ 'maj.inconnue'|trans }}</p>
         {% elseif not disponible %}
-            <p class="flash flash-success">GrimPanBloc est à jour : la dernière version publiée est la {{ release.version }}.</p>
+            <p class="flash flash-success">{{ 'maj.a_jour'|trans({version: release.version}) }}</p>
         {% else %}
             <p class="flash flash-info">
-                La version <strong>{{ release.version }}</strong> est disponible
-                {%- if release.publieeLe %} (publiée le {{ release.publieeLe|date('d/m/Y') }}){% endif %}.
+                {{ (release.publieeLe ? 'maj.disponible_le' : 'maj.disponible')|trans({version: '<strong>' ~ release.version|e ~ '</strong>', date: release.publieeLe ? release.publieeLe|date('d/m/Y') : ''})|raw }}
             </p>
 
             {% if release.notes %}
-                <h2>Nouveautés</h2>
+                <h2>{{ 'maj.nouveautes'|trans }}</h2>
                 <div class="notes-version">{{ release.notes|nl2br }}</div>
             {% endif %}
-            <p><a href="{{ release.url }}" rel="noopener" target="_blank">Voir la release sur GitHub ↗</a></p>
+            <p><a href="{{ release.url }}" rel="noopener" target="_blank">{{ 'maj.voir_github'|trans }} ↗</a></p>
 
             {% if not release.estInstallable %}
-                <p class="flash flash-error">Cette release ne contient pas d'archive installable : mettez à jour à la main (voir le README).</p>
+                <p class="flash flash-error">{{ 'maj.pas_installable'|trans }}</p>
             {% elseif problemes is not empty %}
                 <div class="flash flash-error">
-                    <p>La mise à jour depuis le navigateur n'est pas possible sur ce serveur :</p>
-                    <ul>{% for p in problemes %}<li>{{ p }}</li>{% endfor %}</ul>
-                    <p>Lancez-la en SSH : <code>php bin/console app:mise-a-jour</code></p>
+                    <p>{{ 'maj.impossible_navigateur'|trans }}</p>
+                    <ul>{% for p in problemes %}<li>{{ p|trans }}</li>{% endfor %}</ul>
+                    <p>{{ 'maj.en_ssh'|trans }} <code>php bin/console app:mise-a-jour</code></p>
                 </div>
             {% else %}
-                <h2>Installer</h2>
+                <h2>{{ 'maj.installer'|trans }}</h2>
                 <ul class="aide">
-                    <li>Le site passe en maintenance pendant quelques secondes.</li>
-                    <li>Les photos, la configuration (<code>.env.local</code>) et la base sont conservées ; la base est mise à jour si besoin.</li>
-                    <li>Le code actuel est conservé dans <code>var/mise-a-jour/</code>.</li>
-                    <li><strong>Sauvegardez la base de données avant</strong> (outil de votre hébergeur ou <code>mariadb-dump</code>).</li>
+                    <li>{{ 'maj.point1'|trans }}</li>
+                    <li>{{ 'maj.point2'|trans({fichier: '<code>.env.local</code>'})|raw }}</li>
+                    <li>{{ 'maj.point3'|trans({dossier: '<code>var/mise-a-jour/</code>'})|raw }}</li>
+                    <li>{{ 'maj.point4'|trans({outil: '<code>mariadb-dump</code>'})|raw }}</li>
                 </ul>
                 {# data-turbo="false" : la réponse est une page (envoi du jeton), pas une redirection #}
                 <form method="post" action="{{ path('admin_mise_a_jour_installer') }}" data-turbo="false"
-                      onsubmit="this.querySelector('button').disabled = true; this.querySelector('button').textContent = 'Mise à jour en cours…'">
+                      onsubmit="this.querySelector('button').disabled = true; this.querySelector('button').textContent = '{{ 'maj.en_cours'|trans|e('js')|e('html_attr') }}'">
                     <input type="hidden" name="_token" value="{{ csrf_token('mise_a_jour') }}">
-                    <button class="btn">Mettre à jour vers la version {{ release.version }}</button>
+                    <button class="btn">{{ 'maj.mettre_a_jour'|trans({version: release.version}) }}</button>
                 </form>
             {% endif %}
         {% endif %}
 
-        <p class="meta"><a href="{{ path('admin_mise_a_jour', {verifier: 1}) }}">Vérifier maintenant</a>
-            (sinon, GrimPanBloc vérifie une fois par jour)</p>
+        <p class="meta"><a href="{{ path('admin_mise_a_jour', {verifier: 1}) }}">{{ 'maj.verifier'|trans }}</a>
+            {{ 'maj.verifier_aide'|trans }}</p>
     </section>
 {% endblock %}

@@ -1,34 +1,33 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Sauvegardes · Administration · GrimPanBloc{% endblock %}
+{% block title %}{{ 'admin.onglet.sauvegardes'|trans }} · {{ 'nav.administration'|trans }} · GrimPanBloc{% endblock %}
 
 {% block body %}
-    <h1>Administration</h1>
+    <h1>{{ 'nav.administration'|trans }}</h1>
     {{ include('admin/_onglets.html.twig', {actif: 'sauvegardes'}) }}
 
-    <p class="aide">Une sauvegarde contient les secteurs, les voies (avec leurs prises et leurs croix) et les photos. Les comptes utilisateurs et les réglages n'en font pas partie.
-        Une sauvegarde automatique est faite avant chaque restauration, nettoyage de secteur et mise à jour, et au moins une fois par semaine.</p>
+    <p class="aide">{{ 'sauvegardes.aide'|trans }}</p>
 
     <section class="carte-form-large">
-        <h2>Nouvelle sauvegarde</h2>
+        <h2>{{ 'sauvegardes.nouvelle'|trans }}</h2>
         <form method="post" action="{{ path('admin_sauvegarde_creer') }}" class="form-en-ligne">
             <input type="hidden" name="_token" value="{{ csrf_token('sauvegarde_creer') }}">
-            <label for="motif">Note (facultative)</label>
-            <input type="text" id="motif" name="motif" maxlength="200" placeholder="Avant le changement des voies de juin">
-            <button class="btn">Sauvegarder maintenant</button>
+            <label for="motif">{{ 'sauvegardes.note'|trans }}</label>
+            <input type="text" id="motif" name="motif" maxlength="200" placeholder="{{ 'sauvegardes.note_exemple'|trans }}">
+            <button class="btn">{{ 'sauvegardes.sauvegarder'|trans }}</button>
         </form>
     </section>
 
     <section class="carte-form-large">
-        <h2>Sauvegardes enregistrées</h2>
+        <h2>{{ 'sauvegardes.enregistrees'|trans }}</h2>
         {% if lignes is empty %}
-            <p class="vide">Aucune sauvegarde pour l'instant.</p>
+            <p class="vide">{{ 'sauvegardes.aucune'|trans }}</p>
         {% else %}
-            <p class="meta">{{ lignes|length }} sauvegarde{{ lignes|length > 1 ? 's' }} · {{ (tailleTotale / 1048576)|number_format(1, ',', ' ') }} Mo au total</p>
+            <p class="meta">{{ 'sauvegardes.total'|trans({n: lignes|length, taille: (tailleTotale / 1048576)|nombre(1)}) }}</p>
             <div class="tableau-defilant">
                 <table class="tableau tableau-sauvegardes">
                     <thead>
-                        <tr><th>Date</th><th>Type</th><th>Contenu</th><th>Taille</th><th>Actions</th></tr>
+                        <tr><th>{{ 'sauvegardes.col_date'|trans }}</th><th>{{ 'sauvegardes.col_type'|trans }}</th><th>{{ 'sauvegardes.col_contenu'|trans }}</th><th>{{ 'sauvegardes.col_taille'|trans }}</th><th>{{ 'commun.actions'|trans }}</th></tr>
                     </thead>
                     <tbody>
                         {% for l in lignes %}
@@ -36,23 +35,23 @@
                             {% set r = l.resume %}
                             <tr>
                                 <td>{{ s.creeLe|date('d/m/Y H:i') }}</td>
-                                <td>{{ s.type.libelle }}{% if r and r.motif %}<br><small>{{ r.motif }}</small>{% endif %}</td>
+                                <td>{{ s.type|trans }}{% if r and r.motif %}<br><small>{{ r.motif }}</small>{% endif %}</td>
                                 <td>
                                     {% if r %}
-                                        {{ r.secteurs|length }} secteur{{ r.secteurs|length > 1 ? 's' }}, {{ r.nombreVoies }} voie{{ r.nombreVoies > 1 ? 's' }}, {{ r.nombrePhotos }} photo{{ r.nombrePhotos > 1 ? 's' }}
-                                        <br><small>version {{ r.version }}</small>
+                                        {{ 'sauvegardes.contenu'|trans({secteurs: r.secteurs|length, voies: r.nombreVoies, photos: r.nombrePhotos}) }}
+                                        <br><small>{{ 'sauvegardes.version'|trans({version: r.version}) }}</small>
                                     {% else %}
-                                        <span class="erreur">Illisible : {{ l.erreur }}</span>
+                                        <span class="erreur">{{ 'sauvegardes.illisible'|trans({erreur: l.erreur|trans}) }}</span>
                                     {% endif %}
                                 </td>
-                                <td>{{ (s.taille / 1048576)|number_format(1, ',', ' ') }} Mo</td>
+                                <td>{{ 'sauvegardes.mo'|trans({taille: (s.taille / 1048576)|nombre(1)}) }}</td>
                                 <td class="actions-ligne">
-                                    <a class="btn btn-petit btn-secondaire" href="{{ path('admin_sauvegarde_telecharger', {nom: s.nom}) }}" download>Télécharger</a>
-                                    {% if r %}<a class="btn btn-petit" href="{{ path('admin_sauvegarde_restaurer', {nom: s.nom}) }}">Restaurer…</a>{% endif %}
+                                    <a class="btn btn-petit btn-secondaire" href="{{ path('admin_sauvegarde_telecharger', {nom: s.nom}) }}" download>{{ 'sauvegardes.telecharger'|trans }}</a>
+                                    {% if r %}<a class="btn btn-petit" href="{{ path('admin_sauvegarde_restaurer', {nom: s.nom}) }}">{{ 'sauvegardes.restaurer_ellipse'|trans }}</a>{% endif %}
                                     <form method="post" action="{{ path('admin_sauvegarde_supprimer', {nom: s.nom}) }}"
-                                          onsubmit="return confirm('Supprimer définitivement la sauvegarde du {{ s.creeLe|date('d/m/Y H:i') }} ?')">
+                                          onsubmit="return confirm('{{ 'sauvegardes.confirmer_suppression'|trans({date: s.creeLe|date('d/m/Y H:i')})|e('js') }}')">
                                         <input type="hidden" name="_token" value="{{ csrf_token('supprimer' ~ s.nom) }}">
-                                        <button class="btn btn-petit btn-danger">Supprimer</button>
+                                        <button class="btn btn-petit btn-danger">{{ 'commun.supprimer'|trans }}</button>
                                     </form>
                                 </td>
                             </tr>
@@ -61,31 +60,30 @@
                 </table>
             </div>
         {% endif %}
-        <p class="aide">Les sauvegardes sont rangées sur le serveur, dans <code>var/sauvegardes/</code>. Téléchargez-en une de temps en temps : si le serveur est perdu, elles le sont aussi.</p>
+        <p class="aide">{{ 'sauvegardes.emplacement'|trans({dossier: '<code>var/sauvegardes/</code>'})|raw }}</p>
     </section>
 
     <section class="carte-form-large">
-        <h2>Sauvegardes automatiques conservées</h2>
-        <p class="aide">Au-delà, les plus anciennes sauvegardes automatiques sont supprimées. Les sauvegardes manuelles et importées ne sont jamais supprimées d'office.</p>
+        <h2>{{ 'sauvegardes.conservees'|trans }}</h2>
+        <p class="aide">{{ 'sauvegardes.conservees_aide'|trans }}</p>
         {{ form_start(conservation, {attr: {class: 'form-en-ligne'}}) }}
             {{ form_errors(conservation) }}
-            {{ form_label(conservation.automatiques, 'Nombre (' ~ constant('App\\Sauvegarde\\ReglageSauvegardes::MIN') ~ ' à ' ~ constant('App\\Sauvegarde\\ReglageSauvegardes::MAX') ~ ')') }}
+            {{ form_label(conservation.automatiques, 'sauvegardes.nombre', {label_translation_parameters: {min: constant('App\\Sauvegarde\\ReglageSauvegardes::MIN'), max: constant('App\\Sauvegarde\\ReglageSauvegardes::MAX')}}) }}
             {{ form_widget(conservation.automatiques) }}
-            <button class="btn">Enregistrer</button>
+            <button class="btn">{{ 'commun.enregistrer'|trans }}</button>
             {{ form_errors(conservation.automatiques) }}
         {{ form_end(conservation) }}
     </section>
 
     <section class="carte-form-large">
-        <h2>Importer une sauvegarde</h2>
-        <p class="aide">Une archive téléchargée depuis cette page, ici ou sur un autre site GrimPanBloc. Taille maximale acceptée par le serveur : {{ tailleEnvoiMax }}.
-            L'archive rejoint la liste ci-dessus ; rien n'est restauré sans votre confirmation.</p>
+        <h2>{{ 'sauvegardes.importer_titre'|trans }}</h2>
+        <p class="aide">{{ 'sauvegardes.importer_aide'|trans({taille: tailleEnvoiMax}) }}</p>
         {{ form_start(import) }}
             {{ form_errors(import) }}
-            {{ form_label(import.archive, 'Archive (.zip)') }}
+            {{ form_label(import.archive, 'sauvegardes.archive') }}
             {{ form_errors(import.archive) }}
             {{ form_widget(import.archive, {attr: {accept: '.zip,application/zip'}}) }}
-            <button class="btn">Importer</button>
+            <button class="btn">{{ 'sauvegardes.importer'|trans }}</button>
         {{ form_end(import) }}
     </section>
 {% endblock %}

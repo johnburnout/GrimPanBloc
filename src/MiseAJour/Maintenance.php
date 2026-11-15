@@ -2,6 +2,8 @@
 
 namespace App\MiseAJour;
 
+use App\Exception\EchecOperation;
+
 /**
  * Mode maintenance pendant une mise à jour : public/index.php répond 503 à tout
  * le monde, sauf à la requête de finalisation qui porte le bon jeton.
@@ -28,7 +30,7 @@ final class Maintenance
         $jeton = bin2hex(random_bytes(24));
         $contenu = json_encode(['jeton' => hash('sha256', $jeton), 'depuis' => time()]);
         if (false === @file_put_contents($this->fichier(), $contenu, LOCK_EX)) {
-            throw new \RuntimeException('Impossible d\'activer le mode maintenance (var/ non accessible en écriture).');
+            throw new EchecOperation('maj.erreur.maintenance');
         }
 
         return $jeton;

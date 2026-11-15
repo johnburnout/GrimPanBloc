@@ -21,16 +21,20 @@
     const SEUIL_GLISSE = 6;      // px d'écran avant qu'un toucher devienne un glissé
     const DELAI_DOUBLE = 350;    // ms entre les deux touchers d'un double toucher
     const DISTANCE_DOUBLE = 30;  // px d'écran entre les deux touchers
+    // Textes traduits, fournis par la page (base.html.twig) ; le français à défaut
+    const T = (() => { try { return JSON.parse(document.getElementById('textes-js')?.textContent || '{}'); } catch { return {}; } })();
+    const t = (cle, defaut) => T[cle] || defaut;
+    const attr = (texte) => String(texte).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
 
     const COMMANDES = `
-        <div class="zoom" role="group" aria-label="Zoom">
-            <button type="button" data-zoom="plus" aria-label="Zoomer">+</button>
-            <input type="range" min="0" max="3" step="0.01" value="0" aria-label="Niveau de zoom">
-            <button type="button" data-zoom="moins" aria-label="Dézoomer">−</button>
-            <button type="button" data-zoom="ajuster" title="Voir toute la photo" aria-label="Voir toute la photo">
+        <div class="zoom" role="group" aria-label="${attr(t('zoom', 'Zoom'))}">
+            <button type="button" data-zoom="plus" aria-label="${attr(t('zoomer', 'Zoomer'))}">+</button>
+            <input type="range" min="0" max="3" step="0.01" value="0" aria-label="${attr(t('niveau_zoom', 'Niveau de zoom'))}">
+            <button type="button" data-zoom="moins" aria-label="${attr(t('dezoomer', 'Dézoomer'))}">−</button>
+            <button type="button" data-zoom="ajuster" title="${attr(t('voir_toute_photo', 'Voir toute la photo'))}" aria-label="${attr(t('voir_toute_photo', 'Voir toute la photo'))}">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="1.5"/></svg>
             </button>
-            <button type="button" data-plein-ecran title="Plein écran" aria-label="Plein écran" aria-pressed="false">
+            <button type="button" data-plein-ecran title="${attr(t('plein_ecran', 'Plein écran'))}" aria-label="${attr(t('plein_ecran', 'Plein écran'))}" aria-pressed="false">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>
             </button>
         </div>`;
@@ -154,7 +158,7 @@
             figure.classList.toggle('plein-ecran', actif);
             document.body.classList.toggle('plein-ecran-actif', actif);
             boutonPleinEcran.setAttribute('aria-pressed', actif ? 'true' : 'false');
-            boutonPleinEcran.title = actif ? 'Quitter le plein écran' : 'Plein écran';
+            boutonPleinEcran.title = actif ? t('quitter_plein_ecran', 'Quitter le plein écran') : t('plein_ecran', 'Plein écran');
             dimensionner();
         };
 

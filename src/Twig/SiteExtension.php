@@ -2,18 +2,42 @@
 
 namespace App\Twig;
 
+use App\Locale\Langues;
 use App\Site\IdentiteClub;
 use chillerlan\QRCode\Common\EccLevel;
 use chillerlan\QRCode\Output\QRMarkupSVG;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
+use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Attribute\AsTwigFilter;
 use Twig\Attribute\AsTwigFunction;
 
-/** Fonctions Twig : identité du club et QR code. */
+/** Fonctions Twig : identité du club, langues de l'interface et QR code. */
 final class SiteExtension
 {
-    public function __construct(private readonly IdentiteClub $club)
+    public function __construct(
+        private readonly IdentiteClub $club,
+        private readonly Langues $langues,
+        private readonly TranslatorInterface $translator,
+    ) {
+    }
+
+    /** Nombre écrit à la façon de la langue de la page (« 1 250,5 », « 1,250.5 »). */
+    #[AsTwigFilter('nombre')]
+    public function nombre(int|float $valeur, int $decimales = 0): string
     {
+        $format = new \NumberFormatter($this->translator->getLocale(), \NumberFormatter::DECIMAL);
+        $format->setAttribute(\NumberFormatter::MIN_FRACTION_DIGITS, $decimales);
+        $format->setAttribute(\NumberFormatter::MAX_FRACTION_DIGITS, $decimales);
+
+        return (string) $format->format($valeur);
+    }
+
+    /** @return array<string, string> code → nom de la langue (dans cette langue) */
+    #[AsTwigFunction('langues')]
+    public function langues(): array
+    {
+        return $this->langues->toutes();
     }
 
     #[AsTwigFunction('club_nom')]

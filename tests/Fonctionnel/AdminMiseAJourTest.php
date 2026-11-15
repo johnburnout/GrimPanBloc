@@ -10,6 +10,7 @@ use App\MiseAJour\Maintenance;
 use App\MiseAJour\VerificateurMiseAJour;
 use App\MiseAJour\VersionInstallee;
 use App\Sauvegarde\DepotSauvegardes;
+use App\Tests\Traduction;
 use Psr\Log\NullLogger;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Filesystem\Filesystem;
@@ -141,7 +142,7 @@ final class AdminMiseAJourTest extends FonctionnelTestCase
         $this->client->request('GET', '/admin/mise-a-jour/finaliser?jeton='.$jeton);
 
         self::assertResponseRedirects('/admin/mise-a-jour');
-        self::assertSame(["Les migrations de la base ont échoué :\nerreur SQL"], $this->flashs('error'));
+        self::assertSame(['Les migrations de la base ont échoué : erreur SQL'], $this->flashs('error'));
         self::assertSame([], $this->flashs('success'));
         self::assertCount(1, $this->lancees, 'Pas de compilation des logos après un échec des migrations.');
         self::assertFileDoesNotExist($this->maintenance->fichier(), 'La maintenance est levée même en cas d\'échec.');
@@ -240,6 +241,6 @@ final class AdminMiseAJourTest extends FonctionnelTestCase
         $session = $this->client->getRequest()->getSession();
         self::assertInstanceOf(FlashBagAwareSessionInterface::class, $session);
 
-        return $session->getFlashBag()->get($type);
+        return array_map(Traduction::fr(...), $session->getFlashBag()->get($type));
     }
 }

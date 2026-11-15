@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ app.request.locale }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -15,29 +15,29 @@
        utilise la police Bricolage Grotesque chargée par la page.
        Sur petit écran, le symbole seul laisse la place au menu. #}
     {% if club_logo() %}
-        <img class="logo-club" src="{{ asset(club_logo()) }}" alt="{{ club_nom() ?: 'Logo du club' }}">
+        <img class="logo-club" src="{{ asset(club_logo()) }}" alt="{{ club_nom() ?: 'commun.logo_club'|trans }}">
     {% endif %}
-    <a href="{{ path('app_home') }}" class="logo" aria-label="GrimPanBloc, accueil">
+    <a href="{{ path('app_home') }}" class="logo" aria-label="{{ 'nav.accueil'|trans }}">
         <span class="logo-complet">{{ source('@logo/logo-inverse.svg') }}</span>
         <span class="logo-symbole">{{ source('@logo/mark-inverse.svg') }}</span>
     </a>
     <nav>
-        <a href="{{ path('app_home') }}">Voies</a>
-        <a href="{{ path('secteur_index') }}">Secteurs</a>
-        <a href="{{ path('informations') }}">Infos</a>
+        <a href="{{ path('app_home') }}">{{ 'nav.voies'|trans }}</a>
+        <a href="{{ path('secteur_index') }}">{{ 'nav.secteurs'|trans }}</a>
+        <a href="{{ path('informations') }}">{{ 'nav.infos'|trans }}</a>
         {% if is_granted('ROLE_ADMIN') %}
-            <a href="{{ path('admin') }}">Administration</a>
+            <a href="{{ path('admin') }}">{{ 'nav.administration'|trans }}</a>
         {% endif %}
         {% if app.user %}
-            <a href="{{ path('profil') }}" class="pseudo" title="Mon compte">{{ app.user.pseudo }}</a>
+            <a href="{{ path('profil') }}" class="pseudo" title="{{ 'nav.mon_compte'|trans }}">{{ app.user.pseudo }}</a>
             {# POST + jeton CSRF : un site tiers ne peut pas déconnecter l'utilisateur à son insu #}
             <form method="post" action="{{ path('app_logout') }}" class="form-deconnexion">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
-                <button type="submit" class="btn-lien">Déconnexion</button>
+                <button type="submit" class="btn-lien">{{ 'nav.deconnexion'|trans }}</button>
             </form>
         {% else %}
-            <a href="{{ path('app_login') }}">Connexion</a>
-            <a href="{{ path('app_register') }}" class="btn btn-petit">Inscription</a>
+            <a href="{{ path('app_login') }}">{{ 'nav.connexion'|trans }}</a>
+            <a href="{{ path('app_register') }}" class="btn btn-petit">{{ 'nav.inscription'|trans }}</a>
         {% endif %}
     </nav>
 </header>
@@ -46,8 +46,8 @@
     {% set maj = grimpanbloc_mise_a_jour() %}
     {% if maj and not (app.current_route starts with 'admin_mise_a_jour') %}
         <div class="bandeau-maj" role="status">
-            GrimPanBloc {{ maj.version }} est disponible (version installée : {{ grimpanbloc_version() }}).
-            <a href="{{ path('admin_mise_a_jour') }}">Voir la mise à jour</a>
+            {{ 'maj.bandeau'|trans({version: maj.version, installee: grimpanbloc_version()}) }}
+            <a href="{{ path('admin_mise_a_jour') }}">{{ 'maj.bandeau_lien'|trans }}</a>
         </div>
     {% endif %}
 {% endif %}
@@ -55,15 +55,37 @@
 <main class="contenu">
     {% for type, messages in app.flashes %}
         {% for message in messages %}
-            <div class="flash flash-{{ type }}">{{ message }}</div>
+            <div class="flash flash-{{ type }}">{{ message|trans }}</div>
         {% endfor %}
     {% endfor %}
 
     {% block body %}{% endblock %}
 </main>
 
-<footer class="pied">GrimPanBloc {{ grimpanbloc_version() }}</footer>
+<footer class="pied">
+    <span>GrimPanBloc {{ grimpanbloc_version() }}</span>
+    <nav class="langues" aria-label="{{ 'pied.langue'|trans }}">
+        {% set retour = app.request.requestUri %}
+        {% for code, nom in langues() %}
+            <a href="{{ path('langue', {langue: code, retour: retour}) }}" lang="{{ code }}" hreflang="{{ code }}"
+               {% if code == app.request.locale %}aria-current="true"{% endif %}>{{ nom }}</a>
+        {% endfor %}
+    </nav>
+</footer>
 
+{# Textes des scripts (public/js/), dans la langue de la page #}
+<script type="application/json" id="textes-js">{{ {
+    plein_ecran: 'js.plein_ecran'|trans,
+    quitter_plein_ecran: 'js.quitter_plein_ecran'|trans,
+    zoom: 'js.zoom'|trans,
+    zoomer: 'js.zoomer'|trans,
+    dezoomer: 'js.dezoomer'|trans,
+    niveau_zoom: 'js.niveau_zoom'|trans,
+    voir_toute_photo: 'js.voir_toute_photo'|trans,
+    deplier_barre: 'js.deplier_barre'|trans,
+    replier_barre: 'js.replier_barre'|trans,
+    photo_zone: 'js.photo_zone'|trans,
+}|json_encode(constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_HEX_TAG'))|raw }}</script>
 {% block javascripts %}{% endblock %}
 </body>
 </html>

@@ -2,6 +2,7 @@
 
 namespace App\Sauvegarde;
 
+use App\Exception\ArgumentInvalide;
 use App\Repository\ReglageRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -29,7 +30,7 @@ final class ReglageSauvegardes
     public function definirAutomatiquesGardees(int $nombre): void
     {
         if ($nombre < self::MIN || $nombre > self::MAX) {
-            throw new \InvalidArgumentException(\sprintf('Entre %d et %d sauvegardes automatiques.', self::MIN, self::MAX));
+            throw new ArgumentInvalide('erreur.sauvegarde.conservation', ['min' => self::MIN, 'max' => self::MAX]);
         }
         $this->reglages->definir(self::CLE, (string) $nombre);
         $this->em->flush();

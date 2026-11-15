@@ -1,22 +1,22 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Mon profil · GrimPanBloc{% endblock %}
+{% block title %}{{ 'profil.titre'|trans }} · GrimPanBloc{% endblock %}
 
 {% block body %}
-    <h1>Mon compte</h1>
+    <h1>{{ 'nav.mon_compte'|trans }}</h1>
     {{ include('profil/_onglets.html.twig', {actif: 'profil'}) }}
 
     <section class="carte-form-large carte-etroite">
-        <p><span class="etiquette">Pseudo</span> <strong>{{ app.user.pseudo }}</strong>
-            <small class="aide">(non modifiable)</small></p>
-        <p><span class="etiquette">Inscrit le</span> {{ app.user.creeLe|date('d/m/Y') }}</p>
+        <p><span class="etiquette">{{ 'commun.pseudo'|trans }}</span> <strong>{{ app.user.pseudo }}</strong>
+            <small class="aide">{{ 'profil.non_modifiable'|trans }}</small></p>
+        <p><span class="etiquette">{{ 'profil.inscrit_le'|trans }}</span> {{ app.user.creeLe|date('d/m/Y') }}</p>
 
         {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
         {{ form_errors(form) }}
         {{ form_row(form.email) }}
         {{ form_row(form.nouveauMotDePasse) }}
         {{ form_row(form.motDePasseActuel) }}
-        <button class="btn">Enregistrer</button>
+        <button class="btn">{{ 'commun.enregistrer'|trans }}</button>
         {{ form_end(form) }}
     </section>
 {% endblock %}

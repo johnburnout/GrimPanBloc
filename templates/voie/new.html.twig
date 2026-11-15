@@ -1,16 +1,14 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}{{ source is defined ? 'Copie de ' ~ source.nom : 'Nouvelle voie' }} · GrimPanBloc{% endblock %}
+{% block title %}{{ source is defined ? 'voie.copie_de'|trans({nom: source.nom}) : 'voie.nouvelle'|trans }} · GrimPanBloc{% endblock %}
 
 {% block body %}
     <p class="fil"><a href="{{ path('secteur_show', {id: secteur.id}) }}">← {{ secteur.nom }}</a></p>
     {% if source is defined %}
-        <h1>Copie de « {{ source.nom }} »</h1>
-        <p class="aide">La photo, les prises, la cotation et les consignes de
-            <a href="{{ path('voie_show', {id: source.id}) }}">{{ source.nom }}</a> sont reprises :
-            ajustez-les, puis enregistrez. La voie d'origine ne change pas.</p>
+        <h1>{{ 'voie.copie_titre'|trans({nom: source.nom}) }}</h1>
+        <p class="aide">{{ 'voie.copie_aide'|trans({lien: '<a href="' ~ path('voie_show', {id: source.id}) ~ '">' ~ source.nom|e ~ '</a>'})|raw }}</p>
     {% else %}
-        <h1>Nouvelle voie</h1>
+        <h1>{{ 'voie.nouvelle'|trans }}</h1>
     {% endif %}
 
     {{ include('voie/_form.html.twig') }}

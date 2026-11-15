@@ -2,11 +2,13 @@
 
 namespace App\Command;
 
+use App\Exception\Messages;
 use App\Sauvegarde\GestionSauvegardes;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Attribute\Option;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Sauvegarde des secteurs, voies et photos en ligne de commande (cron, SSH).
@@ -17,8 +19,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 #[AsCommand(name: 'app:sauvegarde', description: 'Sauvegarde les secteurs, voies et photos dans var/sauvegardes/')]
 class SauvegardeCommand
 {
-    public function __construct(private readonly GestionSauvegardes $sauvegardes)
-    {
+    public function __construct(
+        private readonly GestionSauvegardes $sauvegardes,
+        private readonly TranslatorInterface $translator,
+    ) {
     }
 
     public function __invoke(
@@ -31,7 +35,7 @@ class SauvegardeCommand
                 ? $this->sauvegardes->creerAutomatique('' !== $motif ? $motif : 'ligne de commande')
                 : $this->sauvegardes->creerManuelle($motif);
         } catch (\Throwable $e) {
-            $io->error($e->getMessage());
+            $io->error(Messages::texte($e, $this->translator, 'fr'));
 
             return Command::FAILURE;
         }

@@ -1,17 +1,17 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Secteurs · GrimPanBloc{% endblock %}
+{% block title %}{{ 'secteurs.titre'|trans }} · GrimPanBloc{% endblock %}
 
 {% block body %}
     <div class="titre-actions">
-        <h1>Secteurs</h1>
+        <h1>{{ 'secteurs.titre'|trans }}</h1>
         {% if is_granted('ROLE_ADMIN') %}
-            <a href="{{ path('secteur_new') }}" class="btn">+ Nouveau secteur</a>
+            <a href="{{ path('secteur_new') }}" class="btn">+ {{ 'secteurs.nouveau'|trans }}</a>
         {% endif %}
     </div>
 
     {% if secteurs is empty %}
-        <p class="vide">Aucun secteur.{% if is_granted('ROLE_ADMIN') %} Commencez par en créer un (pan, mur, dévers…).{% else %} Un administrateur doit d'abord en créer un (pan, mur, dévers…).{% endif %}</p>
+        <p class="vide">{{ (is_granted('ROLE_ADMIN') ? 'secteurs.aucun_admin' : 'secteurs.aucun')|trans }}</p>
     {% else %}
         <ul class="liste-secteurs">
             {% for ligne in secteurs %}
@@ -19,7 +19,7 @@
                 <li>
                     <a href="{{ path('secteur_show', {id: s.id}) }}">
                         <strong>{{ s.nom }}</strong>
-                        <small>{{ ligne.voies }} voie{{ ligne.voies > 1 ? 's' }}</small>
+                        <small>{{ 'voies.nombre'|trans({n: ligne.voies}) }}</small>
                     </a>
                 </li>
             {% endfor %}

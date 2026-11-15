@@ -50,7 +50,7 @@ final class InformationsTest extends FonctionnelTestCase
         self::assertSelectorExists('a[href*="google.com/maps/dir/"][href*="destination=44.8312%2C1.3254"]');
         self::assertSelectorTextSame('a.site-salle', 'grimpeurs-du-causse.fr');
         self::assertSame('https://grimpeurs-du-causse.fr/', $page->filter('a.site-salle')->attr('href'));
-        self::assertSame(['Hauteur', '4,5 m', 'Surface grimpable', '1 250 m²'], $page->filter('.caracteristiques dt, .caracteristiques dd')->each(fn ($n) => $n->text()));
+        self::assertSame(['Hauteur', '4,5 m', 'Surface grimpable', "1\u{202F}250 m²"], $page->filter('.caracteristiques dt, .caracteristiques dd')->each(fn ($n) => $n->text()));
         self::assertSame('18 h – 22 h', $page->filter('.horaires tr')->eq(1)->filter('td')->text());
         self::assertSame('Fermé', $page->filter('.horaires tr')->eq(0)->filter('td')->text());
         self::assertSelectorTextContains('main', 'Fermé en août');

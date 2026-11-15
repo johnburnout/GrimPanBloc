@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsCsrfTokenValid;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Translation\TranslatableMessage;
 
 /**
  * Liste des utilisateurs : nommer / retirer un admin, désactiver / réactiver,
@@ -26,6 +27,7 @@ class AdminUtilisateursController extends AbstractController
     public function __construct(
         private readonly UserRepository $utilisateurs,
         private readonly EntityManagerInterface $em,
+        private readonly ConfirmationSuppression $confirmation,
     ) {
     }
 
@@ -42,16 +44,16 @@ class AdminUtilisateursController extends AbstractController
         $this->refuserSiSupprime($cible);
         if ($cible->isAdmin()) {
             if ($this->dernierAdmin($cible)) {
-                return $this->refuser('Il doit rester au moins un administrateur actif.');
+                return $this->refuser('flash.utilisateur.dernier_admin');
             }
             $cible->setAdmin(false);
-            $message = sprintf('%s n\'est plus administrateur.', $cible->getPseudo());
+            $message = new TranslatableMessage('flash.utilisateur.plus_admin', ['pseudo' => $cible->getPseudo()]);
         } else {
             if (!$cible->isActif()) {
-                return $this->refuser('Réactivez d\'abord ce compte.');
+                return $this->refuser('flash.utilisateur.reactivez');
             }
             $cible->setAdmin(true);
-            $message = sprintf('%s est maintenant administrateur.', $cible->getPseudo());
+            $message = new TranslatableMessage('flash.utilisateur.admin', ['pseudo' => $cible->getPseudo()]);
         }
         $this->em->flush();
         $this->addFlash('success', $message);
@@ -66,14 +68,14 @@ class AdminUtilisateursController extends AbstractController
     {
         $this->refuserSiSupprime($cible);
         if ($cible === $this->getUser()) {
-            return $this->refuser('Vous ne pouvez pas désactiver votre propre compte.');
+            return $this->refuser('flash.utilisateur.pas_soi_desactiver');
         }
         if ($cible->isActif() && $this->dernierAdmin($cible)) {
-            return $this->refuser('Il doit rester au moins un administrateur actif.');
+            return $this->refuser('flash.utilisateur.dernier_admin');
         }
         $cible->setActif(!$cible->isActif());
         $this->em->flush();
-        $this->addFlash('success', sprintf('Compte de %s %s.', $cible->getPseudo(), $cible->isActif() ? 'réactivé' : 'désactivé : il ne peut plus se connecter'));
+        $this->addFlash('success', new TranslatableMessage($cible->isActif() ? 'flash.utilisateur.reactive' : 'flash.utilisateur.desactive', ['pseudo' => $cible->getPseudo()]));
 
         return $this->redirectToRoute('admin_utilisateurs');
     }
@@ -83,25 +85,25 @@ class AdminUtilisateursController extends AbstractController
     public function supprimer(User $cible, Request $request): Response
     {
         if ($cible->estSupprime()) {
-            return $this->refuser('Ce compte est déjà supprimé.');
+            return $this->refuser('flash.utilisateur.deja_supprime');
         }
         if ($cible === $this->getUser()) {
-            return $this->refuser('Vous ne pouvez pas supprimer votre propre compte.');
+            return $this->refuser('flash.utilisateur.pas_soi_supprimer');
         }
         if ($this->dernierAdmin($cible)) {
-            return $this->refuser('Il doit rester au moins un administrateur actif.');
+            return $this->refuser('flash.utilisateur.dernier_admin');
         }
 
         if ($request->isMethod('POST')) {
-            if (!ConfirmationSuppression::estConfirmee($request->getPayload()->getString('confirmation'))) {
-                $this->addFlash('error', ConfirmationSuppression::MESSAGE_ANNULATION);
+            if (!$this->confirmation->estConfirmee($request->getPayload()->getString('confirmation'))) {
+                $this->addFlash('error', ConfirmationSuppression::annulation());
 
                 return $this->redirectToRoute('admin_utilisateur_supprimer', ['id' => $cible->getId()]);
             }
             $pseudo = $cible->getPseudo();
             $cible->supprimer();
             $this->em->flush();
-            $this->addFlash('success', sprintf('Compte de %s supprimé. Ses voies restent visibles sous son pseudo.', $pseudo));
+            $this->addFlash('success', new TranslatableMessage('flash.utilisateur.supprime', ['pseudo' => $pseudo]));
 
             return $this->redirectToRoute('admin_utilisateurs');
         }
@@ -124,9 +126,9 @@ class AdminUtilisateursController extends AbstractController
         return $cible->isAdmin() && $cible->isActif() && $this->utilisateurs->nombreAdminsActifs() <= 1;
     }
 
-    private function refuser(string $message): Response
+    private function refuser(string $cle): Response
     {
-        $this->addFlash('error', $message);
+        $this->addFlash('error', new TranslatableMessage($cle));
 
         return $this->redirectToRoute('admin_utilisateurs');
     }

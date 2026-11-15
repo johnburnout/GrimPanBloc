@@ -30,13 +30,13 @@ final class SmtpType extends AbstractType
 
         $builder
             ->add('hote', TextType::class, $texte + [
-                'constraints' => [new Regex('/^[A-Za-z0-9.\-]+$/', message: 'Nom de serveur SMTP invalide.')],
+                'constraints' => [new Regex('/^[A-Za-z0-9.\-]+$/', message: 'smtp.serveur')],
             ])
             ->add('port', IntegerType::class, [
-                'invalid_message' => 'Port invalide.',
+                'invalid_message' => 'smtp.port',
                 'constraints' => [
-                    new NotNull(message: 'Port invalide.'),
-                    new Range(min: 1, max: 65535, notInRangeMessage: 'Port invalide.'),
+                    new NotNull(message: 'smtp.port'),
+                    new Range(min: 1, max: 65535, notInRangeMessage: 'smtp.port'),
                 ],
             ])
             ->add('chiffrement', ChoiceType::class, ['choices' => array_flip(ReglagesSmtp::CHIFFREMENTS)])
@@ -44,7 +44,7 @@ final class SmtpType extends AbstractType
             ->add('mot_de_passe', PasswordType::class, $texte + ['mapped' => false])
             ->add('effacer_mot_de_passe', CheckboxType::class, ['required' => false, 'mapped' => false])
             ->add('expediteur', EmailType::class, $texte + [
-                'constraints' => [new Email(message: 'Adresse d\'expédition invalide.')],
+                'constraints' => [new Email(message: 'smtp.expediteur')],
             ])
             ->add('expediteur_nom', TextType::class, $texte);
     }

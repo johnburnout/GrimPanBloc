@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\Exception\EchecOperation;
+
 /**
  * Prépare une photo pour le stockage :
  * - la redresse selon l'orientation EXIF (photos de téléphone) ;
@@ -81,7 +83,7 @@ class PhotoOptimiseur
             IMAGETYPE_WEBP => imagewebp($image, $chemin, self::QUALITE_WEBP),
         };
         if (!$ok) {
-            throw new \RuntimeException(sprintf('Impossible d\'enregistrer la photo « %s ».', $chemin));
+            throw new EchecOperation('erreur.photo_enregistrement', ['fichier' => basename($chemin)]);
         }
 
         return ['largeur' => imagesx($image), 'hauteur' => imagesy($image), 'modifiee' => true];
@@ -119,7 +121,7 @@ class PhotoOptimiseur
 
         $dossier = \dirname($destination);
         if (!is_dir($dossier) && !@mkdir($dossier, 0775, true) && !is_dir($dossier)) {
-            throw new \RuntimeException(\sprintf('Impossible de créer le dossier « %s ».', $dossier));
+            throw new EchecOperation('erreur.dossier', ['dossier' => $dossier]);
         }
         if (IMAGETYPE_JPEG === $type) {
             imageinterlace($reduite, true);

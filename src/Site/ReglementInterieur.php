@@ -2,6 +2,7 @@
 
 namespace App\Site;
 
+use App\Exception\ArgumentInvalide;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -47,7 +48,7 @@ final class ReglementInterieur
         // Le type annoncé par le navigateur ne suffit pas : on lit la signature du fichier
         $debut = (string) @file_get_contents($fichier->getPathname(), false, null, 0, 5);
         if ('%PDF-' !== $debut) {
-            throw new \InvalidArgumentException('Le règlement intérieur doit être un fichier PDF.');
+            throw new ArgumentInvalide('erreur.reglement_pdf');
         }
 
         $this->fs->mkdir($this->dossier);

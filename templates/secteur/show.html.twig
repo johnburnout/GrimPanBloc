@@ -6,13 +6,13 @@
     <div class="titre-actions">
         <h1>{{ secteur.nom }}</h1>
         {% if is_granted('ROLE_USER') %}
-            <a href="{{ path('voie_new', {id: secteur.id}) }}" class="btn">+ Nouvelle voie</a>
+            <a href="{{ path('voie_new', {id: secteur.id}) }}" class="btn">+ {{ 'voie.nouvelle'|trans }}</a>
         {% else %}
-            <a href="{{ path('app_login') }}" class="btn btn-secondaire">Connectez-vous pour créer une voie</a>
+            <a href="{{ path('app_login') }}" class="btn btn-secondaire">{{ 'secteurs.connectez_vous'|trans }}</a>
         {% endif %}
         {% if is_granted('ROLE_ADMIN') %}
-            <a href="{{ path('admin_secteur_nettoyer', {id: secteur.id}) }}" class="btn btn-secondaire">Nettoyer le secteur…</a>
-            <a href="{{ path('admin_secteur_supprimer', {id: secteur.id}) }}" class="btn btn-secondaire">Supprimer le secteur…</a>
+            <a href="{{ path('admin_secteur_nettoyer', {id: secteur.id}) }}" class="btn btn-secondaire">{{ 'secteurs.nettoyer_ellipse'|trans }}</a>
+            <a href="{{ path('admin_secteur_supprimer', {id: secteur.id}) }}" class="btn btn-secondaire">{{ 'secteurs.supprimer_ellipse'|trans }}</a>
         {% endif %}
     </div>
 

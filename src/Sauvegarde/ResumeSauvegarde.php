@@ -3,6 +3,7 @@
 namespace App\Sauvegarde;
 
 use App\Enum\TypeSauvegarde;
+use App\Exception\ArgumentInvalide;
 
 /**
  * Contenu de resume.json : de quoi afficher une sauvegarde (liste, choix du
@@ -65,17 +66,17 @@ final readonly class ResumeSauvegarde
     public static function depuisTableau(mixed $d): self
     {
         if (!\is_array($d) || !\is_int($d['format'] ?? null) || !\is_array($d['secteurs'] ?? null)) {
-            throw new \InvalidArgumentException('résumé illisible');
+            throw new ArgumentInvalide('erreur.sauvegarde.resume_illisible');
         }
         $creeLe = \is_string($d['creeLe'] ?? null) ? \DateTimeImmutable::createFromFormat(\DATE_ATOM, $d['creeLe']) : false;
         $type = \is_string($d['type'] ?? null) ? TypeSauvegarde::tryFrom($d['type']) : null;
         if (false === $creeLe || null === $type) {
-            throw new \InvalidArgumentException('résumé illisible');
+            throw new ArgumentInvalide('erreur.sauvegarde.resume_illisible');
         }
         $secteurs = [];
         foreach ($d['secteurs'] as $s) {
             if (!\is_array($s) || !\is_int($s['id'] ?? null) || !\is_string($s['nom'] ?? null) || !\is_int($s['voies'] ?? null) || !\is_int($s['photos'] ?? null)) {
-                throw new \InvalidArgumentException('résumé illisible');
+                throw new ArgumentInvalide('erreur.sauvegarde.resume_illisible');
             }
             $secteurs[] = ['id' => $s['id'], 'nom' => $s['nom'], 'voies' => $s['voies'], 'photos' => $s['photos']];
         }

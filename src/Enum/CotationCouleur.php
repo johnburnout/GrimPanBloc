@@ -2,10 +2,13 @@
 
 namespace App\Enum;
 
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
 /**
  * Échelle de couleurs de difficulté croissante.
  */
-enum CotationCouleur: string
+enum CotationCouleur: string implements TranslatableInterface
 {
     case Vert = 'vert';
     case Jaune = 'jaune';
@@ -36,5 +39,11 @@ enum CotationCouleur: string
             self::Noir => '#1d1d1d',
             self::Blanc => '#ffffff',
         };
+    }
+
+    /** Nom de la couleur dans la langue de l'interface. */
+    public function trans(TranslatorInterface $translator, ?string $locale = null): string
+    {
+        return $translator->trans('enum.couleur.'.$this->value, locale: $locale);
     }
 }

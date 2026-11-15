@@ -1,179 +1,176 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Réglages · Administration · GrimPanBloc{% endblock %}
+{% block title %}{{ 'admin.onglet.reglages'|trans }} · {{ 'nav.administration'|trans }} · GrimPanBloc{% endblock %}
 
 {% block body %}
-    <h1>Administration</h1>
+    <h1>{{ 'nav.administration'|trans }}</h1>
     {{ include('admin/_onglets.html.twig', {actif: 'reglages'}) }}
 
     <section class="carte-form-large">
-        <h2>Sécurité de la connexion</h2>
+        <h2>{{ 'reglages.https.titre'|trans }}</h2>
         {% if not enHttps %}
-            <p class="flash flash-error">Cette page est ouverte en <strong>HTTP</strong> : les mots de passe circulent en clair.
-                Ouvrez-la en <a href="https://{{ app.request.httpHost }}{{ path('admin_reglages') }}">HTTPS</a> pour activer la redirection.</p>
+            <p class="flash flash-error">{{ 'reglages.https.page_en_http'|trans({lien: '<a href="https://' ~ app.request.httpHost|e ~ path('admin_reglages') ~ '">HTTPS</a>'})|raw }}</p>
         {% endif %}
         {{ form_start(https) }}
             {{ form_errors(https) }}
             <label class="case">
                 {{ form_widget(https.forcer_https, {attr: {disabled: not enHttps and not forcerHttps}}) }}
-                Toujours utiliser HTTPS : les visiteurs arrivant en <code>http://</code> sont redirigés vers <code>https://</code>
+                {{ 'reglages.https.forcer'|trans|raw }}
             </label>
-            <p class="aide">À n'activer que si le certificat HTTPS est en place et renouvelé automatiquement (c'est le cas chez la plupart des hébergeurs, avec Let's Encrypt).
-                Les navigateurs retiennent ce choix pendant 30 jours.</p>
-            <button class="btn">Enregistrer</button>
+            <p class="aide">{{ 'reglages.https.aide'|trans }}</p>
+            <button class="btn">{{ 'commun.enregistrer'|trans }}</button>
         {{ form_end(https) }}
     </section>
 
     <section class="carte-form-large">
-        <h2>Identité de la salle ou du club</h2>
-        <p class="aide">Le logo s'affiche dans l'en-tête du site et sur la <a href="{{ path('admin_fiche') }}">fiche à imprimer</a>. PNG, JPEG ou WebP, 5 Mo au plus. Il est réduit à {{ constant('App\\Site\\IdentiteClub::COTE_MAX_LOGO') }} px.</p>
+        <h2>{{ 'reglages.club.titre'|trans }}</h2>
+        <p class="aide">{{ 'reglages.club.aide'|trans({fiche: '<a href="' ~ path('admin_fiche') ~ '">' ~ 'reglages.club.fiche'|trans ~ '</a>', cote: constant('App\\Site\\IdentiteClub::COTE_MAX_LOGO')})|raw }}</p>
         {{ form_start(club) }}
             {{ form_errors(club) }}
-            {{ form_label(club.nom_club, 'Nom de la salle ou du club') }}
+            {{ form_label(club.nom_club, 'reglages.club.nom') }}
             {{ form_errors(club.nom_club) }}
             {{ form_widget(club.nom_club, {attr: {maxlength: 100, placeholder: 'Périgord Escalade — Veyrignac'}}) }}
             {% if clubLogo %}
-                <p class="apercu-logo"><img src="{{ asset(clubLogo) }}" alt="Logo actuel"></p>
-                <label class="case">{{ form_widget(club.supprimer_logo) }} Supprimer le logo</label>
+                <p class="apercu-logo"><img src="{{ asset(clubLogo) }}" alt="{{ 'reglages.club.logo_actuel'|trans }}"></p>
+                <label class="case">{{ form_widget(club.supprimer_logo) }} {{ 'reglages.club.supprimer_logo'|trans }}</label>
             {% else %}
                 {% do club.supprimer_logo.setRendered %}
             {% endif %}
-            {{ form_label(club.logo, clubLogo ? 'Remplacer le logo' : 'Logo') }}
+            {{ form_label(club.logo, clubLogo ? 'reglages.club.remplacer_logo' : 'reglages.club.logo') }}
             {{ form_errors(club.logo) }}
             {{ form_widget(club.logo, {attr: {accept: 'image/png,image/jpeg,image/webp'}}) }}
-            <button class="btn">Enregistrer</button>
+            <button class="btn">{{ 'commun.enregistrer'|trans }}</button>
         {{ form_end(club) }}
     </section>
 
     <section class="carte-form-large">
-        <h2>Informations sur la salle</h2>
-        <p class="aide">Affichées sur la page <a href="{{ path('informations') }}">Informations</a>, accessible à tous depuis le menu. Tous les champs sont facultatifs : ce qui est vide n'est pas affiché.</p>
+        <h2>{{ 'reglages.salle.titre'|trans }}</h2>
+        <p class="aide">{{ 'reglages.salle.aide'|trans({lien: '<a href="' ~ path('informations') ~ '">' ~ 'infos.titre'|trans ~ '</a>'})|raw }}</p>
         {{ form_start(salle) }}
             {{ form_errors(salle) }}
-            {{ form_label(salle.adresse, 'Adresse postale') }}
+            {{ form_label(salle.adresse, 'reglages.salle.adresse') }}
             {{ form_errors(salle.adresse) }}
             {{ form_widget(salle.adresse, {attr: {rows: 3, maxlength: constant('App\\Site\\InformationsSalle::LONGUEUR_MAX_ADRESSE'), placeholder: "Salle des sports\n12 route du Causse\n24370 Veyrignac"}}) }}
 
-            {{ form_label(salle.coordonnees, 'Localisation sur la carte (latitude, longitude)') }}
+            {{ form_label(salle.coordonnees, 'reglages.salle.coordonnees') }}
             {{ form_errors(salle.coordonnees) }}
             {{ form_widget(salle.coordonnees, {attr: {placeholder: '44.8312, 1.3254', inputmode: 'decimal'}}) }}
-            <p class="aide">Dans OpenStreetMap ou Google Maps, un clic droit sur l'emplacement de la salle affiche ses coordonnées : copiez-les ici. Une carte s'affichera sur la page Informations.</p>
+            <p class="aide">{{ 'reglages.salle.coordonnees_aide'|trans }}</p>
 
-            {{ form_label(salle.site_web, 'Site internet') }}
+            {{ form_label(salle.site_web, 'infos.site_internet') }}
             {{ form_errors(salle.site_web) }}
             {{ form_widget(salle.site_web, {attr: {placeholder: 'https://www.exemple.org'}}) }}
 
             <div class="ligne-form">
-                <div>{{ form_label(salle.hauteur, 'Hauteur (m)') }}{{ form_errors(salle.hauteur) }}{{ form_widget(salle.hauteur, {attr: {min: 0.5, max: 100, step: 0.1, placeholder: '4,5'}}) }}</div>
-                <div>{{ form_label(salle.surface, 'Surface grimpable (m²)') }}{{ form_errors(salle.surface) }}{{ form_widget(salle.surface, {type: 'number', attr: {min: 1, max: 100000, placeholder: '250'}}) }}</div>
+                <div>{{ form_label(salle.hauteur, 'reglages.salle.hauteur') }}{{ form_errors(salle.hauteur) }}{{ form_widget(salle.hauteur, {attr: {min: 0.5, max: 100, step: 0.1, placeholder: '4,5'}}) }}</div>
+                <div>{{ form_label(salle.surface, 'reglages.salle.surface') }}{{ form_errors(salle.surface) }}{{ form_widget(salle.surface, {type: 'number', attr: {min: 1, max: 100000, placeholder: '250'}}) }}</div>
             </div>
 
             <fieldset class="choix">
-                <legend>Horaires d'ouverture</legend>
-                <label class="case">{{ form_widget(salle.horaires_affiches) }} Afficher les horaires d'ouverture sur la page Informations</label>
-                <p class="aide">Une ligne par jour, par exemple « 18 h – 22 h ». Laissez vide les jours de fermeture.</p>
+                <legend>{{ 'infos.horaires'|trans }}</legend>
+                <label class="case">{{ form_widget(salle.horaires_affiches) }} {{ 'reglages.salle.afficher_horaires'|trans }}</label>
+                <p class="aide">{{ 'reglages.salle.horaires_aide'|trans }}</p>
                 {{ form_errors(salle.horaires) }}
                 <div class="grille-horaires">
-                    {% for jour, libelle in constant('App\\Site\\InformationsSalle::JOURS') %}
-                        {{ form_label(salle.horaires[jour], libelle) }}
-                        <div>{{ form_errors(salle.horaires[jour]) }}{{ form_widget(salle.horaires[jour], {attr: {maxlength: constant('App\\Site\\InformationsSalle::LONGUEUR_MAX_HORAIRE'), placeholder: 'Fermé'}}) }}</div>
+                    {% for jour in constant('App\\Site\\InformationsSalle::JOURS')|keys %}
+                        {{ form_label(salle.horaires[jour], 'jour.' ~ jour) }}
+                        <div>{{ form_errors(salle.horaires[jour]) }}{{ form_widget(salle.horaires[jour], {attr: {maxlength: constant('App\\Site\\InformationsSalle::LONGUEUR_MAX_HORAIRE'), placeholder: 'infos.ferme'}}) }}</div>
                     {% endfor %}
                 </div>
-                {{ form_label(salle.horaires_remarque, 'Remarque sur les horaires') }}
+                {{ form_label(salle.horaires_remarque, 'reglages.salle.remarque_horaires') }}
                 {{ form_errors(salle.horaires_remarque) }}
-                {{ form_widget(salle.horaires_remarque, {attr: {maxlength: constant('App\\Site\\InformationsSalle::LONGUEUR_MAX_REMARQUE'), placeholder: 'Fermé pendant les vacances scolaires'}}) }}
+                {{ form_widget(salle.horaires_remarque, {attr: {maxlength: constant('App\\Site\\InformationsSalle::LONGUEUR_MAX_REMARQUE'), placeholder: 'reglages.salle.remarque_exemple'}}) }}
             </fieldset>
 
-            {{ form_label(salle.autres, 'Autres informations') }}
-            <p class="aide">Texte libre affiché en bas de la page Informations (tarifs, accès, consignes…). Mise en forme
-                <a href="https://www.markdownguide.org/basic-syntax/" target="_blank" rel="noopener">Markdown</a> :
-                <code>**gras**</code>, <code>*italique*</code>, <code>## Titre</code>, <code>- liste</code>, <code>[lien](https://…)</code>, ligne vide entre deux paragraphes.</p>
+            {{ form_label(salle.autres, 'infos.autres') }}
+            <p class="aide">{{ 'reglages.salle.autres_aide'|trans({lien: '<a href="https://www.markdownguide.org/basic-syntax/" target="_blank" rel="noopener">Markdown</a>'})|raw }}
+                <code>**…**</code>, <code>*…*</code>, <code>## …</code>, <code>- …</code>, <code>[…](https://…)</code></p>
             {{ form_errors(salle.autres) }}
             {{ form_widget(salle.autres, {attr: {rows: 10, class: 'saisie-markdown', maxlength: constant('App\\Site\\InformationsSalle::LONGUEUR_MAX_AUTRES')}}) }}
 
             <fieldset class="choix">
-                <legend>Règlement intérieur</legend>
-                <p class="aide">Fichier PDF de 10 Mo au plus, proposé en lien sur la page Informations.</p>
+                <legend>{{ 'infos.reglement'|trans }}</legend>
+                <p class="aide">{{ 'reglages.salle.reglement_aide'|trans }}</p>
                 {% if reglement %}
-                    <p><a href="{{ path('informations_reglement', {v: reglement.timestamp}) }}" target="_blank" rel="noopener">Règlement intérieur actuel (PDF)</a>
-                        <small>— envoyé le {{ reglement|date('d/m/Y') }}</small></p>
-                    <label class="case">{{ form_widget(salle.supprimer_reglement) }} Supprimer le règlement intérieur</label>
+                    <p><a href="{{ path('informations_reglement', {v: reglement.timestamp}) }}" target="_blank" rel="noopener">{{ 'reglages.salle.reglement_actuel'|trans }}</a>
+                        <small>— {{ 'reglages.salle.envoye_le'|trans({date: reglement|date('d/m/Y')}) }}</small></p>
+                    <label class="case">{{ form_widget(salle.supprimer_reglement) }} {{ 'reglages.salle.supprimer_reglement'|trans }}</label>
                 {% else %}
                     {% do salle.supprimer_reglement.setRendered %}
                 {% endif %}
-                {{ form_label(salle.reglement, reglement ? 'Remplacer le règlement intérieur' : 'Règlement intérieur (PDF)') }}
+                {{ form_label(salle.reglement, reglement ? 'reglages.salle.remplacer_reglement' : 'reglages.salle.reglement_pdf') }}
                 {{ form_errors(salle.reglement) }}
                 {{ form_widget(salle.reglement, {attr: {accept: 'application/pdf,.pdf'}}) }}
             </fieldset>
-            <button class="btn">Enregistrer</button>
+            <button class="btn">{{ 'commun.enregistrer'|trans }}</button>
         {{ form_end(salle) }}
     </section>
 
     <section class="carte-form-large">
-        <h2>Serveur d'envoi des mails (SMTP)</h2>
-        <p class="aide">Les informations sont fournies par votre hébergeur ou votre messagerie. Le mot de passe est enregistré chiffré.</p>
+        <h2>{{ 'reglages.smtp.titre'|trans }}</h2>
+        <p class="aide">{{ 'reglages.smtp.aide'|trans }}</p>
         {{ form_start(smtp, {attr: {autocomplete: 'off', class: 'grille-form'}}) }}
             {{ form_errors(smtp) }}
             <div class="ligne-form">
-                <div>{{ form_label(smtp.hote, 'Serveur') }}{{ form_errors(smtp.hote) }}{{ form_widget(smtp.hote, {attr: {placeholder: 'smtp.exemple.org'}}) }}</div>
-                <div class="etroit">{{ form_label(smtp.port, 'Port') }}{{ form_errors(smtp.port) }}{{ form_widget(smtp.port, {type: 'number', attr: {min: 1, max: 65535}}) }}</div>
+                <div>{{ form_label(smtp.hote, 'reglages.smtp.serveur') }}{{ form_errors(smtp.hote) }}{{ form_widget(smtp.hote, {attr: {placeholder: 'smtp.exemple.org'}}) }}</div>
+                <div class="etroit">{{ form_label(smtp.port, 'reglages.smtp.port') }}{{ form_errors(smtp.port) }}{{ form_widget(smtp.port, {type: 'number', attr: {min: 1, max: 65535}}) }}</div>
             </div>
-            {{ form_label(smtp.chiffrement, 'Chiffrement') }}
+            {{ form_label(smtp.chiffrement, 'reglages.smtp.chiffrement') }}
             {{ form_errors(smtp.chiffrement) }}
             {{ form_widget(smtp.chiffrement) }}
             <div class="ligne-form">
-                <div>{{ form_label(smtp.utilisateur, 'Identifiant') }}{{ form_widget(smtp.utilisateur, {attr: {autocomplete: 'off'}}) }}</div>
+                <div>{{ form_label(smtp.utilisateur, 'reglages.smtp.identifiant') }}{{ form_widget(smtp.utilisateur, {attr: {autocomplete: 'off'}}) }}</div>
                 <div>
-                    <label for="{{ smtp.mot_de_passe.vars.id }}">Mot de passe {% if smtpDefini %}<small>(enregistré : laissez vide pour le garder)</small>{% endif %}</label>
+                    <label for="{{ smtp.mot_de_passe.vars.id }}">{{ 'commun.mot_de_passe'|trans }} {% if smtpDefini %}<small>{{ 'reglages.smtp.mot_de_passe_garde'|trans }}</small>{% endif %}</label>
                     {{ form_widget(smtp.mot_de_passe, {attr: {autocomplete: 'new-password'}}) }}
                 </div>
             </div>
             {% if smtpDefini %}
-                <label class="case">{{ form_widget(smtp.effacer_mot_de_passe) }} Effacer le mot de passe enregistré</label>
+                <label class="case">{{ form_widget(smtp.effacer_mot_de_passe) }} {{ 'reglages.smtp.effacer_mot_de_passe'|trans }}</label>
             {% else %}
                 {% do smtp.effacer_mot_de_passe.setRendered %}
             {% endif %}
             <div class="ligne-form">
-                <div>{{ form_label(smtp.expediteur, 'Adresse d\'expédition') }}{{ form_errors(smtp.expediteur) }}{{ form_widget(smtp.expediteur, {attr: {placeholder: 'contact@exemple.org'}}) }}</div>
-                <div>{{ form_label(smtp.expediteur_nom, 'Nom d\'expéditeur') }}{{ form_widget(smtp.expediteur_nom) }}</div>
+                <div>{{ form_label(smtp.expediteur, 'reglages.smtp.expediteur') }}{{ form_errors(smtp.expediteur) }}{{ form_widget(smtp.expediteur, {attr: {placeholder: 'contact@exemple.org'}}) }}</div>
+                <div>{{ form_label(smtp.expediteur_nom, 'reglages.smtp.expediteur_nom') }}{{ form_widget(smtp.expediteur_nom) }}</div>
             </div>
-            <button class="btn">Enregistrer</button>
+            <button class="btn">{{ 'commun.enregistrer'|trans }}</button>
         {{ form_end(smtp) }}
     </section>
 
     <section class="carte-form-large">
-        <h2>Mail de test</h2>
-        {% if not smtpConfigure %}<p class="flash flash-info">Renseignez d'abord le serveur et l'adresse d'expédition.</p>{% endif %}
-        <p class="aide">Envoie un message générique pour vérifier les réglages ci-dessus.</p>
+        <h2>{{ 'reglages.mail_test.titre'|trans }}</h2>
+        {% if not smtpConfigure %}<p class="flash flash-info">{{ 'reglages.mail_test.renseignez'|trans }}</p>{% endif %}
+        <p class="aide">{{ 'reglages.mail_test.aide'|trans }}</p>
         {{ form_start(mail_test, {attr: {class: 'form-en-ligne'}}) }}
             {{ form_errors(mail_test) }}
-            {{ form_label(mail_test.destinataire, 'Destinataire') }}
+            {{ form_label(mail_test.destinataire, 'reglages.mail_test.destinataire') }}
             {{ form_widget(mail_test.destinataire) }}
-            <button class="btn" {{ not smtpConfigure ? 'disabled' }}>Envoyer le mail de test</button>
+            <button class="btn" {{ not smtpConfigure ? 'disabled' }}>{{ 'reglages.mail_test.envoyer'|trans }}</button>
             {{ form_errors(mail_test.destinataire) }}
         {{ form_end(mail_test) }}
     </section>
 
     <section class="carte-form-large">
-        <h2>Envoyer un message</h2>
-        <p class="aide">Un mail est envoyé à chaque destinataire : les adresses ne sont pas visibles des autres. Écrivez <code>{pseudo}</code> pour insérer le pseudo du destinataire. Les comptes désactivés ou supprimés ne reçoivent rien.</p>
-        {{ form_start(envoi_groupe, {attr: {onsubmit: "return confirm('Envoyer ce message ?')"}}) }}
+        <h2>{{ 'reglages.groupe.titre'|trans }}</h2>
+        <p class="aide">{{ 'reglages.groupe.aide'|trans({pseudo: '<code>{pseudo}</code>'})|raw }}</p>
+        {{ form_start(envoi_groupe, {attr: {onsubmit: "return confirm('" ~ 'reglages.groupe.confirmer'|trans|e('js') ~ "')"}}) }}
             {{ form_errors(envoi_groupe) }}
             <fieldset class="choix">
-                <legend>Destinataires</legend>
-                {% set libelles = {tous: 'Tous les utilisateurs (' ~ nbTous ~ ')', admins: 'Les administrateurs (' ~ nbAdmins ~ ')'} %}
+                <legend>{{ 'reglages.groupe.destinataires'|trans }}</legend>
+                {% set libelles = {tous: 'reglages.groupe.tous'|trans({n: nbTous}), admins: 'reglages.groupe.admins'|trans({n: nbAdmins})} %}
                 {% for choix in envoi_groupe.cible %}
                     <label class="case">{{ form_widget(choix) }} {{ libelles[choix.vars.value] }}</label>
                 {% endfor %}
                 {{ form_errors(envoi_groupe.cible) }}
             </fieldset>
-            {{ form_label(envoi_groupe.objet, 'Objet') }}
+            {{ form_label(envoi_groupe.objet, 'reglages.groupe.objet') }}
             {{ form_errors(envoi_groupe.objet) }}
             {{ form_widget(envoi_groupe.objet, {attr: {maxlength: constant('App\\Form\\Reglages\\EnvoiGroupeType::LONGUEUR_MAX_OBJET')}}) }}
-            {{ form_label(envoi_groupe.corps, 'Message') }}
+            {{ form_label(envoi_groupe.corps, 'reglages.groupe.message') }}
             {{ form_errors(envoi_groupe.corps) }}
             {{ form_widget(envoi_groupe.corps, {attr: {rows: 8}}) }}
-            <button class="btn" {{ not smtpConfigure ? 'disabled' }}>Envoyer</button>
+            <button class="btn" {{ not smtpConfigure ? 'disabled' }}>{{ 'reglages.groupe.envoyer'|trans }}</button>
         {{ form_end(envoi_groupe) }}
     </section>
 {% endblock %}

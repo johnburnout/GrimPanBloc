@@ -102,7 +102,7 @@ final class AdminSauvegardesTest extends FonctionnelTestCase
         $this->restaurer($sauvegarde, 'tout', 'garder');
 
         self::assertResponseRedirects('/secteurs');
-        self::assertStringStartsWith('Sauvegarde restaurée : 1 voie(s), 1 photo(s) et 1 croix.', $this->flashsApresRedirection('success')[0]);
+        self::assertStringStartsWith('Sauvegarde restaurée : 1 voie, 1 photo et 1 croix.', $this->flashsApresRedirection('success')[0]);
         $this->em->clear();
         $restauree = $this->em->find(Voie::class, $idVoie);
         self::assertNotNull($restauree, 'Même identifiant : liens et QR codes restent valables.');
@@ -206,7 +206,7 @@ final class AdminSauvegardesTest extends FonctionnelTestCase
         self::assertResponseRedirects('/admin/sauvegardes/'.$sauvegarde->nom.'/restaurer');
 
         $this->restaurer($sauvegarde, '9001');
-        self::assertStringContainsString('1 croix ignorée(s) : grimpeur absent de ce site.', $this->flashsApresRedirection('success')[0]);
+        self::assertStringContainsString('1 croix ignorée : grimpeur absent de ce site.', $this->flashsApresRedirection('success')[0]);
         $this->em->clear();
         $voie = $this->em->find(Voie::class, 9001);
         self::assertSame('admin', $voie?->getAuteur()?->getPseudo());
@@ -275,8 +275,8 @@ final class AdminSauvegardesTest extends FonctionnelTestCase
         $this->client->loginUser($this->admin);
         $page = $this->client->request('GET', '/secteurs/'.$secteur->getId());
         $page = $this->client->click($page->selectLink('Nettoyer le secteur…')->link());
-        self::assertStringContainsString('1 voie(s)', $page->filter('.zone-danger')->text());
-        self::assertStringContainsString('2 photo(s)', $page->filter('.zone-danger')->text());
+        self::assertStringContainsString('1 voie ', $page->filter('.zone-danger')->text());
+        self::assertStringContainsString('2 photos ', $page->filter('.zone-danger')->text());
         self::assertStringContainsString('1 croix', $page->filter('.zone-danger')->text());
 
         // Garde-fou : sans le mot, rien
@@ -288,7 +288,7 @@ final class AdminSauvegardesTest extends FonctionnelTestCase
         $this->client->submit($page->selectButton('Nettoyer le secteur')->form(['confirmation' => 'SUPPRIMER']));
 
         self::assertResponseRedirects('/secteurs/'.$secteur->getId());
-        self::assertSame(['Secteur « Dévers » nettoyé : 1 voie(s) et 2 photo(s) supprimée(s).'], $this->flashsApresRedirection('success'));
+        self::assertSame(['Secteur « Dévers » nettoyé : 1 voie et 2 photos supprimées.'], $this->flashsApresRedirection('success'));
         self::assertFalse($this->voieExiste($idVoie));
         self::assertNull($this->em->find(Photo::class, $libre->getId()));
         self::assertNotNull($this->em->find(Secteur::class, $secteur->getId()), 'Le secteur reste.');
@@ -337,8 +337,8 @@ final class AdminSauvegardesTest extends FonctionnelTestCase
         $this->client->loginUser($this->admin);
         $page = $this->client->request('GET', "/secteurs/$idSecteur");
         $page = $this->client->click($page->selectLink('Supprimer le secteur…')->link());
-        self::assertStringContainsString('1 voie(s)', $page->filter('.zone-danger')->text());
-        self::assertStringContainsString('2 photo(s)', $page->filter('.zone-danger')->text());
+        self::assertStringContainsString('1 voie ', $page->filter('.zone-danger')->text());
+        self::assertStringContainsString('2 photos ', $page->filter('.zone-danger')->text());
 
         // Garde-fous : jeton et mot de confirmation
         $this->client->request('POST', $url, ['_token' => 'faux', 'confirmation' => 'SUPPRIMER']);
@@ -352,7 +352,7 @@ final class AdminSauvegardesTest extends FonctionnelTestCase
         $this->client->submit($page->selectButton('Supprimer le secteur')->form(['confirmation' => 'SUPPRIMER']));
 
         self::assertResponseRedirects('/secteurs');
-        self::assertSame(['Secteur « Dévers » supprimé, avec 1 voie(s) et 2 photo(s).'], $this->flashsApresRedirection('success'));
+        self::assertSame(['Secteur « Dévers » supprimé, avec 1 voie et 2 photos.'], $this->flashsApresRedirection('success'));
         $this->em->clear();
         self::assertNull($this->em->find(Secteur::class, $idSecteur));
         self::assertFalse($this->voieExiste($idVoie));
@@ -406,7 +406,7 @@ final class AdminSauvegardesTest extends FonctionnelTestCase
         $page = $this->client->request('GET', '/admin/sauvegardes');
         $this->client->submit($page->selectButton('Enregistrer')->form(['conservation[automatiques]' => '3']));
         self::assertResponseRedirects('/admin/sauvegardes');
-        self::assertStringContainsString('2 sauvegarde(s) plus ancienne(s) supprimée(s)', $this->flashsApresRedirection('success')[0]);
+        self::assertStringContainsString('2 sauvegardes plus anciennes supprimées', $this->flashsApresRedirection('success')[0]);
         $restantes = $this->depot->lister();
         self::assertCount(4, $restantes);
         self::assertContains($manuelle->nom, array_map(fn (Sauvegarde $s) => $s->nom, $restantes), 'Les manuelles ne sont jamais purgées.');

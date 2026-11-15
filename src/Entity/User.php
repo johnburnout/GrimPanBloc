@@ -12,8 +12,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'utilisateur')]
-#[UniqueEntity(fields: ['email'], message: 'Un compte existe déjà avec cet email.')]
-#[UniqueEntity(fields: ['pseudo'], message: 'Ce pseudo est déjà pris.')]
+#[UniqueEntity(fields: ['email'], message: 'utilisateur.email.pris')]
+#[UniqueEntity(fields: ['pseudo'], message: 'utilisateur.pseudo.pris')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
     #[ORM\Id]
@@ -52,6 +52,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $supprimeLe = null;
 
+    /** Langue de l'interface choisie par l'utilisateur (« fr », « en »…), ou null : celle du navigateur. */
+    #[ORM\Column(length: 5, nullable: true)]
+    private ?string $langue = null;
+
     public function __construct()
     {
         $this->creeLe = new \DateTimeImmutable();
@@ -70,6 +74,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     public function setEmail(string $email): static
     {
         $this->email = mb_strtolower($email);
+
+        return $this;
+    }
+
+    public function getLangue(): ?string
+    {
+        return $this->langue;
+    }
+
+    public function setLangue(?string $langue): static
+    {
+        $this->langue = $langue;
 
         return $this;
     }

@@ -2,7 +2,10 @@
 
 namespace App\Enum;
 
-enum TypePrise: string
+use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
+
+enum TypePrise: string implements TranslatableInterface
 {
     case Depart = 'depart';
     case Main = 'main';
@@ -17,5 +20,11 @@ enum TypePrise: string
             self::Pied => 'Pied',
             self::Top => 'Top',
         };
+    }
+
+    /** Libellé dans la langue de l'interface (libelle() : en français). */
+    public function trans(TranslatorInterface $translator, ?string $locale = null): string
+    {
+        return $translator->trans('enum.type_prise.'.$this->value, locale: $locale);
     }
 }

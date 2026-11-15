@@ -23,24 +23,24 @@ class ProfilType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email', EmailType::class, ['label' => 'Email', 'attr' => ['autocomplete' => 'email']])
+            ->add('email', EmailType::class, ['label' => 'commun.email', 'attr' => ['autocomplete' => 'email']])
             ->add('nouveauMotDePasse', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'mapped' => false,
                 'required' => false,
-                'invalid_message' => 'Les deux mots de passe ne correspondent pas.',
-                'first_options' => ['label' => 'Nouveau mot de passe', 'help' => 'Laissez vide pour garder le mot de passe actuel.', 'attr' => ['autocomplete' => 'new-password']],
-                'second_options' => ['label' => 'Confirmation du nouveau mot de passe', 'attr' => ['autocomplete' => 'new-password']],
-                'constraints' => [new Length(min: 8, max: 4096, minMessage: 'Au moins {{ limit }} caractères.')],
+                'invalid_message' => 'mot_de_passe.differents',
+                'first_options' => ['label' => 'profil.nouveau_mot_de_passe', 'help' => 'profil.nouveau_mot_de_passe_aide', 'attr' => ['autocomplete' => 'new-password']],
+                'second_options' => ['label' => 'profil.confirmation_mot_de_passe', 'attr' => ['autocomplete' => 'new-password']],
+                'constraints' => [new Length(min: 8, max: 4096, minMessage: 'mot_de_passe.court')],
             ])
             ->add('motDePasseActuel', PasswordType::class, [
-                'label' => 'Mot de passe actuel',
-                'help' => 'Obligatoire pour enregistrer une modification.',
+                'label' => 'profil.mot_de_passe_actuel',
+                'help' => 'profil.mot_de_passe_actuel_aide',
                 'mapped' => false,
                 'attr' => ['autocomplete' => 'current-password'],
                 'constraints' => [
-                    new NotBlank(message: 'Saisissez votre mot de passe actuel.'),
-                    new UserPassword(message: 'Mot de passe actuel incorrect.'),
+                    new NotBlank(message: 'mot_de_passe.actuel_requis'),
+                    new UserPassword(message: 'mot_de_passe.actuel_incorrect'),
                 ],
             ]);
     }

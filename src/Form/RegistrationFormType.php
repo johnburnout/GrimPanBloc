@@ -19,17 +19,17 @@ class RegistrationFormType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email', EmailType::class, ['label' => 'Email'])
-            ->add('pseudo', TextType::class, ['label' => 'Pseudo'])
+            ->add('email', EmailType::class, ['label' => 'commun.email'])
+            ->add('pseudo', TextType::class, ['label' => 'commun.pseudo'])
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'mapped' => false,
-                'invalid_message' => 'Les deux mots de passe ne correspondent pas.',
-                'first_options' => ['label' => 'Mot de passe', 'attr' => ['autocomplete' => 'new-password']],
-                'second_options' => ['label' => 'Confirmation', 'attr' => ['autocomplete' => 'new-password']],
+                'invalid_message' => 'mot_de_passe.differents',
+                'first_options' => ['label' => 'commun.mot_de_passe', 'attr' => ['autocomplete' => 'new-password']],
+                'second_options' => ['label' => 'inscription.confirmation', 'attr' => ['autocomplete' => 'new-password']],
                 'constraints' => [
-                    new NotBlank(message: 'Choisissez un mot de passe.'),
-                    new Length(min: 8, max: 4096, minMessage: 'Au moins {{ limit }} caractères.'),
+                    new NotBlank(message: 'mot_de_passe.requis'),
+                    new Length(min: 8, max: 4096, minMessage: 'mot_de_passe.court'),
                 ],
             ]);
     }

@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Translation\TranslatableMessage;
 
 #[Route('/secteurs')]
 class SecteurController extends AbstractController
@@ -35,7 +36,7 @@ class SecteurController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $em->persist($secteur);
             $em->flush();
-            $this->addFlash('success', 'Secteur créé.');
+            $this->addFlash('success', new TranslatableMessage('flash.secteur.cree'));
 
             return $this->redirectToRoute('secteur_show', ['id' => $secteur->getId()]);
         }

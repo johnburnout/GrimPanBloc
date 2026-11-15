@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Translation\TranslatableMessage;
 
 class RegistrationController extends AbstractController
 {
@@ -31,10 +32,12 @@ class RegistrationController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $user->setPassword($hasher->hashPassword($user, $form->get('plainPassword')->getData()));
+            // Langue de l'inscription : celle des mails qu'il recevra
+            $user->setLangue($request->getLocale());
             $em->persist($user);
             $em->flush();
 
-            $this->addFlash('success', 'Bienvenue '.$user->getPseudo().' !');
+            $this->addFlash('success', new TranslatableMessage('flash.bienvenue', ['pseudo' => $user->getPseudo()]));
 
             return $security->login($user, 'form_login', 'main') ?? $this->redirectToRoute('app_home');
         }

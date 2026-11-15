@@ -29,14 +29,14 @@ final class EnvoiGroupeType extends AbstractType
             ])
             ->add('objet', TextType::class, [
                 'constraints' => [
-                    new NotBlank(message: 'L\'objet est obligatoire.'),
-                    new Length(max: self::LONGUEUR_MAX_OBJET, maxMessage: 'Objet trop long ({{ limit }} caractères au plus).'),
+                    new NotBlank(message: 'groupe.objet.requis'),
+                    new Length(max: self::LONGUEUR_MAX_OBJET, maxMessage: 'groupe.objet.long'),
                 ],
             ])
             ->add('corps', TextareaType::class, [
                 'constraints' => [
-                    new NotBlank(message: 'Le message est obligatoire.'),
-                    new Length(max: self::LONGUEUR_MAX_CORPS, maxMessage: 'Message trop long ({{ limit }} caractères au plus).'),
+                    new NotBlank(message: 'groupe.message.requis'),
+                    new Length(max: self::LONGUEUR_MAX_CORPS, maxMessage: 'groupe.message.long'),
                 ],
             ]);
     }

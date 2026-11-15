@@ -1,10 +1,10 @@
 {# Fiche A4 à imprimer : page autonome (sans l'en-tête du site). #}
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ app.request.locale }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Fiche à imprimer · GrimPanBloc</title>
+    <title>{{ 'admin.onglet.fiche'|trans }} · GrimPanBloc</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('logo/favicon.svg') }}">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <style>
@@ -36,26 +36,26 @@
 </head>
 <body>
     <div class="barre">
-        <a class="btn btn-secondaire" href="{{ path('admin_reglages') }}">← Administration</a>
-        <button class="btn" type="button" onclick="window.print()">Imprimer</button>
+        <a class="btn btn-secondaire" href="{{ path('admin_reglages') }}">← {{ 'nav.administration'|trans }}</a>
+        <button class="btn" type="button" onclick="window.print()">{{ 'fiche.imprimer'|trans }}</button>
     </div>
 
     <main class="feuille">
         <div class="logos">
-            {% if club_logo() %}<img src="{{ asset(club_logo()) }}" alt="{{ club_nom() ?: 'Logo du club' }}">{% endif %}
+            {% if club_logo() %}<img src="{{ asset(club_logo()) }}" alt="{{ club_nom() ?: 'commun.logo_club'|trans }}">{% endif %}
             {{ source('@logo/logo.svg') }}
         </div>
 
-        <h1>{{ club_nom() ?: 'Les voies de la salle' }}</h1>
-        <p class="accroche">Toutes les voies du pan, leurs prises et leur cotation, sur votre téléphone.</p>
+        <h1>{{ club_nom() ?: 'fiche.titre'|trans }}</h1>
+        <p class="accroche">{{ 'fiche.accroche'|trans }}</p>
 
         <div class="qr">{{ qr_code_svg(urlSite) }}</div>
         <p class="url">{{ urlSite }}</p>
 
         <ol class="etapes">
-            <li>Scannez le QR code avec l'appareil photo de votre téléphone.</li>
-            <li>Créez votre compte en quelques secondes.</li>
-            <li>Consultez les voies, cochez celles que vous réussissez et proposez leur cotation.</li>
+            <li>{{ 'fiche.etape1'|trans }}</li>
+            <li>{{ 'fiche.etape2'|trans }}</li>
+            <li>{{ 'fiche.etape3'|trans }}</li>
         </ol>
 
         <p class="pied-fiche">GrimPanBloc</p>

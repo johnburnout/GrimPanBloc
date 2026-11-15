@@ -3,6 +3,8 @@
 namespace App\Sauvegarde;
 
 use App\Entity\Voie;
+use App\Exception\ArgumentInvalide;
+use App\Exception\EchecOperation;
 use App\Service\MiniaturesPhotos;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
@@ -200,7 +202,7 @@ final class Restauration
         $flux = $stat['size'] <= self::TAILLE_MAX_PHOTO ? $zip->getStream($entree) : false;
         if (false === $flux) {
             if ($obligatoire) {
-                throw new \InvalidArgumentException("Archive invalide : photo $entree illisible ou trop volumineuse.");
+                throw new ArgumentInvalide('erreur.restauration.photo_illisible', ['fichier' => $entree]);
             }
 
             return false;
@@ -210,7 +212,7 @@ final class Restauration
         $sortie = @fopen($temporaire, 'x');
         if (false === $sortie) {
             fclose($flux);
-            throw new \RuntimeException('Impossible d\'écrire dans le dossier des photos.');
+            throw new EchecOperation('erreur.restauration.dossier_photos');
         }
         $copie = stream_copy_to_stream($flux, $sortie, self::TAILLE_MAX_PHOTO + 1);
         fclose($flux);
@@ -221,7 +223,7 @@ final class Restauration
         if (false === $image || !\in_array($image[2], [\IMAGETYPE_JPEG, \IMAGETYPE_PNG, \IMAGETYPE_WEBP], true)) {
             @unlink($temporaire);
             if ($obligatoire) {
-                throw new \InvalidArgumentException("Archive invalide : $entree n'est pas une image JPEG, PNG ou WebP.");
+                throw new ArgumentInvalide('erreur.restauration.pas_une_image', ['fichier' => $entree]);
             }
 
             return false;

@@ -328,7 +328,7 @@ class Voie
     {
         if (null === $this->getCotationAuteurEnum()) {
             $champ = SystemeCotation::Francaise === $this->systeme ? 'cotationFr' : 'cotationCouleur';
-            $context->buildViolation('Choisissez une cotation.')->atPath($champ)->addViolation();
+            $context->buildViolation('voie.cotation.requise')->atPath($champ)->addViolation();
         }
     }
 

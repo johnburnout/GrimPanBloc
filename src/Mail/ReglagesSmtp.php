@@ -13,7 +13,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  */
 final class ReglagesSmtp
 {
-    public const CHIFFREMENTS = ['starttls' => 'STARTTLS (port 587)', 'ssl' => 'SSL/TLS (port 465)', 'aucun' => 'Aucun (déconseillé)'];
+    /** Clé → libellé (clé de traduction) */
+    public const CHIFFREMENTS = ['starttls' => 'reglages.smtp.starttls', 'ssl' => 'reglages.smtp.ssl', 'aucun' => 'reglages.smtp.aucun'];
 
     public function __construct(
         private readonly ReglageRepository $reglages,

@@ -19,8 +19,8 @@ final class MailTestType extends AbstractType
     {
         $builder->add('destinataire', EmailType::class, [
             'constraints' => [
-                new NotBlank(message: 'Adresse du destinataire invalide.'),
-                new Email(message: 'Adresse du destinataire invalide.'),
+                new NotBlank(message: 'mail_test.destinataire'),
+                new Email(message: 'mail_test.destinataire'),
             ],
         ]);
     }

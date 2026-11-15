@@ -37,49 +37,49 @@ final class SalleType extends AbstractType
         $horaires = $builder->create('horaires', FormType::class, ['label' => false]);
         foreach (array_keys(InformationsSalle::JOURS) as $jour) {
             $horaires->add($jour, TextType::class, $texte + [
-                'constraints' => [new Length(max: InformationsSalle::LONGUEUR_MAX_HORAIRE, maxMessage: 'Horaires trop longs ({{ limit }} caractères au plus).')],
+                'constraints' => [new Length(max: InformationsSalle::LONGUEUR_MAX_HORAIRE, maxMessage: 'salle.horaires.long')],
             ]);
         }
 
         $builder
             ->add('adresse', TextareaType::class, $texte + [
-                'constraints' => [new Length(max: InformationsSalle::LONGUEUR_MAX_ADRESSE, maxMessage: 'Adresse trop longue ({{ limit }} caractères au plus).')],
+                'constraints' => [new Length(max: InformationsSalle::LONGUEUR_MAX_ADRESSE, maxMessage: 'salle.adresse.longue')],
             ])
             ->add('coordonnees', TextType::class, $texte + [
                 'constraints' => [new Callback(static function (?string $saisie, ExecutionContextInterface $contexte): void {
                     if ('' !== trim((string) $saisie) && null === InformationsSalle::analyserCoordonnees((string) $saisie)) {
-                        $contexte->addViolation('Coordonnées invalides : saisissez la latitude puis la longitude, par exemple 44.8312, 1.3254.');
+                        $contexte->addViolation('salle.coordonnees');
                     }
                 })],
             ])
             ->add('site_web', UrlType::class, $texte + [
                 'default_protocol' => 'https',
-                'invalid_message' => 'Adresse du site internet invalide.',
+                'invalid_message' => 'salle.site_web',
                 'constraints' => [
-                    new Url(message: 'Adresse du site internet invalide.', protocols: ['http', 'https'], requireTld: true),
+                    new Url(message: 'salle.site_web', protocols: ['http', 'https'], requireTld: true),
                     new Length(max: 255),
                 ],
             ])
             ->add('horaires_affiches', CheckboxType::class, ['required' => false])
             ->add($horaires)
             ->add('horaires_remarque', TextType::class, $texte + [
-                'constraints' => [new Length(max: InformationsSalle::LONGUEUR_MAX_REMARQUE, maxMessage: 'Remarque trop longue ({{ limit }} caractères au plus).')],
+                'constraints' => [new Length(max: InformationsSalle::LONGUEUR_MAX_REMARQUE, maxMessage: 'salle.remarque.longue')],
             ])
             ->add('hauteur', NumberType::class, [
                 'required' => false,
                 'scale' => 1,
                 'html5' => true,
-                'invalid_message' => 'Hauteur invalide.',
-                'constraints' => [new Range(min: 0.5, max: 100, notInRangeMessage: 'La hauteur doit être comprise entre {{ min }} et {{ max }} m.')],
+                'invalid_message' => 'salle.hauteur.invalide',
+                'constraints' => [new Range(min: 0.5, max: 100, notInRangeMessage: 'salle.hauteur.limites')],
             ])
             ->add('surface', IntegerType::class, [
                 'required' => false,
-                'invalid_message' => 'Surface invalide.',
-                'constraints' => [new Range(min: 1, max: 100000, notInRangeMessage: 'La surface doit être comprise entre {{ min }} et {{ max }} m².')],
+                'invalid_message' => 'salle.surface.invalide',
+                'constraints' => [new Range(min: 1, max: 100000, notInRangeMessage: 'salle.surface.limites')],
             ])
             ->add('autres', TextareaType::class, $texte + [
                 'trim' => false,
-                'constraints' => [new Length(max: InformationsSalle::LONGUEUR_MAX_AUTRES, maxMessage: 'Texte trop long ({{ limit }} caractères au plus).')],
+                'constraints' => [new Length(max: InformationsSalle::LONGUEUR_MAX_AUTRES, maxMessage: 'salle.autres.long')],
             ])
             ->add('supprimer_reglement', CheckboxType::class, ['required' => false, 'mapped' => false])
             ->add('reglement', FileType::class, [
@@ -88,8 +88,8 @@ final class SalleType extends AbstractType
                 'constraints' => [new File(
                     maxSize: ReglementInterieur::TAILLE_MAX,
                     mimeTypes: ['application/pdf'],
-                    maxSizeMessage: 'Le règlement intérieur ne doit pas dépasser 10 Mo.',
-                    mimeTypesMessage: 'Le règlement intérieur doit être un fichier PDF.',
+                    maxSizeMessage: 'salle.reglement.taille',
+                    mimeTypesMessage: 'salle.reglement.pdf',
                 )],
             ]);
     }

@@ -1,13 +1,13 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouveau secteur · GrimPanBloc{% endblock %}
+{% block title %}{{ 'secteurs.nouveau'|trans }} · GrimPanBloc{% endblock %}
 
 {% block body %}
 <div class="carte-form">
-    <h1>Nouveau secteur</h1>
+    <h1>{{ 'secteurs.nouveau'|trans }}</h1>
     {{ form_start(form) }}
         {{ form_widget(form) }}
-        <button class="btn" type="submit">Créer</button>
+        <button class="btn" type="submit">{{ 'secteurs.creer'|trans }}</button>
     {{ form_end(form) }}
 </div>
 {% endblock %}

@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Photo;
+use App\Exception\OperationRefusee;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -24,7 +25,7 @@ final class GestionPhotos
     public function supprimer(Photo $photo): void
     {
         if (!$photo->getVoies()->isEmpty()) {
-            throw new \LogicException('Cette photo est utilisée par une voie : supprimez ou modifiez d\'abord la voie.');
+            throw new OperationRefusee('erreur.photo_utilisee');
         }
         $fichier = $this->photosDir.'/'.$photo->getFichier();
 

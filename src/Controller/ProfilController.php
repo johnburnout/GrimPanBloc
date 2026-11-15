@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Translation\TranslatableMessage;
 
 /** Espace personnel : profil, croix posées, voies créées. */
 #[Route('/profil')]
@@ -34,7 +35,7 @@ class ProfilController extends AbstractController
                     $user->setPassword($hasher->hashPassword($user, $nouveau));
                 }
                 $em->flush();
-                $this->addFlash('success', 'Profil enregistré.');
+                $this->addFlash('success', new TranslatableMessage('flash.profil.enregistre'));
 
                 return $this->redirectToRoute('profil');
             }

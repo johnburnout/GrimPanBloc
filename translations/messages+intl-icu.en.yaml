@@ -1,0 +1,498 @@
+commun.logo_club: 'Club logo'
+commun.actions: Actions
+commun.enregistrer: Save
+commun.supprimer: Delete
+commun.formulaire_expire: 'The form has expired: reload the page and try again.'
+nav.accueil: 'GrimPanBloc, home'
+nav.voies: Routes
+nav.secteurs: Sectors
+nav.infos: Info
+nav.administration: Administration
+nav.mon_compte: 'My account'
+nav.deconnexion: 'Log out'
+nav.connexion: 'Log in'
+nav.inscription: 'Sign up'
+pied.langue: Language
+maj.bandeau: 'GrimPanBloc {version} is available (installed version: {installee}).'
+maj.bandeau_lien: 'See the update'
+js.plein_ecran: 'Full screen'
+js.quitter_plein_ecran: 'Exit full screen'
+js.zoom: Zoom
+js.zoomer: 'Zoom in'
+js.dezoomer: 'Zoom out'
+js.niveau_zoom: 'Zoom level'
+js.voir_toute_photo: 'Show the whole photo'
+js.deplier_barre: 'Expand the toolbar'
+js.replier_barre: 'Collapse the toolbar'
+js.photo_zone: 'Photo of the area'
+accueil.titre: Routes
+accueil.partager: Share
+accueil.partager_aide: 'Scan this QR code with the camera of another phone.'
+voies.aucune: 'No routes yet.'
+voies.aucune_filtre: 'No routes match these filters.'
+voies.tri.cotation: Grade
+voies.tri.nom: Name
+voies.tri.secteur: Sector
+voies.tri.ouvreur: Setter
+voies.filtre.secteur: Sector
+voies.filtre.tous: All
+voies.filtre.echelle: Scale
+voies.filtre.toutes: All
+voies.filtre.echelle_fr: French
+voies.filtre.echelle_couleur: Colours
+voies.filtre.de: From
+voies.filtre.a: to
+voies.trier_par: 'Sort by'
+voies.ordre: Order
+voies.croissant: Ascending
+voies.decroissant: Descending
+voies.valider: Apply
+voies.nombre: '{n, plural, one {# route} other {# routes}}'
+voies.miniatures: Thumbnails
+voies.miniature: Thumbnail
+voies.taille: Size
+voies.taille_icones: 'Icon size'
+voies.mode_affichage: 'Display mode'
+voies.vue_icones: Icons
+voies.vue_liste: List
+voie.dupliquer: Duplicate
+voie.dupliquer_nom: 'Duplicate {nom}'
+voie.photo_alt: 'Photo of the route {nom}'
+enum.type_prise.depart: Start
+enum.type_prise.main: Hand
+enum.type_prise.pied: Foot
+enum.type_prise.top: Top
+enum.systeme_cotation.fr: 'French scale'
+enum.systeme_cotation.couleur: Colours
+enum.couleur.vert: Green
+enum.couleur.jaune: Yellow
+enum.couleur.bleu: Blue
+enum.couleur.orange: Orange
+enum.couleur.rouge: Red
+enum.couleur.noir: Black
+enum.couleur.blanc: White
+enum.type_sauvegarde.manuelle: Manual
+enum.type_sauvegarde.automatique: Automatic
+enum.type_sauvegarde.importee: Imported
+voie.modifier: Edit
+voie.supprimer_ellipse: Delete…
+voie.supprimer_confirmer: 'Delete this route?'
+voie.pieds_libres: 'open feet'
+voie.pieds_imposes: 'marked feet only'
+voie.ouverte_par: 'set by {pseudo} on {date}'
+voie.nombre_prises: '{n, plural, one {# hold} other {# holds}}'
+voie.cotation: Grade
+voie.cotation_proposee_par: 'suggested by {pseudo} (setter). It will be replaced by the opinion of the climbers who send the route.'
+voie.cotation_d_apres: 'based on {n, plural, one {# climber who has} other {# climbers who have}} sent the route'
+voie.proposition_createur: 'setter’s suggestion:'
+voie.cotations_proposees: 'Suggested grades'
+voie.reussites: Sends
+voie.personne: 'Nobody has sent this route yet.'
+voie.ma_cotation: 'My grade'
+voie.cotation_que_je_propose: 'Grade I suggest'
+voie.modifier_ma_cotation: 'Change my grade'
+voie.retirer_croix: 'Remove my tick'
+voie.j_ai_reussi: 'I sent this route'
+voie.propre_croix: 'Your own tick does not lock the route and does not count as a vote: only the other climbers’ ticks count.'
+voie.supprimer_titre: 'Delete the route'
+voie.supprimer_validee: 'This route has been sent by {autres, plural, one {# other climber} other {# other climbers}}. Deleting it will also erase {croix, plural, one {# tick} other {# ticks}}. This cannot be undone.'
+voie.copie_de: 'Copy of {nom}'
+voie.nouvelle: 'New route'
+voie.copie_titre: 'Copy of “{nom}”'
+voie.copie_aide: 'The photo, holds, grade and instructions of {lien} are copied: adjust them, then save. The original route does not change.'
+voie.modifier_nom: 'Edit {nom}'
+voie.modifier_titre: 'Edit the route'
+voie.verrouillee: 'This route has already been sent by {grimpeurs}: the photo, holds and grade are locked. You can still correct the name and description.'
+voie.form.etape_photo: '1. The photo'
+voie.form.etape_prises: '2. The holds'
+voie.form.etape_infos: '3. Details and grade'
+voie.form.aide_prises: 'Choose a type in the toolbar, then <strong>double-tap</strong> the photo (double-click with a mouse) to place a hold. Drag a hold with one finger to move it; tap it once to give it the selected type and adjust its size. Zoom with two fingers or the slider on the side; move the image with two fingers (or one finger away from the holds). The button at the bottom of the slider switches to full screen, and the toolbar can be moved by its handle'
+voie.form.editeur_vide: 'Choose or upload a photo to start.'
+voie.form.outils: 'Marking tools'
+voie.form.deplacer_barre: 'Move the toolbar'
+voie.form.effacer: Erase
+voie.form.taille: Size
+voie.form.annuler: 'Undo the last action'
+voie.form.prises: hold(s)
+voie.form.aide_pieds: 'With open feet, foot holds are not shown to climbers (they stay saved and appear faded here).'
+voie.form.enregistrer: 'Save the route'
+voie.form.enregistrer_modifications: 'Save changes'
+confirmation.supprimer: DELETE
+confirmation.restaurer: RESTORE
+confirmation.tapez: 'Type {mot} to confirm'
+confirmation.en_majuscules: 'Type {mot} in capital letters'
+confirmation.supprimer_definitivement: 'Delete permanently'
+confirmation.annulee.suppression: 'Deletion cancelled: type {mot} to confirm.'
+confirmation.annulee.nettoyage: 'Clean-up cancelled: type {mot} to confirm.'
+confirmation.annulee.restauration: 'Restore cancelled: type {mot} to confirm.'
+commun.email: Email
+commun.mot_de_passe: Password
+commun.pseudo: Username
+secteurs.titre: Sectors
+secteurs.nouveau: 'New sector'
+secteurs.aucun_admin: 'No sectors. Start by creating one (board, wall, overhang…).'
+secteurs.aucun: 'No sectors. An administrator must create one first (board, wall, overhang…).'
+secteurs.creer: Create
+secteurs.connectez_vous: 'Log in to create a route'
+secteurs.nettoyer_ellipse: 'Clear the sector…'
+secteurs.supprimer_ellipse: 'Delete the sector…'
+connexion.titre: 'Log in'
+connexion.identifiants_incorrects: 'Incorrect email or password.'
+connexion.rester_connecte: 'Stay logged in'
+connexion.se_connecter: 'Log in'
+connexion.pas_de_compte: 'No account yet?'
+inscription.titre: 'Create an account'
+inscription.bouton: 'Sign up'
+profil.titre: 'My profile'
+profil.onglet_profil: Profile
+profil.onglet_croix: 'My ticks'
+profil.onglet_voies: 'My routes'
+profil.aucune_croix: 'You have not ticked any route as sent yet.'
+profil.col_voie: Route
+profil.col_cotation_affichee: 'Displayed grade'
+profil.col_le: 'On'
+profil.votre_voie: '(your route)'
+profil.croix_total: '{n, plural, one {# route sent} other {# routes sent}}. To change the grade you suggest, open the route page.'
+profil.non_modifiable: '(cannot be changed)'
+profil.inscrit_le: 'Joined on'
+profil.aucune_voie: 'You have not created any route yet.'
+infos.titre: Information
+infos.vide: 'The gym information has not been filled in yet.'
+infos.renseigner: 'Fill it in the settings'
+infos.adresse: Address
+infos.carte: 'Map: location of the gym'
+infos.voir_osm: 'View on OpenStreetMap'
+infos.google_maps: 'Google Maps'
+infos.itineraire: Directions
+infos.site_internet: Website
+infos.la_salle: 'The gym'
+infos.hauteur: Height
+infos.surface: 'Climbing surface'
+infos.horaires: 'Opening hours'
+infos.ferme: Closed
+infos.reglement: 'House rules'
+infos.lire_reglement: 'Read the house rules (PDF)'
+infos.autres: 'Other information'
+infos.modifier: 'Edit this information'
+jour.lundi: Monday
+jour.mardi: Tuesday
+jour.mercredi: Wednesday
+jour.jeudi: Thursday
+jour.vendredi: Friday
+jour.samedi: Saturday
+jour.dimanche: Sunday
+admin.onglet.reglages: Settings
+admin.onglet.utilisateurs: Users
+admin.onglet.photos: Photos
+admin.onglet.sauvegardes: Backups
+admin.onglet.fiche: 'Printable sheet'
+admin.onglet.mise_a_jour: Updates
+reglages.https.titre: 'Connection security'
+reglages.https.page_en_http: 'This page is open over <strong>HTTP</strong>: passwords travel unencrypted. Open it over {lien} to enable the redirection.'
+reglages.https.forcer: 'Always use HTTPS: visitors arriving on <code>http://</code> are redirected to <code>https://</code>'
+reglages.https.aide: 'Only enable this if the HTTPS certificate is in place and renewed automatically (as with most hosting providers, using Let’s Encrypt). Browsers remember this choice for 30 days.'
+reglages.club.titre: 'Gym or club identity'
+reglages.club.aide: 'The logo appears in the site header and on the {fiche}. PNG, JPEG or WebP, 5 MB maximum. It is resized to {cote} px.'
+reglages.club.fiche: 'printable sheet'
+reglages.club.nom: 'Name of the gym or club'
+reglages.club.logo_actuel: 'Current logo'
+reglages.club.supprimer_logo: 'Delete the logo'
+reglages.club.remplacer_logo: 'Replace the logo'
+reglages.club.logo: Logo
+reglages.salle.titre: 'Gym information'
+reglages.salle.aide: 'Shown on the {lien} page, available to everyone from the menu. All fields are optional: empty ones are not shown.'
+reglages.salle.adresse: 'Postal address'
+reglages.salle.coordonnees: 'Location on the map (latitude, longitude)'
+reglages.salle.coordonnees_aide: 'In OpenStreetMap or Google Maps, right-clicking on the gym’s location shows its coordinates: copy them here. A map will appear on the Information page.'
+reglages.salle.hauteur: 'Height (m)'
+reglages.salle.surface: 'Climbing surface (m²)'
+reglages.salle.afficher_horaires: 'Show the opening hours on the Information page'
+reglages.salle.horaires_aide: 'One line per day, for example “6 pm – 10 pm”. Leave closing days empty.'
+reglages.salle.remarque_horaires: 'Note about opening hours'
+reglages.salle.remarque_exemple: 'Closed during school holidays'
+reglages.salle.autres_aide: 'Free text shown at the bottom of the Information page (prices, access, rules…). {lien} formatting: bold, italic, heading, list, link; an empty line between two paragraphs.'
+reglages.salle.reglement_aide: 'PDF file of 10 MB maximum, linked from the Information page.'
+reglages.salle.reglement_actuel: 'Current house rules (PDF)'
+reglages.salle.envoye_le: 'uploaded on {date}'
+reglages.salle.supprimer_reglement: 'Delete the house rules'
+reglages.salle.remplacer_reglement: 'Replace the house rules'
+reglages.salle.reglement_pdf: 'House rules (PDF)'
+reglages.smtp.titre: 'Outgoing mail server (SMTP)'
+reglages.smtp.aide: 'This information is provided by your hosting or email provider. The password is stored encrypted.'
+reglages.smtp.serveur: Server
+reglages.smtp.port: Port
+reglages.smtp.chiffrement: Encryption
+reglages.smtp.identifiant: Username
+reglages.smtp.mot_de_passe_garde: '(saved: leave empty to keep it)'
+reglages.smtp.effacer_mot_de_passe: 'Clear the saved password'
+reglages.smtp.expediteur: 'Sender address'
+reglages.smtp.expediteur_nom: 'Sender name'
+reglages.smtp.starttls: 'STARTTLS (port 587)'
+reglages.smtp.ssl: 'SSL/TLS (port 465)'
+reglages.smtp.aucun: 'None (not recommended)'
+reglages.mail_test.titre: 'Test email'
+reglages.mail_test.renseignez: 'First fill in the server and the sender address.'
+reglages.mail_test.aide: 'Sends a generic message to check the settings above.'
+reglages.mail_test.destinataire: Recipient
+reglages.mail_test.envoyer: 'Send the test email'
+reglages.groupe.titre: 'Send a message'
+reglages.groupe.aide: 'One email is sent to each recipient: addresses are not visible to the others. Write {pseudo} to insert the recipient’s username. Disabled or deleted accounts receive nothing.'
+reglages.groupe.confirmer: 'Send this message?'
+reglages.groupe.destinataires: Recipients
+reglages.groupe.tous: 'All users ({n})'
+reglages.groupe.admins: 'Administrators ({n})'
+reglages.groupe.objet: Subject
+reglages.groupe.message: Message
+reglages.groupe.envoyer: Send
+utilisateurs.croix: Ticks
+utilisateurs.statut: Status
+utilisateurs.vous: (you)
+utilisateurs.supprime_le: 'Deleted on {date}'
+utilisateurs.desactive: Disabled
+utilisateurs.actif: Active
+utilisateurs.admin: admin
+utilisateurs.retirer_admin: 'Remove admin'
+utilisateurs.nommer_admin: 'Make admin'
+utilisateurs.desactiver: Disable
+utilisateurs.reactiver: Re-enable
+utilisateurs.aide: 'A disabled account can no longer log in (reversible). A deleted account loses its email and password (irreversible); its routes and ticks remain visible under its username.'
+utilisateurs.supprimer_titre: 'Delete {pseudo}’s account'
+utilisateurs.supprimer_email: 'The email ({email}) and password are erased: the person will no longer be able to log in.'
+utilisateurs.supprimer_voies: '{voies, plural, one {# route} other {# routes}} and {croix, plural, one {# tick} other {# ticks}} remain visible under the username “{pseudo}”. Only an administrator will be able to delete these routes.'
+utilisateurs.supprimer_pseudo: 'The username stays reserved. This cannot be undone.'
+photos.aide: 'Photos that no route uses. They stay in their sector so they can be used for a new route; delete the ones that will no longer be needed. Deletion is permanent.'
+photos.aucune: 'No unused photos.'
+photos.total: '{n, plural, one {# unused photo} other {# unused photos}}'
+photos.page_sur: 'page {page} of {pages}'
+photos.voir_en_grand: 'View the full-size photo'
+photos.alt: 'Photo of the sector {secteur}'
+photos.envoyee: 'Uploaded on {date} by {pseudo}'
+photos.confirmer: 'Permanently delete this photo from the sector “{secteur}”?'
+photos.pages: Pages
+photos.precedente: Previous
+photos.suivante: Next
+sauvegardes.aide: 'A backup contains the sectors, the routes (with their holds and ticks) and the photos. User accounts and settings are not included. An automatic backup is made before each restore, sector clean-up and update, and at least once a week.'
+sauvegardes.nouvelle: 'New backup'
+sauvegardes.note: 'Note (optional)'
+sauvegardes.note_exemple: 'Before the June route change'
+sauvegardes.sauvegarder: 'Back up now'
+sauvegardes.enregistrees: 'Saved backups'
+sauvegardes.aucune: 'No backups yet.'
+sauvegardes.total: '{n, plural, one {# backup} other {# backups}} · {taille} MB in total'
+sauvegardes.col_date: Date
+sauvegardes.col_type: Type
+sauvegardes.col_contenu: Content
+sauvegardes.col_taille: Size
+sauvegardes.contenu: '{secteurs, plural, one {# sector} other {# sectors}}, {voies, plural, one {# route} other {# routes}}, {photos, plural, one {# photo} other {# photos}}'
+sauvegardes.version: 'version {version}'
+sauvegardes.illisible: 'Unreadable: {erreur}'
+sauvegardes.mo: '{taille} MB'
+sauvegardes.telecharger: Download
+sauvegardes.restaurer_ellipse: Restore…
+sauvegardes.confirmer_suppression: 'Permanently delete the backup of {date}?'
+sauvegardes.emplacement: 'Backups are stored on the server, in {dossier}. Download one from time to time: if the server is lost, so are they.'
+sauvegardes.conservees: 'Automatic backups kept'
+sauvegardes.conservees_aide: 'Beyond this number, the oldest automatic backups are deleted. Manual and imported backups are never deleted automatically.'
+sauvegardes.nombre: 'Number ({min} to {max})'
+sauvegardes.importer_titre: 'Import a backup'
+sauvegardes.importer_aide: 'An archive downloaded from this page, here or on another GrimPanBloc site. Maximum size accepted by the server: {taille}. The archive joins the list above; nothing is restored without your confirmation.'
+sauvegardes.archive: 'Archive (.zip)'
+sauvegardes.importer: Import
+restaurer.titre_page: 'Restore a backup'
+restaurer.titre: 'Restore the backup of {date} at {heure}'
+restaurer.point1: 'The current state is backed up automatically first: the restore can be undone by restoring that backup.'
+restaurer.point2: 'Routes, photos and ticks are brought back as they were at the time of the backup; links to routes remain valid.'
+restaurer.point3: 'Authors are matched by username. A route whose author no longer exists on this site is assigned to you; a tick whose climber no longer exists is ignored.'
+restaurer.quoi: 'What should be restored?'
+restaurer.tous: 'All sectors'
+restaurer.tous_effet: 'all current routes and photos are replaced, and sectors created since are deleted.'
+restaurer.seulement: 'Only the sector {nom}'
+restaurer.contenu_secteur: '{voies, plural, one {# route} other {# routes}}, {photos, plural, one {# photo} other {# photos}}'
+restaurer.remplace: 'replaces all the current content of the sector “{nom}”.'
+restaurer.recree: 'the sector, deleted since, is recreated.'
+restaurer.apres: 'After the restore, should this manual backup be…'
+restaurer.gardee: kept
+restaurer.supprimee: deleted
+restaurer.bouton: Restore
+nettoyer.titre_court: 'Clear {nom}'
+nettoyer.titre: 'Clear the sector “{nom}”'
+nettoyer.vide: 'This sector is already empty: no routes, no photos.'
+nettoyer.voies: '{voies, plural, one {# route of the sector is deleted} other {# routes of the sector are deleted}}, with their holds and {croix, plural, one {# tick} other {# ticks}}.'
+nettoyer.photos: '{photos, plural, one {# photo of the sector is deleted} other {# photos of the sector are deleted}}, including those no route uses.'
+nettoyer.conserve: 'The sector itself (name, description) is kept, ready for new routes.'
+nettoyer.bouton: 'Clear the sector'
+secteur.sauvegarde_avant: 'An automatic backup is made just before: the sector can be restored from Administration → {lien}.'
+supprimer_secteur.titre_court: 'Delete {nom}'
+supprimer_secteur.titre: 'Delete the sector “{nom}”'
+supprimer_secteur.disparait: 'The sector {nom} disappears from the list of sectors.'
+supprimer_secteur.voies: '{voies, plural, one {# route is deleted} other {# routes are deleted}}, with their holds and {croix, plural, one {# tick} other {# ticks}}.'
+supprimer_secteur.photos: '{photos, plural, one {# photo is deleted} other {# photos are deleted}}, including those no route uses.'
+supprimer_secteur.bouton: 'Delete the sector'
+fiche.imprimer: Print
+fiche.titre: 'The gym’s routes'
+fiche.accroche: 'All the routes on the board, their holds and grades, on your phone.'
+fiche.etape1: 'Scan the QR code with your phone’s camera.'
+fiche.etape2: 'Create your account in a few seconds.'
+fiche.etape3: 'Browse the routes, tick the ones you send and suggest their grade.'
+maj.derniere: 'Last update'
+maj.version_installee: 'Installed version:'
+maj.inconnue: 'Unable to find out the latest published version (no release, or GitHub unreachable).'
+maj.a_jour: 'GrimPanBloc is up to date: the latest published version is {version}.'
+maj.disponible: 'Version {version} is available.'
+maj.disponible_le: 'Version {version} is available (published on {date}).'
+maj.nouveautes: 'What’s new'
+maj.voir_github: 'See the release on GitHub'
+maj.pas_installable: 'This release has no installable archive: update manually (see the README).'
+maj.impossible_navigateur: 'Updating from the browser is not possible on this server:'
+maj.en_ssh: 'Run it over SSH:'
+maj.installer: Install
+maj.point1: 'The site goes into maintenance for a few seconds.'
+maj.point2: 'Photos, configuration ({fichier}) and the database are kept; the database is updated if needed.'
+maj.point3: 'The current code is kept in {dossier}.'
+maj.point4: 'Back up the database first (your hosting provider’s tool or {outil}).'
+maj.en_cours: Updating…
+maj.mettre_a_jour: 'Update to version {version}'
+maj.verifier: 'Check now'
+maj.verifier_aide: '(otherwise, GrimPanBloc checks once a day)'
+flash.voie.creee: 'Route “{nom}” created.'
+flash.voie.copiee: 'Route “{nom}” created (copy of “{source}”).'
+flash.voie.modifiee: 'Route “{nom}” updated.'
+flash.voie.supprimee: 'Route deleted.'
+flash.croix.retiree: 'Tick removed.'
+flash.croix.cotation_modifiee: 'Suggested grade changed: {cotation}.'
+flash.croix.posee: 'Well done! Route ticked as sent.'
+flash.secteur.cree: 'Sector created.'
+flash.secteur.nettoye: 'Sector “{nom}” cleared: {voies, plural, one {# route} other {# routes}} and {photos, plural, one {# photo} other {# photos}} deleted.'
+flash.secteur.supprime: 'Sector “{nom}” deleted, with {voies, plural, one {# route} other {# routes}} and {photos, plural, one {# photo} other {# photos}}.'
+flash.secteur.echec_nettoyage: 'The clean-up failed, nothing was deleted: {erreur}'
+flash.secteur.echec_suppression: 'The deletion failed: {erreur}'
+flash.secteur.sauvegarde_avant: 'Backup made just before ({date}): if something went wrong, restore this sector from Administration → Backups.'
+flash.profil.enregistre: 'Profile saved.'
+flash.bienvenue: 'Welcome {pseudo}!'
+flash.photo.supprimee: 'Photo of the sector “{secteur}” deleted.'
+flash.utilisateur.dernier_admin: 'There must be at least one active administrator.'
+flash.utilisateur.plus_admin: '{pseudo} is no longer an administrator.'
+flash.utilisateur.reactivez: 'Re-enable this account first.'
+flash.utilisateur.admin: '{pseudo} is now an administrator.'
+flash.utilisateur.pas_soi_desactiver: 'You cannot disable your own account.'
+flash.utilisateur.reactive: '{pseudo}’s account re-enabled.'
+flash.utilisateur.desactive: '{pseudo}’s account disabled: they can no longer log in.'
+flash.utilisateur.deja_supprime: 'This account is already deleted.'
+flash.utilisateur.pas_soi_supprimer: 'You cannot delete your own account.'
+flash.utilisateur.supprime: '{pseudo}’s account deleted. Their routes remain visible under their username.'
+flash.sauvegarde.creee: 'Backup created ({taille} MB).'
+flash.sauvegarde.echec: 'The backup failed: {erreur}'
+flash.sauvegarde.importee: 'Archive imported: you can now restore it.'
+flash.sauvegarde.conservation: 'The last {n} automatic backups will be kept.{supprimees, plural, =0 {} one { # older backup deleted.} other { # older backups deleted.}}'
+flash.sauvegarde.supprimee: 'Backup of {date} deleted.'
+flash.restauration.choisir: 'Choose what to restore.'
+flash.restauration.garder: 'Say whether to keep this backup after the restore.'
+flash.restauration.echec: 'The restore failed, nothing was changed: {erreur}'
+flash.restauration.tout: 'Backup restored'
+flash.restauration.secteur: 'Sector “{nom}” restored'
+flash.restauration.bilan: '{debut}: {voies, plural, one {# route} other {# routes}}, {photos, plural, one {# photo} other {# photos}} and {croix, plural, one {# tick} other {# ticks}}.{ignorees, plural, =0 {} one { # tick ignored: climber not on this site.} other { # ticks ignored: climbers not on this site.}}{sans_fichier, plural, =0 {} one { # photo without a file in the backup.} other { # photos without a file in the backup.}}'
+flash.restauration.etat_precedent: 'The previous state was backed up automatically ({date}).'
+flash.restauration.supprimee: 'The restored backup has been deleted.'
+flash.restauration.non_supprimee: 'The restored backup could not be deleted: {erreur}'
+flash.reglages.https_d_abord: 'First open this page over HTTPS (https://…) to enable this setting.'
+flash.reglages.https_active: 'The site now always uses HTTPS.'
+flash.reglages.https_desactive: 'Redirection to HTTPS disabled.'
+flash.reglages.club: 'Club identity saved.'
+flash.reglages.salle: 'Gym information saved.'
+flash.reglages.smtp: 'SMTP settings saved.'
+flash.reglages.mail_test: 'Test email sent to {destinataire}.'
+flash.reglages.echec_envoi: 'Sending failed: {erreur}'
+flash.reglages.groupe_envoye: 'Message sent to {n, plural, one {# recipient} other {# recipients}}.'
+flash.reglages.echec_pour: 'Failed for {erreur}'
+flash.maj.deja_a_jour: 'GrimPanBloc is already up to date.'
+flash.maj.sauvegarde_echec: 'Update cancelled: the preliminary backup failed. {erreur}'
+flash.maj.echec: 'The update failed: {erreur}'
+flash.maj.lien_invalide: 'Invalid or expired finalisation link.'
+flash.maj.reussie: 'GrimPanBloc has been updated from version {depuis} to version {version}.'
+maj.finalisation.titre: 'Finishing the update'
+maj.finalisation.texte: 'Updating the database, a few seconds.'
+maj.finalisation.bouton: 'Finish the update'
+maj.journal.sauvegarde: 'Sectors, routes and photos backed up (Administration → Backups, {date}).'
+maj.journal.telechargee: 'Archive downloaded ({taille, number} MB), SHA-256 checksum verified.'
+maj.journal.extraite: 'Archive extracted and checked.'
+maj.journal.maintenance: 'Site in maintenance.'
+maj.journal.code_remplace: 'Code replaced. Previous version kept in {dossier}.'
+maj.journal.cache: 'Cache cleared.'
+maj.journal.base: 'Database up to date, maintenance finished.'
+maj.probleme.zip: 'The PHP “zip” extension is missing.'
+maj.probleme.ecriture: 'The web server cannot write to {dossier}.'
+maj.probleme.racine: 'the project root'
+maj.erreur.pas_d_archive: 'The release {tag} has no installable archive.'
+maj.erreur.pas_plus_recente: 'Version {version} is not newer than the installed version ({installee}).'
+maj.erreur.problemes: 'Update impossible: {problemes}'
+maj.erreur.migrations: 'The database migrations failed: {sortie}'
+maj.erreur.deplacer: 'Unable to move {element} (insufficient permissions?).'
+maj.erreur.installer: 'Unable to install {element}.'
+maj.erreur.annulee: 'Update cancelled, the previous version is still in place: {erreur}'
+maj.erreur.empreinte: 'The SHA-256 checksum of the archive does not match: corrupted or modified download.'
+maj.erreur.archive_illisible: 'Unreadable archive.'
+maj.erreur.chemin_interdit: 'Forbidden path in the archive: {chemin}'
+maj.erreur.sans_version: 'Invalid archive: VERSION file not found.'
+maj.erreur.mauvaise_version: 'The archive announces version “{annoncee}” instead of {attendue}.'
+maj.erreur.incomplete: 'Incomplete archive: {fichier} is missing.'
+maj.erreur.telechargement: 'Download failed (HTTP {code}).'
+maj.erreur.trop_volumineuse: 'Archive too large.'
+maj.erreur.maintenance: 'Unable to enable maintenance mode (var/ not writable).'
+maj.avertissement.logos: 'The logos could not be compiled: run “{commande}”.'
+maj.avertissement.miniatures: 'Some photo thumbnails could not be created: run “{commande}”.'
+erreur.sauvegarde.zip_absente: 'The PHP “zip” extension is missing: backup impossible.'
+erreur.sauvegarde.creation: 'Unable to create the archive (backup folder not writable?).'
+erreur.sauvegarde.ecriture: 'Unable to write the archive: {detail}'
+erreur.sauvegarde.enregistrement: 'Unable to save the archive in the backup folder.'
+erreur.sauvegarde.plus_recente: 'This backup comes from a newer version of GrimPanBloc: update the site first.'
+erreur.sauvegarde.donnees_absentes: 'Invalid archive: data missing or too large.'
+erreur.sauvegarde.pas_une_sauvegarde: 'This file is not a GrimPanBloc backup.'
+erreur.sauvegarde.donnees_illisibles: 'Invalid archive: unreadable data.'
+erreur.sauvegarde.espace_disque: 'Not enough disk space for the backup: {besoin, number} MB needed, {libre, number} MB free. Delete old backups.'
+erreur.sauvegarde.importee_introuvable: 'Imported archive not found.'
+erreur.sauvegarde.introuvable_apres: 'Backup not found after its creation.'
+erreur.sauvegarde.secteur_absent: 'This sector is not part of the backup.'
+erreur.sauvegarde.en_cours: 'A backup or restore is already in progress: try again in a few minutes.'
+erreur.sauvegarde.conservation: 'Between {min} and {max} automatic backups.'
+erreur.sauvegarde.resume_illisible: 'unreadable summary'
+erreur.restauration.dossier_photos: 'Unable to write to the photo folder.'
+erreur.restauration.pas_une_image: 'Invalid archive: {fichier} is not a JPEG, PNG or WebP image.'
+erreur.restauration.photo_illisible: 'Invalid archive: photo {fichier} unreadable or too large.'
+erreur.smtp_non_configure: 'The SMTP server is not configured (server and sender address required).'
+erreur.reglement_pdf: 'The house rules must be a PDF file.'
+erreur.logo_format: 'The logo must be a PNG, JPEG or WebP image.'
+erreur.image_illisible: 'Unreadable image.'
+erreur.dossier: 'Unable to create the folder “{dossier}”.'
+erreur.logo_enregistrement: 'Unable to save the logo.'
+erreur.croix_cotation: 'Choose the grade you suggest.'
+erreur.photo_utilisee: 'This photo is used by a route: delete or edit the route first.'
+erreur.photo_enregistrement: 'Unable to save the photo “{fichier}”.'
+mail.test.objet: 'GrimPanBloc: test email'
+mail.test.texte: |-
+    Hello,
+
+    This message confirms that GrimPanBloc can send emails with the configured SMTP server.
+
+    Sent on {date} at {heure}.
+
+    — GrimPanBloc
+voie.form.nom: 'Route name'
+voie.form.description: 'Description / instructions'
+voie.form.photo_existante: 'Existing photo of the sector'
+voie.form.envoyer_nouvelle: '— Upload a new photo —'
+voie.form.nouvelle_photo: 'New photo'
+voie.form.echelle: Scale
+voie.form.couleur: Colour
+voie.form.pieds: Feet
+voie.form.pieds_imposes: 'Marked feet only'
+voie.form.pieds_libres: 'Open feet'
+inscription.confirmation: 'Confirm password'
+profil.nouveau_mot_de_passe: 'New password'
+profil.nouveau_mot_de_passe_aide: 'Leave empty to keep the current password.'
+profil.confirmation_mot_de_passe: 'Confirm the new password'
+profil.mot_de_passe_actuel: 'Current password'
+profil.mot_de_passe_actuel_aide: 'Required to save a change.'
+secteurs.form.nom: 'Sector name'
+secteurs.form.nom_exemple: 'Board, overhang, slab…'
+secteurs.form.description: Description
+voie.form.photo_choix: 'Photo no. {id} of {date}'
