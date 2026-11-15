@@ -7,6 +7,13 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [Non publié]
+
+### Ajouté
+- **Partager le site d'un téléphone à l'autre** : sur l'accueil, le bouton
+  « Partager » affiche le QR code de l'adresse du site. Il suffit de le faire
+  scanner avec l'appareil photo d'un autre téléphone.
+
 ## [1.8.0] - 2026-11-15
 
 ### Ajouté
