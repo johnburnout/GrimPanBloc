@@ -19,7 +19,7 @@ final class LanguesTest extends FonctionnelTestCase
 
         self::assertSelectorExists('html[lang="es"]');
         self::assertSelectorTextContains('h1', 'Sectores');
-        self::assertSelectorExists('.langues a[lang="es"][aria-current]');
+        self::assertSame('es', $this->client->getCrawler()->filter('.langues select option[selected]')->attr('value'));
     }
 
     public function testUneLangueNonProposeeRetombeSurLeFrancais(): void
@@ -30,11 +30,11 @@ final class LanguesTest extends FonctionnelTestCase
         self::assertSelectorTextContains('h1', 'Secteurs');
     }
 
-    /** Le choix du pied de page l'emporte sur le navigateur, et ramène à la page d'origine. */
+    /** Le choix du menu du pied de page l'emporte sur le navigateur, et ramène à la page d'origine. */
     public function testLeSelecteurMemoriseLaLangue(): void
     {
         $page = $this->client->request('GET', '/secteurs?vue=liste');
-        $this->client->click($page->filter('.langues a[lang="ru"]')->link());
+        $this->client->submit($page->filter('form.langues')->form(['langue' => 'ru']));
 
         self::assertResponseRedirects('/secteurs?vue=liste');
         $cookie = $this->client->getCookieJar()->get(Langues::COOKIE);
@@ -49,14 +49,14 @@ final class LanguesTest extends FonctionnelTestCase
     public function testLeRetourNeMeneJamaisVersUnAutreSite(): void
     {
         foreach (['https://pirate.example/', '//pirate.example/', '/\\pirate.example/'] as $retour) {
-            $this->client->request('GET', '/langue/en', ['retour' => $retour]);
+            $this->client->request('GET', '/langue', ['langue' => 'en', 'retour' => $retour]);
             self::assertResponseRedirects('/', null, $retour);
         }
     }
 
     public function testUneLangueInconnueEstRefusee(): void
     {
-        $this->client->request('GET', '/langue/de');
+        $this->client->request('GET', '/langue', ['langue' => 'de']);
 
         self::assertResponseStatusCodeSame(404);
     }
@@ -66,7 +66,7 @@ final class LanguesTest extends FonctionnelTestCase
     {
         $grimpeur = $this->creerUtilisateur('grimpeur');
         $this->client->loginUser($grimpeur);
-        $this->client->request('GET', '/langue/it');
+        $this->client->request('GET', '/langue', ['langue' => 'it']);
 
         $this->em->clear();
         self::assertSame('it', $this->em->find(User::class, $grimpeur->getId())?->getLangue());

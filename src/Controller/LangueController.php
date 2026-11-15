@@ -12,11 +12,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\Routing\Attribute\Route;
 
-/** Sélecteur de langue du pied de page : mémorisé dans un cookie et, pour un grimpeur connecté, dans son compte. */
+/** Menu des langues du pied de page : mémorisé dans un cookie et, pour un grimpeur connecté, dans son compte. */
 final class LangueController extends AbstractController
 {
-    #[Route('/langue/{langue}', name: 'langue', requirements: ['langue' => '[a-z]{2}'], methods: ['GET'])]
-    public function choisir(string $langue, Request $request, Langues $langues, EntityManagerInterface $em, #[MapQueryParameter] string $retour = '/'): RedirectResponse
+    /** Formulaire GET du pied de page : /langue?langue=en&retour=/secteurs */
+    #[Route('/langue', name: 'langue', methods: ['GET'])]
+    public function choisir(Request $request, Langues $langues, EntityManagerInterface $em, #[MapQueryParameter] string $langue = '', #[MapQueryParameter] string $retour = '/'): RedirectResponse
     {
         if (!$langues->estActive($langue)) {
             throw $this->createNotFoundException();

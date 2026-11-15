@@ -64,13 +64,17 @@
 
 <footer class="pied">
     <span>GrimPanBloc {{ grimpanbloc_version() }}</span>
-    <nav class="langues" aria-label="{{ 'pied.langue'|trans }}">
-        {% set retour = app.request.requestUri %}
-        {% for code, nom in langues() %}
-            <a href="{{ path('langue', {langue: code, retour: retour}) }}" lang="{{ code }}" hreflang="{{ code }}"
-               {% if code == app.request.locale %}aria-current="true"{% endif %}>{{ nom }}</a>
-        {% endfor %}
-    </nav>
+    {# Menu des langues : le choix s'applique dès la sélection (bouton « OK » sans JavaScript) #}
+    <form class="langues" method="get" action="{{ path('langue') }}">
+        <input type="hidden" name="retour" value="{{ app.request.requestUri }}">
+        <label for="choix-langue" class="visuellement-cache">{{ 'pied.langue'|trans }}</label>
+        <select id="choix-langue" name="langue" onchange="this.form.submit()">
+            {% for code, nom in langues() %}
+                <option value="{{ code }}" lang="{{ code }}" {{ code == app.request.locale ? 'selected' }}>{{ nom }}</option>
+            {% endfor %}
+        </select>
+        <noscript><button type="submit" class="btn btn-petit">OK</button></noscript>
+    </form>
 </footer>
 
 {# Textes des scripts (public/js/), dans la langue de la page #}
