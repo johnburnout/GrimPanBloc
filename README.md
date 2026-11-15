@@ -5,6 +5,10 @@
   </picture>
 </p>
 
+<p align="center">
+  <strong>Français</strong> · <a href="README.en.md">English</a> · <a href="README.es.md">Español</a> · <a href="README.it.md">Italiano</a> · <a href="README.ru.md">Русский</a>
+</p>
+
 # GrimPanBloc
 
 Création et affichage de blocs et de voies sur une structure artificielle d'escalade
@@ -41,7 +45,7 @@ JavaScript natif (aucune étape de build) · AssetMapper.
 ## Fonctionnalités
 
 - **Langues** : français, anglais, espagnol, italien et russe. La langue du navigateur est
-  utilisée d'office ; le pied de page permet d'en changer (choix mémorisé, et enregistré
+  utilisée d'office ; le menu du pied de page permet d'en changer (choix mémorisé, et enregistré
   dans le compte d'un grimpeur connecté). Les textes sont dans `translations/`
   (format ICU pour les pluriels) ; l'assistant d'installation et les commandes restent en français.
 - **Comptes** : inscription (email, pseudo, mot de passe), connexion avec « se souvenir de moi », déconnexion.
@@ -79,7 +83,7 @@ JavaScript natif (aucune étape de build) · AssetMapper.
 | Voie que **personne d'autre** n'a réussie | modifie **tout** : photo, prises, cotation, nom, description | — | — |
 | Voie **réussie** par au moins un autre grimpeur | modifie **seulement le nom et la description** | — | — |
 | Supprimer une voie non réussie | simple confirmation | — | simple confirmation |
-| Supprimer une voie réussie | doit taper **`SUPPRIMER`** | — | doit taper **`SUPPRIMER`** |
+| Supprimer une voie réussie | doit taper **`SUPPRIMER`** (dans la langue de l'interface) | — | doit taper **`SUPPRIMER`** |
 | Poser / retirer sa croix | oui | oui | oui |
 
 Précisions :
@@ -110,14 +114,14 @@ Précisions :
 À reprendre dans la page de confidentialité du club, si elle existe :
 
 - **Données conservées** pour chaque compte : email, pseudo, mot de passe (haché,
-  jamais en clair), date d'inscription, statut (admin, actif). L'application ne
+  jamais en clair), date d'inscription, statut (admin, actif), langue de l'interface. L'application ne
   garde ni adresse IP ni historique de connexion ; le serveur web, lui, tient ses
   propres journaux d'accès.
 - **Contenus publiés** : voies (photo, prises, nom, description), croix et
   cotations proposées, affichés sous le pseudo.
-- **Cookies** : session de connexion, et cookie « Rester connecté » (30 jours)
-  seulement si la case est cochée. Aucun cookie de mesure d'audience ni de
-  service tiers.
+- **Cookies** : session de connexion, cookie « Rester connecté » (30 jours)
+  seulement si la case est cochée, et langue choisie pour l'interface. Aucun
+  cookie de mesure d'audience ni de service tiers.
 - **Suppression d'un compte** : faite par un administrateur, à la demande de la
   personne (il n'y a pas de bouton de suppression dans « Mon compte »). L'email
   et le mot de passe sont effacés. Le **pseudo reste affiché** sur les voies et
@@ -512,6 +516,10 @@ Cette méthode suppose que le serveur web (PHP) puisse écrire dans la racine du
 projet, dans `public/` et dans `var/` : c'est généralement le cas en
 hébergement mutualisé. Sinon, la page le signale et propose la commande SSH.
 
+Si l'API de GitHub refuse la vérification (limite de 60 requêtes par heure et par
+adresse, souvent atteinte en hébergement mutualisé), GrimPanBloc lit la dernière
+version directement sur github.com.
+
 ### Confiance dans les releases GitHub
 
 Les mises à jour, en un clic comme en SSH, installent ce qui est publié dans les
@@ -755,6 +763,7 @@ php bin/console app:photos:miniatures            # crée les miniatures manquant
 php bin/console lint:twig templates
 php bin/console lint:container
 php bin/console debug:router
+php bin/console debug:translation en --only-missing   # textes non traduits
 ```
 
 **Créer un compte administrateur** (le mot de passe est demandé de façon masquée) :
@@ -785,6 +794,9 @@ Pour donner le rôle à un compte existant : **Administration → Utilisateurs �
 | `public/css/app.css` | Styles (palette alignée sur le logo) |
 | `public/fonts/bricolage-grotesque/` | Police des titres et du logo, avec sa licence |
 | `assets/logo/` | Logos SVG et favicon |
+| `public/drapeaux/` | Drapeaux du menu des langues (SVG) |
+| `translations/` | Textes de l'interface en cinq langues (`messages+intl-icu`, `validators`, `security`) |
+| `src/Locale/Langues.php`, `src/EventSubscriber/LangueListener.php` | Choix de la langue de l'interface (cookie, navigateur, compte) |
 | `public/setup/` | Assistant d'installation web (supprimé après l'installation) |
 | `src/Command/CreerUtilisateurCommand.php` | Commande `app:utilisateur:creer` (compte administrateur…) |
 | `src/MiseAJour/` | Vérification des releases GitHub, installation d'une mise à jour, mode maintenance |
@@ -829,6 +841,9 @@ Pour donner le rôle à un compte existant : **Administration → Utilisateurs �
   `Origin` envoyé par le navigateur.
 - **Voie validée** : `Voie::estValidee()` est vraie dès qu'une croix vient d'un
   autre grimpeur que l'auteur.
+- **Traductions** : clés dans `translations/` (format ICU, avec les formes du
+  pluriel de chaque langue) ; les messages flash sont des `TranslatableMessage`
+  et les erreurs des services des exceptions traduisibles (`src/Exception/`).
 
 ## Identité visuelle
 
@@ -849,9 +864,8 @@ Pour donner le rôle à un compte existant : **Administration → Utilisateurs �
 ## Prochaines étapes
 
 - Plusieurs voies affichées sur une même photo
-- Page « Mes voies », avis de cotation, commentaires
+- Avis de cotation, commentaires
 - Administration : gestion des rôles, modération, archivage des voies démontées
-- Tests automatisés (PHPUnit)
 
 ## Licence
 
