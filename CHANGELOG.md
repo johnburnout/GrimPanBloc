@@ -7,6 +7,25 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [2.0.0] - 2026-11-15
+
+### Ajouté
+- **GrimPanBloc parle cinq langues** : français, anglais, espagnol, italien et
+  russe, sur tout le site (pages des grimpeurs et administration), y compris
+  les messages, les erreurs de formulaire et le mail de test.
+  - La langue du navigateur est utilisée d'office (le français si elle n'est
+    pas proposée).
+  - Le **pied de page** permet de changer de langue ; le choix est mémorisé sur
+    l'appareil et, pour un grimpeur connecté, enregistré dans son compte : il
+    le retrouve en se connectant ailleurs.
+  - Les nombres s'écrivent à la façon de chaque langue (« 4,5 m », « 4.5 m »).
+  - Le mot à taper pour confirmer une action définitive suit la langue
+    (« SUPPRIMER », « DELETE », « ELIMINAR »…) ; le mot français reste accepté.
+
+### Modifié
+- Quelques textes français reformulés au passage : les « voie(s) »,
+  « photo(s) »… sont maintenant accordés (« 1 voie », « 2 voies »).
+
 ## [1.12.0] - 2026-11-15
 
 ### Ajouté
