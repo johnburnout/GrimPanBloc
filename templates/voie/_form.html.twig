@@ -62,6 +62,9 @@
     {{ form_row(form.systeme) }}
     <div data-pour-systeme="fr">{{ form_row(form.cotationFr) }}</div>
     <div data-pour-systeme="couleur">{{ form_row(form.cotationCouleur) }}</div>
+    <div class="choix-pieds">{{ form_row(form.piedsLibres) }}</div>
+    <p class="aide">En pieds libres, les prises de pied ne sont pas montrées aux grimpeurs
+        (elles restent enregistrées et apparaissent en transparence ici).</p>
     {{ form_row(form.description) }}
 </section>
 

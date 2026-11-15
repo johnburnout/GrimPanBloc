@@ -2,6 +2,7 @@
     Photo d'une voie avec ses prises entourées et le reste de l'image assombri.
     Variables : voie, classe (optionnelle)
     Les prises sont stockées en % : on les convertit dans le repère en pixels de la photo.
+    En pieds libres, les prises de pied ne sont pas dessinées (voir Voie::getPrisesAffichees).
 #}
 {% set photo = voie.photo %}
 {% set W = photo.largeur ?: 1000 %}
@@ -15,13 +16,13 @@
         <defs>
             <mask id="{{ masque }}">
                 <rect width="{{ W }}" height="{{ H }}" fill="white"/>
-                {% for p in voie.prises %}
+                {% for p in voie.prisesAffichees %}
                     <circle cx="{{ p.x / 100 * W }}" cy="{{ p.y / 100 * H }}" r="{{ p.rayon / 100 * W }}" fill="black"/>
                 {% endfor %}
             </mask>
         </defs>
         <rect width="{{ W }}" height="{{ H }}" fill="rgba(0,0,0,0.55)" mask="url(#{{ masque }})"/>
-        {% for p in voie.prises %}
+        {% for p in voie.prisesAffichees %}
             <circle class="prise prise-{{ p.type.value }}"
                     cx="{{ p.x / 100 * W }}" cy="{{ p.y / 100 * H }}" r="{{ p.rayon / 100 * W }}"
                     stroke-width="{{ trait }}"{% if p.type.value == 'pied' %} stroke-dasharray="{{ W * 0.012 }} {{ W * 0.008 }}"{% endif %}/>

@@ -87,7 +87,7 @@ final class Restauration
                 $id = $idsVoies[] = $this->inserer('voie', $v['id'], [
                     'photo_id' => $idsPhotos[$v['photo']], 'nom' => $v['nom'], 'description' => $v['description'],
                     'auteur_id' => $auteur($v['auteur']), 'systeme' => $v['systeme'], 'cotation' => $v['cotation'],
-                    'cotation_auteur' => $v['cotationAuteur'], 'rang' => $v['rang'], 'active' => (int) $v['active'], 'cree_le' => $v['creeLe'],
+                    'cotation_auteur' => $v['cotationAuteur'], 'rang' => $v['rang'], 'active' => (int) $v['active'], 'pieds_libres' => (int) $v['piedsLibres'], 'cree_le' => $v['creeLe'],
                 ]);
                 foreach ($v['prises'] as $p) {
                     $c->insert('prise', ['voie_id' => $id, 'x' => $p['x'], 'y' => $p['y'], 'rayon' => $p['rayon'], 'type' => $p['type']]);

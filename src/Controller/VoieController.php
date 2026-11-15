@@ -51,6 +51,34 @@ class VoieController extends AbstractController
         ]);
     }
 
+    /**
+     * Nouvelle voie pré-remplie à partir d'une autre (même photo, mêmes prises…),
+     * à ajuster avant de l'enregistrer : rien n'est créé avant la validation.
+     */
+    #[Route('/{id}/dupliquer', name: 'voie_dupliquer', requirements: ['id' => '\d+'])]
+    #[IsGranted(VoieVoter::DUPLIQUER, subject: 'voie')]
+    public function dupliquer(Voie $voie, Request $request, #[CurrentUser] User $user): Response
+    {
+        $secteur = $voie->getPhoto()->getSecteur();
+        $copie = $voie->dupliquerPour($user);
+        $form = $this->createForm(VoieType::class, $copie, ['secteur' => $secteur]);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->voies->enregistrer($copie, $secteur, $user, $form->get('nouvellePhoto')->getData());
+            $this->addFlash('success', 'Voie « '.$copie->getNom().' » créée (copie de « '.$voie->getNom().' »).');
+
+            return $this->redirectToRoute('voie_show', ['id' => $copie->getId()]);
+        }
+
+        return $this->render('voie/new.html.twig', [
+            'form' => $form,
+            'secteur' => $secteur,
+            'source' => $voie,
+            'typesPrise' => TypePrise::cases(),
+        ]);
+    }
+
     #[Route('/{id}/modifier', name: 'voie_edit', requirements: ['id' => '\d+'])]
     #[IsGranted(VoieVoter::MODIFIER, subject: 'voie')]
     public function edit(Voie $voie, Request $request, #[CurrentUser] User $user): Response

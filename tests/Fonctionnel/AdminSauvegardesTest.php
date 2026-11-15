@@ -307,6 +307,22 @@ final class AdminSauvegardesTest extends FonctionnelTestCase
         self::assertFileExists($this->photos.'/libre.jpg');
     }
 
+    public function testLesPiedsLibresSontSauvegardesEtRestaures(): void
+    {
+        $voie = $this->voieAvecPhoto('Dévers', 'Le toit', 'toit.jpg')->setPiedsLibres(true);
+        $this->em->flush();
+        $sauvegarde = $this->gestion->creerManuelle();
+        $voie->setPiedsLibres(false);
+        $this->em->flush();
+
+        $this->client->loginUser($this->admin);
+        $this->restaurer($sauvegarde, (string) $voie->getPhoto()->getSecteur()->getId(), 'garder');
+        self::assertResponseRedirects();
+
+        $this->em->clear();
+        self::assertTrue($this->em->getRepository(Voie::class)->findOneBy(['nom' => 'Le toit'])?->isPiedsLibres());
+    }
+
     public function testSupprimerUnSecteur(): void
     {
         $voie = $this->voieAvecPhoto('Dévers', 'Le toit', 'toit.jpg');

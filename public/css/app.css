@@ -131,6 +131,10 @@ form > div, .etape > div { margin-bottom: .5rem; }
 ul:has(> li > .form-error), form ul { color: #b42318; padding-left: 1.2rem; margin: .25rem 0; }
 #voie_systeme { display: flex; gap: 1.5rem; }
 #voie_systeme label { display: inline; font-weight: normal; margin-left: .3rem; }
+#voie_piedsLibres { display: flex; gap: 1.5rem; }
+#voie_piedsLibres label { display: inline; font-weight: normal; margin-left: .3rem; }
+/* Éditeur en pieds libres : prises de pied gardées, mais en transparence */
+.editeur.pieds-libres .prise-pied { opacity: .3; }
 
 .flash { padding: .75rem 1rem; border-radius: var(--rayon); margin-bottom: 1rem; }
 .flash-success { background: #dcfce7; color: #14532d; }
@@ -155,11 +159,18 @@ ul:has(> li > .form-error), form ul { color: #b42318; padding-left: 1.2rem; marg
     /* --taille-icone : réglée au curseur « Taille » (js/voies.js) ; jamais plus large que l'écran */
     grid-template-columns: repeat(auto-fill, minmax(min(var(--taille-icone, 220px), 100%), 1fr));
 }
-.carte-voie a {
+.carte-voie > a:first-child {
     display: block; text-decoration: none; color: inherit;
     background: var(--surface); border: 1px solid var(--bord); border-radius: var(--rayon); overflow: hidden;
 }
-.carte-voie a:hover { box-shadow: 0 4px 14px rgba(0,0,0,.1); }
+.carte-voie > a:first-child:hover { box-shadow: 0 4px 14px rgba(0,0,0,.1); }
+/* Lien « Dupliquer » sous une carte (page d'un secteur) */
+.carte-voie { display: flex; flex-direction: column; }
+.carte-voie > a:first-child { flex: 1; }
+.carte-voie .lien-dupliquer { align-self: flex-end; margin-top: .3rem; font-size: .9rem; }
+.lien-dupliquer { color: var(--accent-fonce); white-space: nowrap; }
+.table-voies td.col-actions { text-align: right; }
+.table-voies td.col-actions a { font-weight: normal; }
 .carte-infos { padding: .6rem .8rem; display: grid; grid-template-columns: auto 1fr; gap: 0 .6rem; align-items: center; }
 .carte-infos small { grid-column: 2; }
 .carte-infos .badge { grid-row: span 2; }

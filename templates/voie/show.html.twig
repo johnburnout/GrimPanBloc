@@ -11,6 +11,9 @@
             {% if is_granted('VOIE_MODIFIER', voie) %}
                 <a href="{{ path('voie_edit', {id: voie.id}) }}" class="btn btn-secondaire">Modifier</a>
             {% endif %}
+            {% if is_granted('VOIE_DUPLIQUER', voie) %}
+                <a href="{{ path('voie_dupliquer', {id: voie.id}) }}" class="btn btn-secondaire">Dupliquer</a>
+            {% endif %}
             {% if is_granted('VOIE_SUPPRIMER', voie) %}
                 {% if voie.estValidee %}
                     <a href="#suppression" class="btn btn-danger">Supprimer…</a>
@@ -30,15 +33,15 @@
     <ul class="legende">
         <li><span class="pastille prise-depart"></span> Départ</li>
         <li><span class="pastille prise-main"></span> Main</li>
-        <li><span class="pastille prise-pied"></span> Pied</li>
+        {% if not voie.piedsLibres %}<li><span class="pastille prise-pied"></span> Pied</li>{% endif %}
         <li><span class="pastille prise-top"></span> Top</li>
     </ul>
 
     {% if voie.description %}<p>{{ voie.description|nl2br }}</p>{% endif %}
 
     <p class="meta">
-        {{ voie.systeme.libelle }} · ouverte par <strong>{{ voie.auteur.pseudo }}</strong>
-        le {{ voie.creeLe|date('d/m/Y') }} · {{ voie.prises|length }} prise(s)
+        {{ voie.systeme.libelle }} · <strong>{{ voie.piedsLibres ? 'pieds libres' : 'pieds imposés' }}</strong> · ouverte par <strong>{{ voie.auteur.pseudo }}</strong>
+        le {{ voie.creeLe|date('d/m/Y') }} · {{ voie.prisesAffichees|length }} prise(s)
     </p>
 
     <section class="croix">

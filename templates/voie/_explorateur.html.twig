@@ -4,6 +4,8 @@
                 secteurs (optionnelle : sans elle, page d'un secteur, pas de filtre ni de colonne secteur)
 #}
 {% set global = secteurs is defined %}
+{# Page d'un secteur : chaque voie peut être dupliquée (grimpeur connecté) #}
+{% set dupliquer = not global and is_granted('ROLE_USER') %}
 {% set route = app.current_route %}
 {% set routeParams = app.current_route_parameters %}
 {% set tris = global
@@ -107,6 +109,7 @@
                         </a>
                     </th>
                 {% endfor %}
+                {% if dupliquer %}<th><span class="visuellement-cache">Actions</span></th>{% endif %}
             </tr>
         </thead>
         <tbody>
@@ -121,6 +124,13 @@
                     <td>{{ include('voie/_badge.html.twig', {voie: voie}) }}</td>
                     {% if global %}<td>{{ voie.photo.secteur.nom }}</td>{% endif %}
                     <td>{{ voie.auteur.pseudo }}</td>
+                    {% if dupliquer %}
+                        <td class="col-actions">
+                            {% if is_granted('VOIE_DUPLIQUER', voie) %}
+                                <a href="{{ path('voie_dupliquer', {id: voie.id}) }}" class="lien-dupliquer" aria-label="Dupliquer {{ voie.nom }}">Dupliquer</a>
+                            {% endif %}
+                        </td>
+                    {% endif %}
                 </tr>
             {% endfor %}
         </tbody>
@@ -137,6 +147,9 @@
                         <small>{{ global ? voie.photo.secteur.nom ~ ' · ' }}{{ voie.auteur.pseudo }}</small>
                     </div>
                 </a>
+                {% if dupliquer and is_granted('VOIE_DUPLIQUER', voie) %}
+                    <a href="{{ path('voie_dupliquer', {id: voie.id}) }}" class="lien-dupliquer" aria-label="Dupliquer {{ voie.nom }}">Dupliquer</a>
+                {% endif %}
             </li>
         {% endfor %}
     </ul>

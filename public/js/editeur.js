@@ -586,6 +586,15 @@
     radiosSysteme.forEach(r => r.addEventListener('change', majCotation));
     majCotation();
 
+    // Pieds libres : les prises de pied passent en transparence (elles restent enregistrées)
+    const radiosPieds = document.querySelectorAll('input[name="voie[piedsLibres]"]');
+    const majPieds = () => {
+        const libres = [...radiosPieds].some(r => r.checked && r.value === '1');
+        editeur.classList.toggle('pieds-libres', libres);
+    };
+    radiosPieds.forEach(r => r.addEventListener('change', majPieds));
+    majPieds();
+
     // --- Démarrage -----------------------------------------------------------
 
     if (selectPhoto && selectPhoto.value) {

@@ -6,6 +6,7 @@ use App\Cotation\ConsensusCotation;
 use App\Enum\CotationCouleur;
 use App\Enum\CotationFr;
 use App\Enum\SystemeCotation;
+use App\Enum\TypePrise;
 use App\Repository\VoieRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -55,6 +56,13 @@ class Voie
 
     #[ORM\Column]
     private bool $active = true;
+
+    /**
+     * Pieds libres : on pose les pieds où l'on veut. Les prises de pied restent
+     * enregistrées mais ne sont pas affichées.
+     */
+    #[ORM\Column(options: ['default' => false])]
+    private bool $piedsLibres = false;
 
     #[ORM\Column]
     private \DateTimeImmutable $creeLe;
@@ -138,6 +146,53 @@ class Voie
         $this->active = $active;
 
         return $this;
+    }
+
+    public function isPiedsLibres(): bool
+    {
+        return $this->piedsLibres;
+    }
+
+    public function setPiedsLibres(bool $piedsLibres): static
+    {
+        $this->piedsLibres = $piedsLibres;
+
+        return $this;
+    }
+
+    /**
+     * Prises à afficher : sans les prises de pied quand les pieds sont libres.
+     *
+     * @return list<Prise>
+     */
+    public function getPrisesAffichees(): array
+    {
+        return array_values(array_filter(
+            $this->prises->toArray(),
+            fn (Prise $p) => !$this->piedsLibres || TypePrise::Pied !== $p->getType(),
+        ));
+    }
+
+    /**
+     * Nouvelle voie (non enregistrée) qui reprend celle-ci pour $auteur : même photo,
+     * mêmes prises, échelle, cotation proposée, pieds et description. Les croix et
+     * la cotation des autres grimpeurs ne suivent pas.
+     */
+    public function dupliquerPour(User $auteur): self
+    {
+        $copie = (new self())
+            ->setNom(mb_substr($this->nom.' (copie)', 0, 100))
+            ->setDescription($this->description)
+            ->setAuteur($auteur)
+            ->setPhoto($this->photo)
+            ->setSysteme($this->systeme)
+            ->setCotationAuteur($this->cotationAuteur)
+            ->setPiedsLibres($this->piedsLibres);
+        foreach ($this->prises as $p) {
+            $copie->addPrise((new Prise())->setX($p->getX())->setY($p->getY())->setRayon($p->getRayon())->setType($p->getType()));
+        }
+
+        return $copie;
     }
 
     public function getCreeLe(): \DateTimeImmutable

@@ -28,7 +28,7 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * @phpstan-type PhotoArchive array{id: int, secteur: int, fichier: string, largeur: int, hauteur: int, auteur: string, creeLe: string}
  * @phpstan-type PriseArchive array{x: float, y: float, rayon: float, type: string}
  * @phpstan-type CroixArchive array{grimpeur: string, cotation: ?string, creeLe: string}
- * @phpstan-type VoieArchive array{id: int, photo: int, nom: string, description: ?string, auteur: string, systeme: string, cotation: string, cotationAuteur: string, rang: int, active: bool, creeLe: string, prises: list<PriseArchive>, croix: list<CroixArchive>}
+ * @phpstan-type VoieArchive array{id: int, photo: int, nom: string, description: ?string, auteur: string, systeme: string, cotation: string, cotationAuteur: string, rang: int, active: bool, piedsLibres: bool, creeLe: string, prises: list<PriseArchive>, croix: list<CroixArchive>}
  * @phpstan-type DonneesArchive array{secteurs: list<SecteurArchive>, photos: list<PhotoArchive>, voies: list<VoieArchive>}
  */
 final class ArchiveSauvegarde
@@ -191,7 +191,7 @@ final class ArchiveSauvegarde
         try {
             $secteurs = $c->fetchAllAssociative('SELECT id, nom, description FROM secteur ORDER BY id');
             $photos = $c->fetchAllAssociative('SELECT p.id, p.secteur_id, p.fichier, p.largeur, p.hauteur, p.cree_le, u.pseudo FROM photo p JOIN utilisateur u ON u.id = p.auteur_id ORDER BY p.id');
-            $voies = $c->fetchAllAssociative('SELECT v.id, v.photo_id, v.nom, v.description, v.systeme, v.cotation, v.cotation_auteur, v.rang, v.active, v.cree_le, u.pseudo FROM voie v JOIN utilisateur u ON u.id = v.auteur_id ORDER BY v.id');
+            $voies = $c->fetchAllAssociative('SELECT v.id, v.photo_id, v.nom, v.description, v.systeme, v.cotation, v.cotation_auteur, v.rang, v.active, v.pieds_libres, v.cree_le, u.pseudo FROM voie v JOIN utilisateur u ON u.id = v.auteur_id ORDER BY v.id');
             $prises = $c->fetchAllAssociative('SELECT voie_id, x, y, rayon, type FROM prise ORDER BY id');
             $croix = $c->fetchAllAssociative('SELECT c.voie_id, c.cotation, c.cree_le, u.pseudo FROM croix c JOIN utilisateur u ON u.id = c.grimpeur_id ORDER BY c.id');
             $c->commit();
@@ -221,7 +221,7 @@ final class ArchiveSauvegarde
                 'id' => (int) $v['id'], 'photo' => (int) $v['photo_id'], 'nom' => (string) $v['nom'],
                 'description' => null === $v['description'] ? null : (string) $v['description'], 'auteur' => (string) $v['pseudo'],
                 'systeme' => (string) $v['systeme'], 'cotation' => (string) $v['cotation'], 'cotationAuteur' => (string) $v['cotation_auteur'],
-                'rang' => (int) $v['rang'], 'active' => (bool) $v['active'], 'creeLe' => (string) $v['cree_le'],
+                'rang' => (int) $v['rang'], 'active' => (bool) $v['active'], 'piedsLibres' => (bool) $v['pieds_libres'], 'creeLe' => (string) $v['cree_le'],
                 'prises' => $prisesParVoie[(int) $v['id']] ?? [], 'croix' => $croixParVoie[(int) $v['id']] ?? [],
             ], $voies),
         ];
@@ -293,14 +293,15 @@ final class ArchiveSauvegarde
             foreach ($this->liste($v, 'croix') as $c) {
                 $croix[] = ['grimpeur' => $this->texte($c, 'grimpeur', 50), 'cotation' => $this->texteOuNull($c, 'cotation', 10), 'creeLe' => $this->date($c, 'creeLe')];
             }
-            if (!\is_bool($v['active'] ?? null)) {
+            // piedsLibres absent des sauvegardes d'avant la version 1.10 : pieds imposés
+            if (!\is_bool($v['active'] ?? null) || !\is_bool($v['piedsLibres'] ?? false)) {
                 throw $this->invalide("voie $id");
             }
             $voies[$id] = [
                 'id' => $id, 'photo' => $photo, 'nom' => $this->texte($v, 'nom', 100), 'description' => $this->texteOuNull($v, 'description', 65535),
                 'auteur' => $this->texte($v, 'auteur', 50), 'systeme' => $systeme,
                 'cotation' => $this->texte($v, 'cotation', 10, true), 'cotationAuteur' => $this->texte($v, 'cotationAuteur', 10, true),
-                'rang' => $this->entier($v, 'rang', -1000, 1000), 'active' => $v['active'], 'creeLe' => $this->date($v, 'creeLe'),
+                'rang' => $this->entier($v, 'rang', -1000, 1000), 'active' => $v['active'], 'piedsLibres' => $v['piedsLibres'] ?? false, 'creeLe' => $this->date($v, 'creeLe'),
                 'prises' => $prises, 'croix' => $croix,
             ];
         }
