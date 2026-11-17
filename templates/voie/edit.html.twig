@@ -14,6 +14,7 @@
         </div>
 
         {{ include('voie/_photo.html.twig', {classe: 'grande'}) }}
+        <p><a href="{{ path('voie_changer_photo', {id: voie.id}) }}" class="btn btn-secondaire">{{ 'voie.changer_photo'|trans }}</a></p>
 
         {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
         {{ form_errors(form) }}

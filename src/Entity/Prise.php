@@ -38,6 +38,13 @@ class Prise
     #[ORM\Column(enumType: TypePrise::class, length: 10)]
     private TypePrise $type = TypePrise::Main;
 
+    /**
+     * Non enregistré : identifiant de la prise dont celle-ci reprend la place, quand
+     * l'éditeur renvoie les prises d'une voie. Sert à relier la position d'une prise
+     * sur l'ancienne photo à sa position sur la nouvelle (voir Recalage).
+     */
+    private ?int $origine = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -99,6 +106,18 @@ class Prise
     public function setType(TypePrise $type): static
     {
         $this->type = $type;
+
+        return $this;
+    }
+
+    public function getOrigine(): ?int
+    {
+        return $this->origine;
+    }
+
+    public function setOrigine(?int $origine): static
+    {
+        $this->origine = $origine;
 
         return $this;
     }

@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'voie.changer_photo_titre'|trans({nom: voie.nom}) }} · GrimPanBloc{% endblock %}
+
+{% block body %}
+    <p class="fil"><a href="{{ path('voie_show', {id: voie.id}) }}">← {{ voie.nom }}</a></p>
+    <h1>{{ 'voie.changer_photo_titre'|trans({nom: voie.nom}) }}</h1>
+
+    {% if proposition %}
+        <div class="flash flash-info">{{ 'voie.proposition.dans_editeur'|trans }}</div>
+    {% endif %}
+    <p class="aide">{{ 'voie.changer_photo_aide'|trans }}</p>
+
+    {# Prises selon la photo choisie : sur la photo actuelle, et replacées sur les nouvelles photos déjà proposées #}
+    <script type="application/json" id="prises-par-photo">{{ prisesParPhoto|json_encode(constant('JSON_HEX_TAG'))|raw }}</script>
+
+    {{ form_start(form, {attr: {novalidate: 'novalidate'}}) }}
+    {{ form_errors(form) }}
+    <section class="etape">
+        <h2>{{ 'voie.form.etape_photo'|trans }}</h2>
+        {{ form_row(form.photo) }}
+        <div id="bloc-upload">{{ form_row(form.nouvellePhoto) }}</div>
+    </section>
+
+    <section class="etape">
+        <h2>{{ 'voie.form.etape_prises'|trans }}</h2>
+        {{ include('voie/_editeur.html.twig', {positionsSeules: true, typesPrise: []}) }}
+        <p class="compteur"><span id="nb-prises">0</span> {{ 'voie.form.prises'|trans }}</p>
+        {{ form_widget(form.prises) }}
+    </section>
+
+    <button type="submit" class="btn btn-grand">{{ 'voie.proposition.enregistrer'|trans }}</button>
+    {{ form_end(form) }}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/editeur.js') }}" defer></script>
+{% endblock %}

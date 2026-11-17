@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'voie.proposition.titre_page'|trans({nom: voie.nom}) }} · GrimPanBloc{% endblock %}
+
+{% block body %}
+    <p class="fil"><a href="{{ path('voie_show', {id: voie.id}) }}">← {{ voie.nom }}</a></p>
+    <h1>{{ 'voie.proposition.titre'|trans }}</h1>
+
+    <p>{{ 'voie.proposition.explication'|trans({nom: voie.nom}) }}</p>
+
+    <div class="comparaison-photos">
+        <section>
+            <h2>{{ 'voie.proposition.photo_actuelle'|trans }}</h2>
+            {{ include('voie/_photo.html.twig', {classe: 'grande'}) }}
+        </section>
+        <section>
+            <h2>{{ 'voie.proposition.nouvelle_photo'|trans }}</h2>
+            {{ include('voie/_photo.html.twig', {classe: 'grande', autrePhoto: recalage.photoCible, autresPrises: prisesProposees}) }}
+        </section>
+    </div>
+
+    <p class="aide">{{ 'voie.proposition.aide'|trans }}</p>
+
+    <div class="actions">
+        <a href="{{ path('voie_changer_photo', {id: voie.id, proposition: recalage.id}) }}" class="btn">{{ 'voie.proposition.adopter'|trans }}</a>
+        <form method="post" action="{{ path('voie_ignorer_photo', {id: voie.id, recalage: recalage.id}) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('ignorer' ~ voie.id) }}">
+            <button class="btn btn-secondaire">{{ 'voie.proposition.ignorer'|trans }}</button>
+        </form>
+    </div>
+{% endblock %}

@@ -3,49 +3,25 @@
 
 <section class="etape">
     <h2>{{ 'voie.form.etape_photo'|trans }}</h2>
-    {% if form.photo.vars.choices is not empty %}
-        {{ form_row(form.photo) }}
+    {% if form.photo is defined %}
+        {% if form.photo.vars.choices is not empty %}
+            {{ form_row(form.photo) }}
+        {% else %}
+            {% do form.photo.setRendered %}
+        {% endif %}
+        <div id="bloc-upload">{{ form_row(form.nouvellePhoto) }}</div>
     {% else %}
-        {% do form.photo.setRendered %}
+        {# Modification : la photo change par sa propre page, où les prises sont replacées #}
+        <p class="aide">{{ 'voie.form.photo_par_page'|trans }}
+            <a href="{{ path('voie_changer_photo', {id: voie.id}) }}" class="btn btn-secondaire">{{ 'voie.changer_photo'|trans }}</a></p>
     {% endif %}
-    <div id="bloc-upload">{{ form_row(form.nouvellePhoto) }}</div>
 </section>
 
 <section class="etape">
     <h2>{{ 'voie.form.etape_prises'|trans }}</h2>
     <p class="aide">{{ 'voie.form.aide_prises'|trans|raw }} <span aria-hidden="true">⠿</span>.</p>
 
-    <div id="editeur" class="editeur">
-        <p class="editeur-vide" id="editeur-vide">{{ 'voie.form.editeur_vide'|trans }}</p>
-        <div class="vue" id="vue" hidden>
-            <div class="scene" id="scene"></div>
-
-            <div class="barre-outils" id="barre-outils" role="toolbar" aria-label="{{ 'voie.form.outils'|trans }}">
-                <button type="button" class="poignee" id="poignee" title="{{ 'voie.form.deplacer_barre'|trans }}" aria-label="{{ 'voie.form.deplacer_barre'|trans }}">⠿</button>
-                {% for t in typesPrise %}
-                    <button type="button" class="outil" data-outil="{{ t.value }}" aria-pressed="{{ t.value == 'main' ? 'true' : 'false' }}">
-                        <span class="pastille prise-{{ t.value }}"></span> {{ t|trans }}
-                    </button>
-                {% endfor %}
-                <button type="button" class="outil" data-outil="gomme">✕ {{ 'voie.form.effacer'|trans }}</button>
-                <label class="taille">{{ 'voie.form.taille'|trans }} <input type="range" id="taille-prise" min="1" max="10" step="0.5" value="3"></label>
-                <button type="button" class="outil" id="annuler" title="{{ 'voie.form.annuler'|trans }}" aria-label="{{ 'voie.form.annuler'|trans }}">↶</button>
-                <button type="button" class="outil replier" id="replier" aria-expanded="true" title="{{ 'js.replier_barre'|trans }}" aria-label="{{ 'js.replier_barre'|trans }}">▴</button>
-            </div>
-
-            <div class="zoom" id="zoom" role="group" aria-label="{{ 'js.zoom'|trans }}">
-                <button type="button" data-zoom="plus" aria-label="{{ 'js.zoomer'|trans }}">+</button>
-                <input type="range" id="zoom-curseur" min="0" max="3" step="0.01" value="0" aria-label="{{ 'js.niveau_zoom'|trans }}">
-                <button type="button" data-zoom="moins" aria-label="{{ 'js.dezoomer'|trans }}">−</button>
-                <button type="button" data-zoom="ajuster" title="{{ 'js.voir_toute_photo'|trans }}" aria-label="{{ 'js.voir_toute_photo'|trans }}">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="12" rx="1.5"/></svg>
-                </button>
-                <button type="button" id="plein-ecran" title="{{ 'js.plein_ecran'|trans }}" aria-label="{{ 'js.plein_ecran'|trans }}" aria-pressed="false">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg>
-                </button>
-            </div>
-        </div>
-    </div>
+    {{ include('voie/_editeur.html.twig', form.photo is defined ? {} : {photoEditee: voie.photo}) }}
     <p class="compteur"><span id="nb-prises">0</span> {{ 'voie.form.prises'|trans }}</p>
     {{ form_errors(form.prises) }}
     {{ form_widget(form.prises) }}

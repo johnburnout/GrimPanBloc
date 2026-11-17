@@ -15,6 +15,14 @@
         </details>
     </div>
 
+    {# Nouvelles photos proposées pour les voies du grimpeur connecté (voir Recalage) #}
+    {% for p in propositionsPhoto %}
+        <div class="flash flash-info alerte-photo">
+            {{ 'accueil.photo_proposee'|trans({nom: p.voie.nom}) }}
+            <a href="{{ path('voie_proposition_photo', {id: p.voie.id, recalage: p.recalage.id}) }}">{{ 'accueil.photo_proposee_lien'|trans }}</a>
+        </div>
+    {% endfor %}
+
     {{ include('voie/_explorateur.html.twig') }}
 {% endblock %}
 

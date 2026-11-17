@@ -8,7 +8,8 @@ use Symfony\Component\Form\DataTransformerInterface;
 
 /**
  * Champ caché « prises » du formulaire de voie : les prises dessinées par
- * l'éditeur JS circulent en JSON ([{x, y, r, type}, …]).
+ * l'éditeur JS circulent en JSON ([{x, y, r, type, o}, …]). « o », facultatif,
+ * est l'identifiant de la prise enregistrée dont celle-ci reprend la place.
  *
  * Les entrées invalides sont ignorées (jamais d'erreur de transformation) : le
  * formulaire signale seulement l'absence de prise, via une contrainte Count.
@@ -24,7 +25,9 @@ final class PrisesJsonTransformer implements DataTransformerInterface
     {
         $prises = [];
         foreach ($value ?? [] as $prise) {
-            $prises[] = $prise->toArray();
+            // « o » : la prise d'origine, que l'éditeur garde quand on la déplace (voir Recalage)
+            $origine = $prise->getOrigine() ?? $prise->getId();
+            $prises[] = $prise->toArray() + (null !== $origine ? ['o' => $origine] : []);
         }
 
         return json_encode($prises, JSON_THROW_ON_ERROR);
@@ -47,7 +50,8 @@ final class PrisesJsonTransformer implements DataTransformerInterface
                 ->setX((float) $d['x'])
                 ->setY((float) $d['y'])
                 ->setRayon(is_numeric($d['r'] ?? null) ? (float) $d['r'] : self::RAYON_DEFAUT)
-                ->setType(TypePrise::tryFrom((string) ($d['type'] ?? '')) ?? TypePrise::Main);
+                ->setType(TypePrise::tryFrom((string) ($d['type'] ?? '')) ?? TypePrise::Main)
+                ->setOrigine(\is_int($d['o'] ?? null) ? $d['o'] : null);
         }
 
         return $prises;

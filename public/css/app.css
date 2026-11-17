@@ -485,3 +485,8 @@ fieldset.choix { border: 0; padding: 0; margin: .5rem 0; }
 .langues li a:hover, .langues li a:focus-visible { background: var(--fond); }
 .langues li a[aria-current] { font-weight: 600; }
 .drapeau { width: 21px; height: 14px; object-fit: cover; border-radius: 2px; box-shadow: 0 0 0 1px rgba(0,0,0,.15); flex: none; }
+
+/* Nouvelle photo proposée pour une voie : photo actuelle et nouvelle photo côte à côte */
+.comparaison-photos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 1rem; margin: 1rem 0; }
+.comparaison-photos h2 { font-size: 1rem; margin: 0 0 .5rem; }
+.alerte-photo a { font-weight: 600; margin-left: .25rem; }

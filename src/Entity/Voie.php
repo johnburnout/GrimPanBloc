@@ -167,10 +167,26 @@ class Voie
      */
     public function getPrisesAffichees(): array
     {
-        return array_values(array_filter(
-            $this->prises->toArray(),
-            fn (Prise $p) => !$this->piedsLibres || TypePrise::Pied !== $p->getType(),
-        ));
+        return $this->filtrerAffichees($this->prises->toArray());
+    }
+
+    /**
+     * Les prises données, sans les prises de pied quand les pieds sont libres.
+     *
+     * @param iterable<Prise> $prises
+     *
+     * @return list<Prise>
+     */
+    public function filtrerAffichees(iterable $prises): array
+    {
+        $affichees = [];
+        foreach ($prises as $p) {
+            if (!$this->piedsLibres || TypePrise::Pied !== $p->getType()) {
+                $affichees[] = $p;
+            }
+        }
+
+        return $affichees;
     }
 
     /**
