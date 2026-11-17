@@ -14,6 +14,8 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
  * - MODIFIER : l'auteur peut toujours corriger le nom et la description ;
  * - MODIFIER_TRACE : photo, prises et cotation, seulement tant que la voie
  *   n'a été validée (réussie) par aucun autre grimpeur ;
+ * - CHANGER_PHOTO : l'auteur, même pour une voie validée, peut adopter une nouvelle
+ *   photo proposée (voir Recalage) : la voie ne change pas, seule sa photo change ;
  * - DUPLIQUER : tout grimpeur connecté (comme créer une voie) ; la copie est à lui ;
  * - SUPPRIMER : l'auteur ou un administrateur (une voie validée demande en plus
  *   le mot de confirmation, voir ConfirmationSuppression).
@@ -26,6 +28,7 @@ class VoieVoter extends Voter
     public const MODIFIER_TRACE = 'VOIE_MODIFIER_TRACE';
     public const SUPPRIMER = 'VOIE_SUPPRIMER';
     public const DUPLIQUER = 'VOIE_DUPLIQUER';
+    public const CHANGER_PHOTO = 'VOIE_CHANGER_PHOTO';
 
     public function __construct(private readonly AccessDecisionManagerInterface $decisions)
     {
@@ -33,7 +36,7 @@ class VoieVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return \in_array($attribute, [self::MODIFIER, self::MODIFIER_TRACE, self::SUPPRIMER, self::DUPLIQUER], true) && $subject instanceof Voie;
+        return \in_array($attribute, [self::MODIFIER, self::MODIFIER_TRACE, self::SUPPRIMER, self::DUPLIQUER, self::CHANGER_PHOTO], true) && $subject instanceof Voie;
     }
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token, ?Vote $vote = null): bool
@@ -48,6 +51,7 @@ class VoieVoter extends Voter
             self::MODIFIER => $estAuteur,
             self::MODIFIER_TRACE => $estAuteur && !$subject->estValidee(),
             self::DUPLIQUER => true,
+            self::CHANGER_PHOTO => $estAuteur,
             self::SUPPRIMER => $estAuteur || $this->decisions->decide($token, ['ROLE_ADMIN']),
             default => throw new \LogicException(\sprintf('Droit inconnu : « %s ».', $attribute)),
         };

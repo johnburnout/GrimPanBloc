@@ -3,7 +3,17 @@
  *
  * Les prises sont stockées en pourcentage : x et y par rapport à la largeur et à
  * la hauteur de l'image, le rayon par rapport à la largeur. Elles sont envoyées
- * au serveur en JSON dans le champ caché "voie[prises]".
+ * au serveur en JSON dans le champ caché "voie[prises]". Une prise déjà enregistrée
+ * garde l'identifiant de son origine (« o ») : quand la photo change, le serveur relie
+ * ainsi sa position sur l'ancienne photo à celle choisie sur la nouvelle.
+ *
+ * Mode « positions seules » (#editeur[data-positions-seules], voie validée qui passe
+ * sur une nouvelle photo, data-photo) : on déplace et redimensionne les prises, sans
+ * en ajouter, en effacer ni changer leur type.
+ *
+ * Changement de photo (modification d'une voie) : quand la page fournit les prises
+ * pour la photo choisie (#prises-par-photo : celles de la voie sur sa photo actuelle,
+ * ou replacées sur une nouvelle photo déjà proposée), elles remplacent les prises.
  *
  * La photo est affichée dans une « vue » qui peut être zoomée et déplacée :
  * la « scène » (image + SVG des prises) garde la taille réelle de l'image et
@@ -44,8 +54,10 @@
     const curseurTaille = document.getElementById('taille-prise');
     const compteur = document.getElementById('nb-prises');
     const boutonsOutils = document.querySelectorAll('[data-outil]');
+    const positionsSeules = editeur.hasAttribute('data-positions-seules');
 
     let prises = [];
+    let demarrage = true; // la photo pré-choisie au chargement ne recharge pas les prises
     let historique = [];
     let outil = 'main';
     let W = 1000, H = 1000; // dimensions réelles de l'image
@@ -63,6 +75,10 @@
         if (Array.isArray(init)) prises = init;
     } catch (e) { /* champ vide ou invalide */ }
 
+    const prisesParPhoto = (() => {
+        try { return JSON.parse(document.getElementById('prises-par-photo')?.textContent || '{}') || {}; } catch { return {}; }
+    })();
+
     const memoriser = () => {
         historique.push(JSON.stringify(prises));
         if (historique.length > 100) historique.shift();
@@ -71,6 +87,7 @@
     const synchroniser = () => {
         champPrises.value = JSON.stringify(prises.map(p => ({
             x: +p.x.toFixed(2), y: +p.y.toFixed(2), r: +p.r.toFixed(2), type: p.type,
+            ...(Number.isInteger(p.o) ? { o: p.o } : {}),
         })));
         compteur.textContent = prises.length;
         dessiner();
@@ -257,10 +274,17 @@
         selectPhoto.addEventListener('change', () => {
             const option = selectPhoto.selectedOptions[0];
             const src = option ? option.dataset.src : null;
-            blocUpload.hidden = !!src;
+            if (blocUpload) blocUpload.hidden = !!src;
             if (src) {
                 selection++; // une réduction encore en cours ne remettra pas le fichier
-                inputFichier.value = '';
+                if (inputFichier) inputFichier.value = '';
+            }
+            const connues = prisesParPhoto[selectPhoto.value];
+            if (!demarrage && Array.isArray(connues)) {
+                memoriser(); // « Annuler » revient aux prises d'avant le changement de photo
+                prises = connues.map(p => ({ ...p }));
+                derniere = null;
+                synchroniser();
             }
             chargerPhoto(src);
         });
@@ -275,7 +299,7 @@
      */
     const COTE_MAX = 2000;
     const TAILLE_SURE = 2 * 1024 * 1024; // en dessous, et assez petite, la photo part telle quelle
-    const formulaire = inputFichier.form;
+    const formulaire = champPrises.form;
     const boutonsEnvoi = formulaire ? formulaire.querySelectorAll('button[type="submit"]') : [];
     let reductionEnCours = 0;
 
@@ -327,7 +351,7 @@
 
     let selection = 0; // numéro du dernier choix de fichier : un choix plus récent l'emporte
 
-    inputFichier.addEventListener('change', async () => {
+    if (inputFichier) inputFichier.addEventListener('change', async () => {
         const fichier = inputFichier.files[0];
         const numero = ++selection;
         if (!fichier) return;
@@ -530,7 +554,7 @@
         if (lache && geste.type === 'prise' && !geste.bouge) {
             // Simple toucher sur une prise : type de l'outil courant, et cible du curseur de taille.
             const p = prises[geste.index];
-            if (p.type !== outil) { memoriser(); p.type = outil; }
+            if (p.type !== outil && !positionsSeules) { memoriser(); p.type = outil; }
             selectionner(p);
             synchroniser();
         } else if (lache && geste.type === 'image' && !geste.bouge) {
@@ -538,7 +562,7 @@
             const double = dernierToucher
                 && maintenant - dernierToucher.t < DELAI_DOUBLE
                 && Math.hypot(ev.clientX - dernierToucher.x, ev.clientY - dernierToucher.y) < DISTANCE_DOUBLE;
-            if (double && outil !== 'gomme') {
+            if (double && outil !== 'gomme' && !positionsSeules) {
                 memoriser();
                 const p = { ...position(ev.clientX, ev.clientY), r: parseFloat(curseurTaille.value), type: outil };
                 prises.push(p);
@@ -603,6 +627,9 @@
 
     if (selectPhoto && selectPhoto.value) {
         selectPhoto.dispatchEvent(new Event('change'));
+    } else if (editeur.dataset.photo) {
+        chargerPhoto(editeur.dataset.photo);
     }
+    demarrage = false;
     synchroniser();
 })();

@@ -45,34 +45,12 @@ class VoieType extends AbstractType
             return;
         }
 
+        // Modification : la photo change par sa propre page (ChangementPhotoType), sans perdre de prise
+        if ($options['choix_photo']) {
+            self::ajouterChoixPhoto($builder, $secteur, ['mapped' => false, 'constraints' => [new Callback(self::exigerUnePhoto(...))]]);
+        }
+
         $builder
-            ->add('photo', EntityType::class, [
-                'class' => Photo::class,
-                'label' => 'voie.form.photo_existante',
-                'required' => false,
-                'placeholder' => 'voie.form.envoyer_nouvelle',
-                'query_builder' => fn (EntityRepository $r) => $r->createQueryBuilder('p')
-                    ->andWhere('p.secteur = :s')->setParameter('s', $secteur)
-                    ->orderBy('p.creeLe', 'DESC'),
-                'choice_label' => fn (Photo $p) => new TranslatableMessage('voie.form.photo_choix', ['id' => $p->getId(), 'date' => $p->getCreeLe()->format('d/m/Y')]),
-                'choice_translation_domain' => 'messages',
-                'choice_attr' => fn (Photo $p) => ['data-src' => '/'.$p->getChemin()],
-            ])
-            ->add('nouvellePhoto', FileType::class, [
-                'label' => 'voie.form.nouvelle_photo',
-                'mapped' => false,
-                'required' => false,
-                // Pas d'attribut « capture » : il imposerait l'appareil photo sur téléphone,
-                // alors qu'on doit pouvoir aussi choisir une photo de la photothèque.
-                'attr' => ['accept' => 'image/jpeg,image/png,image/webp'],
-                'constraints' => [
-                    new Image(maxSize: '15M', mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
-                        mimeTypesMessage: 'voie.photo.format',
-                        maxPixels: PhotoOptimiseur::PIXELS_MAX,
-                        maxPixelsMessage: 'voie.photo.trop_grande'),
-                    new Callback(self::exigerUnePhoto(...)),
-                ],
-            ])
             // Les prises sont dessinées en JS et envoyées en JSON dans ce champ caché.
             ->add('prises', HiddenType::class, [
                 'attr' => ['data-prises' => ''],
@@ -113,6 +91,45 @@ class VoieType extends AbstractType
         $builder->get('prises')->addModelTransformer(new PrisesJsonTransformer());
     }
 
+    /**
+     * Champs « photo » (existante du secteur) et « nouvellePhoto » (envoyée), partagés
+     * avec le changement de photo (ChangementPhotoType).
+     *
+     * @param FormBuilderInterface<mixed> $builder
+     * @param array<string, mixed> $optionsNouvelle options en plus pour « nouvellePhoto »
+     */
+    public static function ajouterChoixPhoto(FormBuilderInterface $builder, Secteur $secteur, array $optionsNouvelle = []): void
+    {
+        $contraintes = [
+            new Image(maxSize: '15M', mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+                mimeTypesMessage: 'voie.photo.format',
+                maxPixels: PhotoOptimiseur::PIXELS_MAX,
+                maxPixelsMessage: 'voie.photo.trop_grande'),
+            ...($optionsNouvelle['constraints'] ?? []),
+        ];
+        $builder
+            ->add('photo', EntityType::class, [
+                'class' => Photo::class,
+                'label' => 'voie.form.photo_existante',
+                'required' => false,
+                'placeholder' => 'voie.form.envoyer_nouvelle',
+                'query_builder' => fn (EntityRepository $r) => $r->createQueryBuilder('p')
+                    ->andWhere('p.secteur = :s')->setParameter('s', $secteur)
+                    ->orderBy('p.creeLe', 'DESC'),
+                'choice_label' => fn (Photo $p) => new TranslatableMessage('voie.form.photo_choix', ['id' => $p->getId(), 'date' => $p->getCreeLe()->format('d/m/Y')]),
+                'choice_translation_domain' => 'messages',
+                'choice_attr' => fn (Photo $p) => ['data-src' => '/'.$p->getChemin()],
+            ])
+            ->add('nouvellePhoto', FileType::class, [
+                'label' => 'voie.form.nouvelle_photo',
+                'required' => false,
+                // Pas d'attribut « capture » : il imposerait l'appareil photo sur téléphone,
+                // alors qu'on doit pouvoir aussi choisir une photo de la photothèque.
+                'attr' => ['accept' => 'image/jpeg,image/png,image/webp'],
+                'constraints' => $contraintes,
+            ] + $optionsNouvelle);
+    }
+
     /** Sans nouvelle photo, il faut en avoir choisi une existante. */
     private static function exigerUnePhoto(?UploadedFile $fichier, ExecutionContextInterface $context): void
     {
@@ -128,7 +145,10 @@ class VoieType extends AbstractType
             'data_class' => Voie::class,
             // false : formulaire réduit au nom et à la description (voie validée)
             'trace' => true,
+            // false (modification) : pas de choix de photo, voir ChangementPhotoType
+            'choix_photo' => true,
         ]);
+        $resolver->setAllowedTypes('choix_photo', 'bool');
         $resolver->setAllowedTypes('trace', 'bool');
         $resolver->setRequired('secteur');
         $resolver->setAllowedTypes('secteur', Secteur::class);

@@ -7,6 +7,28 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [2.1.0] - 2026-11-17
+
+### Ajouté
+- **Changer la photo d'une voie** : le bouton « Changer de photo » (page
+  « Modifier ») permet de passer une voie sur une autre photo du secteur ou sur
+  une photo envoyée, par exemple quand le mur a été rephotographié. Les prises
+  sont gardées : on les replace sur la nouvelle photo (position et taille),
+  sans pouvoir en ajouter, en supprimer ni changer leur type. La cotation et
+  les croix sont conservées ; une voie déjà réussie peut aussi changer de photo.
+- **Nouvelle photo proposée aux autres voies** : quand une voie change de
+  photo, les déplacements de ses prises sont enregistrés. Les créateurs des
+  autres voies de l'ancienne photo voient une alerte sur l'accueil, avec un
+  aperçu de leur voie sur la nouvelle photo, prises replacées automatiquement.
+  Ils peuvent l'adopter (après avoir ajusté les prises) ou garder leur photo.
+  Chaque voie adoptée rend le placement automatique plus précis pour les
+  suivantes.
+- Les sauvegardes contiennent aussi ces déplacements de prises entre photos.
+
+### Modifié
+- La page « Modifier » d'une voie ne propose plus de choisir la photo : le
+  changement de photo passe par sa propre page, pour ne perdre aucune prise.
+
 ## [2.0.2] - 2026-11-15
 
 ### Modifié

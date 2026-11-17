@@ -136,11 +136,14 @@ final class VoieFormulaireTest extends FonctionnelTestCase
     public function testModifierLesPrisesDUneVoieNonValidee(): void
     {
         $auteur = $this->creerUtilisateur('auteur');
-        $id = $this->creerVoie($auteur)->getId();
+        $voie = $this->creerVoie($auteur);
+        $id = $voie->getId();
+        $priseId = $voie->getPrises()->first()->getId();
 
         $this->client->loginUser($auteur);
         $form = $this->formulaire("/voies/$id/modifier");
-        self::assertSame([['x' => 10, 'y' => 20, 'r' => 3, 'type' => 'main']], json_decode($form['voie[prises]']->getValue(), true));
+        // « o » : la prise enregistrée d'origine, que l'éditeur garde quand on la déplace
+        self::assertSame([['x' => 10, 'y' => 20, 'r' => 3, 'type' => 'main', 'o' => $priseId]], json_decode($form['voie[prises]']->getValue(), true));
 
         $form['voie[prises]'] = json_encode([['x' => 70, 'y' => 80, 'type' => 'pied'], ['x' => 1, 'y' => 1]], \JSON_THROW_ON_ERROR);
         $form['voie[nom]'] = 'Renommée';
