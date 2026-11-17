@@ -13,7 +13,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
- * Remplace le contenu de secteurs (voies, prises, croix, photos et leurs fichiers)
+ * Remplace le contenu de secteurs (voies, prises, croix, photos et leurs fichiers,
+ * recalages entre photos)
  * par celui d'une sauvegarde. Avec des données vides, c'est le nettoyage d'un secteur.
  *
  * La base est modifiée dans une transaction ; les fichiers des photos restaurées sont
@@ -86,7 +87,7 @@ final class Restauration
             $croix = 0;
             $croixIgnorees = 0;
             foreach ($donnees['voies'] as $v) {
-                $id = $idsVoies[] = $this->inserer('voie', $v['id'], [
+                $id = $idsVoies[$v['id']] = $this->inserer('voie', $v['id'], [
                     'photo_id' => $idsPhotos[$v['photo']], 'nom' => $v['nom'], 'description' => $v['description'],
                     'auteur_id' => $auteur($v['auteur']), 'systeme' => $v['systeme'], 'cotation' => $v['cotation'],
                     'cotation_auteur' => $v['cotationAuteur'], 'rang' => $v['rang'], 'active' => (int) $v['active'], 'pieds_libres' => (int) $v['piedsLibres'], 'cree_le' => $v['creeLe'],
@@ -107,10 +108,30 @@ final class Restauration
                 }
             }
 
+            // Recalages (ceux des photos remplacées ont disparu avec elles : ON DELETE CASCADE)
+            foreach ($donnees['recalages'] ?? [] as $r) {
+                $paires = array_map(fn (array $p) => ['voie' => null !== $p['voie'] ? ($idsVoies[$p['voie']] ?? null) : null] + $p, $r['paires']);
+                $source = $idsPhotos[$r['source']];
+                $cible = $idsPhotos[$r['cible']];
+                $c->executeStatement('DELETE FROM recalage WHERE photo_source_id = ? AND photo_cible_id = ?', [$source, $cible]);
+                $c->insert('recalage', [
+                    'photo_source_id' => $source, 'photo_cible_id' => $cible,
+                    'paires' => json_encode($paires, \JSON_PRESERVE_ZERO_FRACTION | \JSON_THROW_ON_ERROR),
+                    'matrice' => json_encode($r['matrice'], \JSON_PRESERVE_ZERO_FRACTION | \JSON_THROW_ON_ERROR),
+                    'cree_le' => $r['creeLe'], 'maj_le' => $r['majLe'],
+                ]);
+                $recalage = (int) $c->lastInsertId();
+                foreach (array_unique($r['ignorees']) as $voie) {
+                    if (isset($idsVoies[$voie])) {
+                        $c->insert('recalage_voie_ignoree', ['recalage_id' => $recalage, 'voie_id' => $idsVoies[$voie]]);
+                    }
+                }
+            }
+
             $this->em->clear();
             if ($croixIgnorees > 0) {
                 // Sans certaines croix, la cotation consensuelle peut changer
-                foreach ($this->em->getRepository(Voie::class)->findBy(['id' => $idsVoies]) as $voie) {
+                foreach ($this->em->getRepository(Voie::class)->findBy(['id' => array_values($idsVoies)]) as $voie) {
                     $voie->recalculerCotation();
                 }
                 $this->em->flush();

@@ -4,6 +4,7 @@ namespace App\Tests\Fonctionnel;
 
 use App\Entity\Photo;
 use App\Entity\Prise;
+use App\Entity\Recalage;
 use App\Entity\Secteur;
 use App\Entity\User;
 use App\Entity\Voie;
@@ -256,6 +257,65 @@ final class AdminSauvegardesTest extends FonctionnelTestCase
             'secteurs' => [['id' => 1, 'nom' => 'S', 'description' => null]],
             'photos' => [$this->photoArchive(1, 99, 'p.jpg', 'admin')], // secteur 99 absent
             'voies' => [],
+        ], []);
+
+        $this->expectException(\InvalidArgumentException::class);
+        static::getContainer()->get(ArchiveSauvegarde::class)->lireDonnees($chemin);
+    }
+
+    public function testLesRecalagesSontSauvegardesEtRestaures(): void
+    {
+        $passee = $this->voieAvecPhoto('Dévers', 'Le toit', 'ancienne.jpg');
+        $ancienne = $passee->getPhoto();
+        $nouvelle = $this->photo($ancienne->getSecteur(), 'nouvelle.jpg');
+        $restee = (new Voie())->setNom('Le bombé')->setAuteur($this->admin)->setPhoto($ancienne)->setCotationFr(CotationFr::tryFrom('6b'));
+        $restee->addPrise((new Prise())->setX(30)->setY(40));
+        $this->em->persist($restee);
+        $passee->setPhoto($nouvelle);
+        $recalage = (new Recalage($ancienne, $nouvelle))
+            ->enregistrerPaires($passee, [[10, 20, 15, 22], [50, 50, 55, 52]])
+            ->ignorer($restee);
+        $this->em->persist($recalage);
+        $this->em->flush();
+        [$paires, $matrice] = [$recalage->getPaires(), $recalage->getMatrice()];
+        $sauvegarde = $this->gestion->creerManuelle();
+        self::assertCount(1, static::getContainer()->get(ArchiveSauvegarde::class)->lireDonnees($sauvegarde->chemin)['recalages']);
+
+        // Après la sauvegarde, le recalage disparaît ; la restauration du secteur le ramène
+        $this->em->remove($recalage);
+        $this->em->flush();
+        $this->client->loginUser($this->admin);
+        $this->restaurer($sauvegarde, (string) $ancienne->getSecteur()->getId(), 'garder');
+        self::assertResponseRedirects();
+
+        $this->em->clear();
+        $restaure = $this->em->getRepository(Recalage::class)->findOneBy([]);
+        self::assertNotNull($restaure);
+        self::assertSame([$ancienne->getId(), $nouvelle->getId()], [$restaure->getPhotoSource()->getId(), $restaure->getPhotoCible()->getId()]);
+        self::assertEquals($paires, $restaure->getPaires());
+        self::assertEqualsWithDelta($matrice, $restaure->getMatrice(), 1e-9);
+        self::assertSame([$restee->getId()], $restaure->getVoiesIgnorees()->map(fn (Voie $v) => $v->getId())->getValues());
+    }
+
+    public function testUneArchiveSansRecalageResteLisible(): void
+    {
+        $chemin = $this->archive([
+            'secteurs' => [['id' => 1, 'nom' => 'S', 'description' => null]],
+            'photos' => [$this->photoArchive(1, 1, 'p.jpg', 'admin')],
+            'voies' => [$this->voieArchive(1, 1, 'admin')],
+        ], []);
+
+        self::assertSame([], static::getContainer()->get(ArchiveSauvegarde::class)->lireDonnees($chemin)['recalages']);
+    }
+
+    public function testUnRecalageVersUnePhotoAbsenteEstRefuse(): void
+    {
+        $chemin = $this->archive([
+            'secteurs' => [['id' => 1, 'nom' => 'S', 'description' => null]],
+            'photos' => [$this->photoArchive(1, 1, 'p.jpg', 'admin')],
+            'voies' => [],
+            'recalages' => [['source' => 1, 'cible' => 2, 'paires' => [], 'matrice' => [1, 0, 0, 0, 1, 0, 0, 0, 1], 'ignorees' => [],
+                'creeLe' => '2026-01-01 10:00:00', 'majLe' => '2026-01-01 10:00:00']],
         ], []);
 
         $this->expectException(\InvalidArgumentException::class);

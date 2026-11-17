@@ -203,8 +203,9 @@ final class GestionSauvegardes
         $photos = array_values(array_filter($donnees['photos'], fn (array $p) => $p['secteur'] === $secteur));
         $idsPhotos = array_flip(array_column($photos, 'id'));
         $voies = array_values(array_filter($donnees['voies'], fn (array $v) => isset($idsPhotos[$v['photo']])));
+        $recalages = array_values(array_filter($donnees['recalages'] ?? [], fn (array $r) => isset($idsPhotos[$r['source']], $idsPhotos[$r['cible']])));
 
-        return ['secteurs' => $secteurs, 'photos' => $photos, 'voies' => $voies];
+        return ['secteurs' => $secteurs, 'photos' => $photos, 'voies' => $voies, 'recalages' => $recalages];
     }
 
     /**

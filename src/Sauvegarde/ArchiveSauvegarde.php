@@ -16,7 +16,8 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * Écriture et lecture d'une archive de sauvegarde (zip) :
  *
  *   resume.json      date, version, motif, secteurs avec leurs nombres de voies et photos ;
- *   donnees.json     secteurs, photos, voies (avec prises et croix) ;
+ *   donnees.json     secteurs, photos, voies (avec prises et croix), recalages entre
+ *                    photos (changement de photo d'une voie, voir Recalage) ;
  *   photos/…         les photos, telles qu'enregistrées dans uploads/photos/ ;
  *   miniatures/…     leurs miniatures.
  *
@@ -31,7 +32,9 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
  * @phpstan-type PriseArchive array{x: float, y: float, rayon: float, type: string}
  * @phpstan-type CroixArchive array{grimpeur: string, cotation: ?string, creeLe: string}
  * @phpstan-type VoieArchive array{id: int, photo: int, nom: string, description: ?string, auteur: string, systeme: string, cotation: string, cotationAuteur: string, rang: int, active: bool, piedsLibres: bool, creeLe: string, prises: list<PriseArchive>, croix: list<CroixArchive>}
- * @phpstan-type DonneesArchive array{secteurs: list<SecteurArchive>, photos: list<PhotoArchive>, voies: list<VoieArchive>}
+ * @phpstan-type PaireArchive array{voie: ?int, s: array{float, float}, c: array{float, float}}
+ * @phpstan-type RecalageArchive array{source: int, cible: int, paires: list<PaireArchive>, matrice: list<float>, ignorees: list<int>, creeLe: string, majLe: string}
+ * @phpstan-type DonneesArchive array{secteurs: list<SecteurArchive>, photos: list<PhotoArchive>, voies: list<VoieArchive>, recalages?: list<RecalageArchive>}
  */
 final class ArchiveSauvegarde
 {
@@ -196,6 +199,8 @@ final class ArchiveSauvegarde
             $voies = $c->fetchAllAssociative('SELECT v.id, v.photo_id, v.nom, v.description, v.systeme, v.cotation, v.cotation_auteur, v.rang, v.active, v.pieds_libres, v.cree_le, u.pseudo FROM voie v JOIN utilisateur u ON u.id = v.auteur_id ORDER BY v.id');
             $prises = $c->fetchAllAssociative('SELECT voie_id, x, y, rayon, type FROM prise ORDER BY id');
             $croix = $c->fetchAllAssociative('SELECT c.voie_id, c.cotation, c.cree_le, u.pseudo FROM croix c JOIN utilisateur u ON u.id = c.grimpeur_id ORDER BY c.id');
+            $recalages = $c->fetchAllAssociative('SELECT id, photo_source_id, photo_cible_id, paires, matrice, cree_le, maj_le FROM recalage ORDER BY id');
+            $ignorees = $c->fetchAllAssociative('SELECT recalage_id, voie_id FROM recalage_voie_ignoree ORDER BY recalage_id, voie_id');
             $c->commit();
         } catch (\Throwable $e) {
             $c->rollBack();
@@ -209,6 +214,11 @@ final class ArchiveSauvegarde
         $croixParVoie = [];
         foreach ($croix as $x) {
             $croixParVoie[(int) $x['voie_id']][] = ['grimpeur' => (string) $x['pseudo'], 'cotation' => null === $x['cotation'] ? null : (string) $x['cotation'], 'creeLe' => (string) $x['cree_le']];
+        }
+
+        $ignoreesParRecalage = [];
+        foreach ($ignorees as $i) {
+            $ignoreesParRecalage[(int) $i['recalage_id']][] = (int) $i['voie_id'];
         }
 
         return [
@@ -226,6 +236,13 @@ final class ArchiveSauvegarde
                 'rang' => (int) $v['rang'], 'active' => (bool) $v['active'], 'piedsLibres' => (bool) $v['pieds_libres'], 'creeLe' => (string) $v['cree_le'],
                 'prises' => $prisesParVoie[(int) $v['id']] ?? [], 'croix' => $croixParVoie[(int) $v['id']] ?? [],
             ], $voies),
+            'recalages' => array_map(fn (array $r) => [
+                'source' => (int) $r['photo_source_id'], 'cible' => (int) $r['photo_cible_id'],
+                'paires' => json_decode((string) $r['paires'], true, flags: \JSON_THROW_ON_ERROR),
+                'matrice' => json_decode((string) $r['matrice'], true, flags: \JSON_THROW_ON_ERROR),
+                'ignorees' => $ignoreesParRecalage[(int) $r['id']] ?? [],
+                'creeLe' => (string) $r['cree_le'], 'majLe' => (string) $r['maj_le'],
+            ], $recalages),
         ];
     }
 
@@ -308,7 +325,74 @@ final class ArchiveSauvegarde
             ];
         }
 
-        return ['secteurs' => array_values($secteurs), 'photos' => array_values($photos), 'voies' => array_values($voies)];
+        return ['secteurs' => array_values($secteurs), 'photos' => array_values($photos), 'voies' => array_values($voies),
+            'recalages' => $this->validerRecalages($d, $photos, $voies)];
+    }
+
+    /**
+     * Recalages entre photos (absents des sauvegardes d'avant la version 2.1) : les
+     * deux photos doivent être dans l'archive ; une voie absente est oubliée (paires
+     * gardées, sans voie ; refus de la proposition effacé).
+     *
+     * @param array<mixed> $d
+     * @param array<int, mixed> $photos photos validées, par identifiant
+     * @param array<int, mixed> $voies voies validées, par identifiant
+     *
+     * @return list<RecalageArchive>
+     */
+    private function validerRecalages(array $d, array $photos, array $voies): array
+    {
+        if (!\array_key_exists('recalages', $d)) {
+            return [];
+        }
+        $recalages = [];
+        foreach ($this->liste($d, 'recalages') as $r) {
+            $source = $this->id($r, 'source');
+            $cible = $this->id($r, 'cible');
+            if ($source === $cible || !isset($photos[$source], $photos[$cible]) || isset($recalages["$source-$cible"])) {
+                throw $this->invalide("recalage $source → $cible");
+            }
+            $paires = [];
+            foreach ($this->liste($r, 'paires') as $p) {
+                $voie = $p['voie'] ?? null;
+                if (null !== $voie && !\is_int($voie)) {
+                    throw $this->invalide("recalage $source → $cible");
+                }
+                $paires[] = ['voie' => isset($voies[$voie]) ? $voie : null, 's' => $this->point($p, 's'), 'c' => $this->point($p, 'c')];
+            }
+            $matrice = $r['matrice'] ?? null;
+            if (!\is_array($matrice) || !array_is_list($matrice) || 9 !== \count($matrice)
+                || [] !== array_filter($matrice, fn (mixed $v) => (!\is_int($v) && !\is_float($v)) || !is_finite((float) $v))) {
+                throw $this->invalide("matrice du recalage $source → $cible");
+            }
+            $ignorees = $r['ignorees'] ?? null;
+            if (!\is_array($ignorees) || !array_is_list($ignorees) || [] !== array_filter($ignorees, fn (mixed $v) => !\is_int($v))) {
+                throw $this->invalide("recalage $source → $cible");
+            }
+            $recalages["$source-$cible"] = [
+                'source' => $source, 'cible' => $cible, 'paires' => $paires,
+                'matrice' => array_map(fn (int|float $v) => (float) $v, $matrice),
+                'ignorees' => array_values(array_filter($ignorees, fn (int $v) => isset($voies[$v]))),
+                'creeLe' => $this->date($r, 'creeLe'), 'majLe' => $this->date($r, 'majLe'),
+            ];
+        }
+
+        return array_values($recalages);
+    }
+
+    /**
+     * @param array<mixed> $d
+     *
+     * @return array{float, float}
+     */
+    private function point(array $d, string $cle): array
+    {
+        $p = $d[$cle] ?? null;
+        if (!\is_array($p) || !array_is_list($p) || 2 !== \count($p)) {
+            throw $this->invalide($cle);
+        }
+
+        return [$this->decimal($p, 0), $this->decimal($p, 1)];
     }
 
     /**
@@ -349,11 +433,11 @@ final class ArchiveSauvegarde
     }
 
     /** @param array<mixed> $d */
-    private function decimal(array $d, string $cle): float
+    private function decimal(array $d, string|int $cle): float
     {
         $v = $d[$cle] ?? null;
         if ((!\is_int($v) && !\is_float($v)) || $v < 0 || $v > 100) {
-            throw $this->invalide($cle);
+            throw $this->invalide((string) $cle);
         }
 
         return (float) $v;
