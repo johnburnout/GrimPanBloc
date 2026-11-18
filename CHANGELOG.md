@@ -7,6 +7,15 @@ Toutes les évolutions notables de GrimPanBloc (anciennement GrimpePan). Format 
 Le texte de chaque version sert de notes de release sur GitHub et s'affiche
 aux administrateurs sur la page « Mises à jour ».
 
+## [2.2.0] - 2026-11-18
+
+### Ajouté
+- **Photos d'un secteur envoyées par un administrateur** : sur la page d'un
+  secteur, le bloc « Ajouter des photos au secteur » permet d'envoyer une ou
+  plusieurs photos à la fois (jusqu'à 20 par envoi ; JPEG, PNG ou WebP). Elles
+  restent dans le secteur sans voie et sont proposées à la création des
+  nouvelles voies.
+
 ## [2.1.0] - 2026-11-17
 
 ### Ajouté
