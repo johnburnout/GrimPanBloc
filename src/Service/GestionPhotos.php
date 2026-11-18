@@ -3,18 +3,45 @@
 namespace App\Service;
 
 use App\Entity\Photo;
+use App\Entity\Secteur;
+use App\Entity\User;
 use App\Exception\OperationRefusee;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-/** Suppression des photos qu'aucune voie n'utilise (Administration → Photos). */
+/**
+ * Photos d'un secteur : ajout par un administrateur (page du secteur), suppression de
+ * celles qu'aucune voie n'utilise (Administration → Photos).
+ */
 final class GestionPhotos
 {
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly MiniaturesPhotos $miniatures,
+        private readonly PhotoUploader $uploader,
         #[Autowire('%photos_dir%')] private readonly string $photosDir,
     ) {
+    }
+
+    /**
+     * Enregistre les photos envoyées dans le secteur, sans voie : elles sont ensuite
+     * proposées à la création d'une voie.
+     *
+     * @param iterable<UploadedFile> $fichiers
+     *
+     * @return int nombre de photos ajoutées
+     */
+    public function ajouter(Secteur $secteur, iterable $fichiers, User $auteur): int
+    {
+        $n = 0;
+        foreach ($fichiers as $fichier) {
+            $this->em->persist($this->uploader->upload($fichier, $secteur, $auteur));
+            ++$n;
+        }
+        $this->em->flush();
+
+        return $n;
     }
 
     /**

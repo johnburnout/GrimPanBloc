@@ -152,6 +152,10 @@ secteurs.creer: Crea
 secteurs.connectez_vous: 'Accedi per creare una via'
 secteurs.nettoyer_ellipse: 'Svuota il settore…'
 secteurs.supprimer_ellipse: 'Elimina il settore…'
+secteurs.photos.ajouter: 'Aggiungi foto al settore'
+secteurs.photos.aide: 'Questo settore ha {nombre, plural, =0 {nessuna foto} one {# foto} other {# foto}}. Le foto caricate qui vengono proposte alla creazione delle vie del settore (fino a {max} per invio; JPEG, PNG o WebP).'
+secteurs.photos.fichiers: 'Foto'
+secteurs.photos.envoyer: 'Carica'
 connexion.titre: Accedi
 connexion.identifiants_incorrects: 'Email o password errati.'
 connexion.rester_connecte: 'Resta connesso'
@@ -386,6 +390,7 @@ flash.secteur.supprime: 'Settore «{nom}» eliminato, con {voies, plural, one {#
 flash.secteur.echec_nettoyage: 'Lo svuotamento non è riuscito, non è stato eliminato nulla: {erreur}'
 flash.secteur.echec_suppression: 'L’eliminazione non è riuscita: {erreur}'
 flash.secteur.sauvegarde_avant: 'Backup fatto subito prima ({date}): in caso di errore, ripristina questo settore da Amministrazione → Backup.'
+flash.secteur.photos_ajoutees: '{nombre, plural, one {# foto aggiunta} other {# foto aggiunte}} al settore «{nom}».'
 flash.profil.enregistre: 'Profilo salvato.'
 flash.bienvenue: 'Benvenuto/a {pseudo}!'
 flash.photo.supprimee: 'Foto del settore «{secteur}» eliminata.'

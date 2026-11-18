@@ -5,9 +5,11 @@ namespace App\Controller;
 use App\Entity\Secteur;
 use App\Entity\User;
 use App\Exception\Messages;
+use App\Form\PhotosSecteurType;
 use App\Repository\SecteurRepository;
 use App\Sauvegarde\GestionSauvegardes;
 use App\Security\ConfirmationSuppression;
+use App\Service\GestionPhotos;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,6 +19,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Translation\TranslatableMessage;
 
 /**
+ * Ajout de photos à un secteur, depuis la page du secteur : elles servent ensuite aux
+ * nouvelles voies.
+ *
  * Nettoyage d'un secteur : toutes ses voies et toutes ses photos (même inutilisées)
  * sont supprimées, après une sauvegarde automatique. Le secteur lui-même reste.
  *
@@ -26,6 +31,31 @@ use Symfony\Component\Translation\TranslatableMessage;
 #[IsGranted('ROLE_ADMIN')]
 class AdminSecteursController extends AbstractController
 {
+    #[Route('/{id}/photos', name: 'admin_secteur_photos', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function photos(Secteur $secteur, Request $request, GestionPhotos $gestion, #[CurrentUser] User $admin): Response
+    {
+        $form = $this->createForm(PhotosSecteurType::class);
+        $form->handleRequest($request);
+
+        if (!$form->isSubmitted()) {
+            $this->addFlash('error', new TranslatableMessage('commun.formulaire_expire'));
+        } elseif ($form->isValid()) {
+            try {
+                $n = $gestion->ajouter($secteur, $form->get('photos')->getData(), $admin);
+                $this->addFlash('success', new TranslatableMessage('flash.secteur.photos_ajoutees', ['nombre' => $n, 'nom' => $secteur->getNom()]));
+            } catch (\Throwable $e) {
+                $this->addFlash('error', Messages::de($e));
+            }
+        } else {
+            // Messages déjà traduits par le validateur (photo trop grande, mauvais format…)
+            foreach ($form->getErrors(true) as $erreur) {
+                $this->addFlash('error', $erreur->getMessage());
+            }
+        }
+
+        return $this->redirectToRoute('secteur_show', ['id' => $secteur->getId()]);
+    }
+
     #[Route('/{id}/nettoyer', name: 'admin_secteur_nettoyer', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
     public function nettoyer(Secteur $secteur, Request $request, SecteurRepository $secteurs, GestionSauvegardes $sauvegardes, ConfirmationSuppression $confirmation, #[CurrentUser] User $admin): Response
     {

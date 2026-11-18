@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Dto\CriteresVoies;
 use App\Entity\Secteur;
+use App\Form\PhotosSecteurType;
 use App\Form\SecteurType;
 use App\Repository\SecteurRepository;
 use App\Repository\VoieRepository;
@@ -51,6 +52,10 @@ class SecteurController extends AbstractController
             'secteur' => $secteur,
             'voies' => $voies->rechercher($criteres, $secteur),
             'criteres' => $criteres,
+            // Ajout de photos au secteur : réservé aux administrateurs (voir AdminSecteursController)
+            'formPhotos' => $this->isGranted('ROLE_ADMIN')
+                ? $this->createForm(PhotosSecteurType::class, null, ['action' => $this->generateUrl('admin_secteur_photos', ['id' => $secteur->getId()])])
+                : null,
         ]);
     }
 }

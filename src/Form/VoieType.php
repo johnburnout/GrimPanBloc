@@ -100,13 +100,7 @@ class VoieType extends AbstractType
      */
     public static function ajouterChoixPhoto(FormBuilderInterface $builder, Secteur $secteur, array $optionsNouvelle = []): void
     {
-        $contraintes = [
-            new Image(maxSize: '15M', mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
-                mimeTypesMessage: 'voie.photo.format',
-                maxPixels: PhotoOptimiseur::PIXELS_MAX,
-                maxPixelsMessage: 'voie.photo.trop_grande'),
-            ...($optionsNouvelle['constraints'] ?? []),
-        ];
+        $contraintes = [self::contrainteImage(), ...($optionsNouvelle['constraints'] ?? [])];
         $builder
             ->add('photo', EntityType::class, [
                 'class' => Photo::class,
@@ -128,6 +122,15 @@ class VoieType extends AbstractType
                 'attr' => ['accept' => 'image/jpeg,image/png,image/webp'],
                 'constraints' => $contraintes,
             ] + $optionsNouvelle);
+    }
+
+    /** Formats et taille acceptés pour une photo envoyée (voie ou secteur, voir PhotosSecteurType). */
+    public static function contrainteImage(): Image
+    {
+        return new Image(maxSize: '15M', mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+            mimeTypesMessage: 'voie.photo.format',
+            maxPixels: PhotoOptimiseur::PIXELS_MAX,
+            maxPixelsMessage: 'voie.photo.trop_grande');
     }
 
     /** Sans nouvelle photo, il faut en avoir choisi une existante. */
