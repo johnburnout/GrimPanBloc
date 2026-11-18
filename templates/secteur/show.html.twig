@@ -18,6 +18,17 @@
 
     {% if secteur.description %}<p>{{ secteur.description|nl2br }}</p>{% endif %}
 
+    {% if formPhotos %}
+        <details class="ajout-photos">
+            <summary>{{ 'secteurs.photos.ajouter'|trans }}</summary>
+            <p class="aide">{{ 'secteurs.photos.aide'|trans({nombre: secteur.photos|length, max: constant('App\\Form\\PhotosSecteurType::MAX')}) }}</p>
+            {{ form_start(formPhotos, {attr: {novalidate: 'novalidate'}}) }}
+                {{ form_row(formPhotos.photos) }}
+                <button class="btn">{{ 'secteurs.photos.envoyer'|trans }}</button>
+            {{ form_end(formPhotos) }}
+        </details>
+    {% endif %}
+
     {{ include('voie/_explorateur.html.twig') }}
 {% endblock %}
 

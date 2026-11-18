@@ -152,6 +152,10 @@ secteurs.creer: Создать
 secteurs.connectez_vous: 'Войдите, чтобы создать трассу'
 secteurs.nettoyer_ellipse: 'Очистить сектор…'
 secteurs.supprimer_ellipse: 'Удалить сектор…'
+secteurs.photos.ajouter: 'Добавить фото в сектор'
+secteurs.photos.aide: 'В этом секторе {nombre, plural, =0 {нет фото} one {# фото} few {# фото} many {# фото} other {# фото}}. Загруженные здесь фото предлагаются при создании трасс сектора (до {max} за раз; JPEG, PNG или WebP).'
+secteurs.photos.fichiers: 'Фото'
+secteurs.photos.envoyer: 'Загрузить'
 connexion.titre: Вход
 connexion.identifiants_incorrects: 'Неверный адрес эл. почты или пароль.'
 connexion.rester_connecte: 'Не выходить из системы'
@@ -386,6 +390,7 @@ flash.secteur.supprime: 'Сектор «{nom}» удалён вместе с {vo
 flash.secteur.echec_nettoyage: 'Очистка не удалась, ничего не удалено: {erreur}'
 flash.secteur.echec_suppression: 'Удаление не удалось: {erreur}'
 flash.secteur.sauvegarde_avant: 'Копия сделана непосредственно перед этим ({date}): в случае ошибки восстановите сектор в разделе Администрирование → Резервные копии.'
+flash.secteur.photos_ajoutees: 'В сектор «{nom}» {nombre, plural, one {добавлено # фото} few {добавлено # фото} many {добавлено # фото} other {добавлено # фото}}.'
 flash.profil.enregistre: 'Профиль сохранён.'
 flash.bienvenue: 'Добро пожаловать, {pseudo}!'
 flash.photo.supprimee: 'Фото сектора «{secteur}» удалено.'
